@@ -16,30 +16,50 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 app.post("/api/chat", async (req, res) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(503).json({ error: "AI is not configured. Add OPENAI_API_KEY on the server." });
+      return res.status(503).json({ error: "AI is not configured." });
     }
+
     const { message, specialty = "Общая медицина" } = req.body || {};
+
     if (typeof message !== "string" || !message.trim() || message.length > 12000) {
       return res.status(400).json({ error: "Введите вопрос (до 12 000 символов)." });
     }
 
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const model = process.env.OPENAI_MODEL || "gpt-5.5";
-    const response = await client.responses.create({
-      model,
-      instructions:
-        "Ты — медицинский справочный AI-помощник MedPilot AI. Отвечай на русском языке, структурированно и осторожно. " +
-        "Учитывай выбранную специальность: " + String(specialty).slice(0, 100) + ". " +
-        "Не выдавай предположения за факты. При клинических вопросах указывай, что ответ требует проверки врачом, " +
-        "учёта состояния пациента, локальных протоколов и актуальных рекомендаций. " +
-        "При неотложных состояниях сначала обозначай необходимость немедленной очной помощи. " +
-        "Не запрашивай идентифицирующие данные пациентов.",
-      input: message.trim()
+    const client = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      baseURL: "https://openrouter.ai/api/v1"
     });
-    res.json({ answer: response.output_text || "Не удалось получить текстовый ответ." });
+
+    const model = process.env.OPENAI_MODEL || "openrouter/free";
+
+    const response = await client.chat.completions.create({
+      model,
+      messages: [
+        {
+          role: "system",
+          content:
+            "Ты — медицинский справочный AI-помощник MedPilot AI. Отвечай на русском языке, структурированно и осторожно. " +
+            "Учитывай специальность: " + String(specialty).slice(0, 100) + ". " +
+            "Не выдавай предположения за факты. Учитывай актуальные рекомендации, клинические протоколы и состояние пациента. " +
+            "При неотложных состояниях указывай необходимость немедленной медицинской помощи. " +
+            "Не запрашивай идентифицирующие данные пациентов."
+        },
+        {
+          role: "user",
+          content: message.trim()
+        }
+      ]
+    });
+
+    res.json({
+      answer: response.choices?.[0]?.message?.content || "Нет ответа от модели."
+    });
+
   } catch (err) {
     console.error("Chat request failed:", err.message);
-    res.status(500).json({ error: "Не удалось обработать запрос. Проверьте настройки сервера и повторите попытку." });
+    res.status(500).json({
+      error: "Не удалось обработать запрос. Проверьте настройки сервера."
+    });
   }
 });
 
