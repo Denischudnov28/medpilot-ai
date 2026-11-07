@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#102b50">
+<title>MedPilot AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fb;color:#17243a;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif}
+header{background:#102b50;color:white;padding:25px 20px 22px;border-radius:0 0 24px 24px}
+.logo{font-size:25px;font-weight:800}
+.sub{font-size:13px;color:#c8d6e8;margin-top:6px}
+main{padding:18px;max-width:650px;margin:auto}
+.card{background:white;border-radius:17px;padding:18px;margin-bottom:16px;box-shadow:0 3px 15px #18365b0c}
+h2{font-size:18px;margin:0 0 14px}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+select,textarea{width:100%;border:1px solid #d9e1ed;border-radius:12px;padding:13px;font-size:16px;background:white;color:#17243a}
+textarea{height:115px;resize:vertical}
+button{border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer}
+.send{background:#1765c1;color:white;width:100%;margin-top:12px}
+.send:disabled{opacity:.6}
+#answer{white-space:pre-wrap;line-height:1.6;font-size:15px}
+#answer:empty:before{content:"Ответ медицинского помощника появится здесь.";color:#8995a5}
+.status{font-size:12px;color:#64748b;margin-top:10px}
+.warning{font-size:12px;color:#8a5a18;line-height:1.5}
+footer{text-align:center;color:#8290a3;font-size:12px;padding:15px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">✚ MedPilot AI</div>
+<div class="sub">Интеллектуальный медицинский помощник</div>
+</header>
+<main>
+<section class="card">
+<h2>🩺 Выберите специальность</h2>
+<label for="specialty">Медицинское направление</label>
+<select id="specialty">
+<option>Общая медицина</option>
+<option>Анестезиология и реаниматология</option>
+<option>Кардиология</option>
+<option>Терапия</option>
+<option>Хирургия</option>
+<option>Неврология</option>
+<option>Нейрохирургия</option>
+<option>Педиатрия</option>
+<option>Акушерство и гинекология</option>
+<option>Онкология</option>
+<option>Травматология и ортопедия</option>
+<option>Инфекционные болезни</option>
+<option>Эндокринология</option>
+<option>Гастроэнтерология</option>
+<option>Нефрология</option>
+<option>Пульмонология</option>
+<option>Урология</option>
+<option>Дерматология</option>
+<option>Офтальмология</option>
+<option>Оториноларингология</option>
+<option>Радиология и лучевая диагностика</option>
+<option>Ультразвуковая диагностика</option>
+<option>Лабораторная диагностика</option>
+<option>Психиатрия</option>
+<option>Ревматология</option>
+<option>Гематология</option>
+<option>Стоматология</option>
+<option>Скорая медицинская помощь</option>
+<option>Другая специальность</option>
+</select>
+</section>
+<section class="card">
+<h2>🤖 Медицинский AI-помощник</h2>
+<label for="question">Ваш клинический вопрос</label>
+<textarea id="question" placeholder="Опишите клиническую задачу, симптомы, результаты анализов или задайте медицинский вопрос..."></textarea>
+<button class="send" id="send" onclick="askAI()">Отправить вопрос</button>
+<div class="status" id="status">Готов к работе</div>
+</section>
+<section class="card">
+<h2>📋 Ответ MedPilot AI</h2>
+<div id="answer"></div>
+</section>
+<section class="card">
+<div class="warning">
+⚠️ MedPilot AI — справочный инструмент для медицинских специалистов. Ответы необходимо проверять по актуальным клиническим рекомендациям и локальным протоколам. Не используйте сервис вместо клинического решения врача. Не вводите персональные данные пациентов.
+</div>
+</section>
+</main>
+<footer>MedPilot AI · Medical Intelligence</footer>
+<script>
+async function askAI(){
+ const question=document.getElementById("question").value.trim();
+ const specialty=document.getElementById("specialty").value;
+ const button=document.getElementById("send");
+ const status=document.getElementById("status");
+ const answer=document.getElementById("answer");
+
+ if(!question){
+  status.textContent="Введите клинический вопрос.";
+  return;
+ }
+
+ button.disabled=true;
+ button.textContent="Обработка...";
+ status.textContent="AI анализирует запрос...";
+ answer.textContent="";
+
+ try{
+  const response=await fetch("/api/chat",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({message:question,specialty:specialty})
+  });
+
+  const data=await response.json();
+
+  if(!response.ok) throw new Error(data.error||"Ошибка сервера");
+
+  answer.textContent=data.answer||"Нет ответа.";
+  status.textContent="Ответ получен.";
+ }catch(error){
+  answer.textContent="Не удалось получить ответ.";
+  status.textContent=error.message;
+ }finally{
+  button.disabled=false;
+  button.textContent="Отправить вопрос";
+ }
+}
+</script>
+</body>
+</html>
+:::
