@@ -153,6 +153,52 @@ button {
   }
 }
 
+/* BOTTOM NAVIGATION */
+body {
+  padding-bottom: 95px;
+}
+
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid #dce5ef;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+}
+
+.mobile-nav-inner {
+  max-width: 650px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+
+.mobile-nav a {
+  text-decoration: none;
+  color: #52647a;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 8px 2px;
+  border-radius: 12px;
+}
+
+.mobile-nav a:active {
+  background: #eaf3fa;
+  color: #145b87;
+}
+
+.mobile-nav .nav-icon {
+  display: block;
+  font-size: 21px;
+  margin-bottom: 4px;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
@@ -256,5 +302,22 @@ async function askAI(){
  }
 }
 </script>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+      <span class="nav-icon">🏠</span>
+      Главная
+    </a>
+    <a href="#" onclick="document.querySelector('textarea').scrollIntoView({behavior:'smooth'});return false;">
+      <span class="nav-icon">✍️</span>
+      Вопрос
+    </a>
+    <a href="#answer">
+      <span class="nav-icon">📋</span>
+      Ответ
+    </a>
+  </div>
+</nav>
 </body>
 </html>
