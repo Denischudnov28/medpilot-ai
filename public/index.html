@@ -26,6 +26,8 @@ button{border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:
 .warning{font-size:12px;color:#8a5a18;line-height:1.5}
 footer{text-align:center;color:#8290a3;font-size:12px;padding:15px}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 </head>
 <body>
 <header>
@@ -115,7 +117,7 @@ async function askAI(){
 
   if(!response.ok) throw new Error(data.error||"Ошибка сервера");
 
-  answer.textContent=data.answer||"Нет ответа.";
+  answer.innerHTML=DOMPurify.sanitize(marked.parse(data.answer||"Нет ответа."));
   status.textContent="Ответ получен.";
  }catch(error){
   answer.textContent="Не удалось получить ответ.";
