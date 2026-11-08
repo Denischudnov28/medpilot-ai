@@ -1492,21 +1492,13 @@ async function askAI(){
   <h2>📚 База медицинских знаний</h2>
   <p class="status">Российские и международные клинические рекомендации, официальные медицинские руководства и проверенные профессиональные источники.</p>
   <div class="ru-guideline-search" id="ru-guidelines">
-    <h3>🇷🇺 Поиск российских клинических рекомендаций</h3>
-    <p class="status">Поиск по названию заболевания, аббревиатуре или коду МКБ-10. Результаты ищутся среди страниц официального рубрикатора Минздрава России.</p>
-    <label for="ru-guideline-query">Заболевание или клиническая тема</label>
-    <input id="ru-guideline-query" class="knowledge-search" type="search" placeholder="Например: сепсис, ОПП, ХОБЛ, I21" autocomplete="off">
-    <div class="ru-guideline-quick">
-      <button type="button" data-ru-query="сепсис">Сепсис</button>
-      <button type="button" data-ru-query="острое повреждение почек">ОПП</button>
-      <button type="button" data-ru-query="острый инфаркт миокарда">Инфаркт миокарда</button>
-      <button type="button" data-ru-query="внебольничная пневмония">Пневмония</button>
-      <button type="button" data-ru-query="бронхиальная астма">Бронхиальная астма</button>
-      <button type="button" data-ru-query="инсульт">Инсульт</button>
-    </div>
-    <button type="button" class="send" id="ru-guideline-search-button">Найти российские рекомендации</button>
+    <h3>🇷🇺 Клинические рекомендации Минздрава РФ</h3>
+    <p class="status">Введите название заболевания или клинической рекомендации. Поиск выполняется по официальному рубрикатору Минздрава России.</p>
+    <label for="ru-guideline-query">Название клинической рекомендации</label>
+    <input id="ru-guideline-query" class="knowledge-search" type="search" placeholder="Введите название рекомендации" autocomplete="off">
+    <button type="button" class="send" id="ru-guideline-search-button">Найти</button>
+    <p class="knowledge-meta" id="ru-guideline-search-status" role="status" aria-live="polite">Результаты откроются по запросу на официальном домене Минздрава. Проверяйте дату утверждения и актуальную редакцию документа.</p>
     <a class="knowledge-link knowledge-open-source" href="https://cr.minzdrav.gov.ru/clin_recomend" target="_blank" rel="noopener noreferrer">Открыть официальный рубрикатор Минздрава ↗</a>
-    <p class="knowledge-meta" id="ru-guideline-search-status" role="status" aria-live="polite">Поиск выполняется по индексированным страницам официального домена cr.minzdrav.gov.ru. Сверяйте найденную версию и статус документа на сайте Минздрава.</p>
   </div>
   <div id="international-guidelines">
   <h3>🌐 Международные клинические рекомендации</h3>
@@ -1626,9 +1618,9 @@ async function askAI(){
   function searchRussianGuidelines(){
     const query=ruQuery?ruQuery.value.trim():"";
     if(!query){if(ruStatus)ruStatus.textContent="Введите заболевание, тему или код МКБ-10.";if(ruQuery)ruQuery.focus();return;}
-    const searchText='site:cr.minzdrav.gov.ru/recomend '+query;
+    const searchText='site:cr.minzdrav.gov.ru/ '+query+' клинические рекомендации';
     const url='https://yandex.ru/search/?text='+encodeURIComponent(searchText);
-    if(ruStatus)ruStatus.textContent='Открываю результаты поиска по официальному домену Минздрава для запроса: '+query+'. Проверьте актуальность документа в рубрикаторе.';
+    if(ruStatus)ruStatus.textContent='Открываю результаты поиска по названию «'+query+'» на официальном домене Минздрава. Проверьте дату и статус найденной рекомендации.';
     window.open(url,"_blank","noopener,noreferrer");
   }
   if(ruButton)ruButton.addEventListener("click",searchRussianGuidelines);
