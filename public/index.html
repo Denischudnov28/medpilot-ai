@@ -346,6 +346,12 @@ body.mp-menu-active{overflow:hidden}
 @media(min-width:760px){.mp-menu-trigger{top:24px;right:max(22px,calc((100vw - 760px)/2))}}
 @media(prefers-reduced-motion:reduce){.mp-side-menu,.mp-menu-backdrop{transition:none}}
 </style>
+<style id="medpilot-back-button-style">
+.mp-back-button{position:absolute;left:16px;top:22px;z-index:3;display:none;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid rgba(255,255,255,.28);border-radius:13px;background:rgba(255,255,255,.14);color:#fff;font-size:27px;line-height:1;backdrop-filter:blur(8px)}
+body.mp-page-mode.mp-subpage .mp-back-button{display:flex}
+body.mp-page-mode.mp-subpage header .logo,body.mp-page-mode.mp-subpage header .sub{margin-left:48px}
+@media(min-width:760px){.mp-back-button{left:max(18px,calc((100vw - 760px)/2))}}
+</style>
 <style id="medpilot-page-navigation">
 .mp-home-page{display:none;text-align:center;margin-top:12px;padding:30px 22px}
 .mp-home-page.mp-page-active{display:block}
@@ -387,6 +393,7 @@ body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-
 </head>
 <body>
 <header>
+<button type="button" class="mp-back-button" id="mp-back-button" aria-label="Назад" title="Назад">‹</button>
 <div class="logo">✚ MedPilot AI</div>
 <div class="sub">Интеллектуальный помощник для медицинских специалистов</div>
 <button type="button" class="mp-menu-trigger" id="mp-menu-trigger" aria-controls="medpilot-side-menu" aria-expanded="false"><span class="mp-burger">☰</span><span>Меню</span></button>
@@ -970,14 +977,20 @@ async function askAI(){
 (function(){
  const directSections=[...document.querySelectorAll('body > main > section, body > section')];
  const home=document.getElementById('mp-home-page');
+ const back=document.getElementById('mp-back-button');
  if(!home)return;
+ const pageHistory=[];
  directSections.forEach((section,index)=>{
    if(section===home)return;
    const id=section.id;
    section.dataset.page = id || (index<=4 ? 'ai' : 'other');
  });
- function activate(page){
+ function activate(page,remember=true){
+   const current=directSections.find(section=>section.classList.contains('mp-page-active'));
+   const currentPage=current?(current.dataset.page||'home'):'home';
+   if(remember&&currentPage!==page)pageHistory.push(currentPage);
    document.body.classList.add('mp-page-mode');
+   document.body.classList.toggle('mp-subpage',page!=='home');
    directSections.forEach(section=>{
      const active=section.dataset.page===page;
      section.classList.toggle('mp-page-active',active);
@@ -985,6 +998,11 @@ async function askAI(){
    });
    window.scrollTo({top:0,behavior:'instant'});
  }
+ function goBack(){
+   const previous=pageHistory.pop()||'home';
+   activate(previous,false);
+ }
+ if(back)back.addEventListener('click',goBack);
  function pageFromLink(link){
    if(link.hasAttribute('data-mp-home'))return 'home';
    const target=(link.getAttribute('href')||'').replace(/^#/,'');
@@ -1001,7 +1019,7 @@ async function askAI(){
  });
  const start=document.getElementById('mp-home-start');
  if(start)start.addEventListener('click',()=>activate('ai'));
- activate('home');
+ activate('home',false);
 })();
 </script>
 
