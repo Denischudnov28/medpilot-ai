@@ -1259,8 +1259,10 @@ async function askAI(){
    window.scrollTo({top:0,behavior:'instant'});
  }
  function goBack(){
-   const previous=pageHistory.pop()||'home';
-   activate(previous,false);
+   pageHistory.length=0;
+   activate('home',false);
+   const menuTrigger=document.getElementById('mp-menu-trigger');
+   if(menuTrigger)menuTrigger.click();
  }
  if(back)back.addEventListener('click',goBack);
  function pageFromLink(link){
