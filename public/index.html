@@ -174,7 +174,7 @@ body {
   max-width: 650px;
   margin: auto;
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(4,minmax(0,1fr));
   gap: 8px;
 }
 
@@ -554,19 +554,23 @@ if (vasoValue === "" || vasoValue === null) {
    "Расчёт завершён. Проверьте клиническую интерпретацию.";
 }
 </script>
-<nav class="mobile-nav">
+<nav class="mobile-nav" aria-label="Основная навигация">
   <div class="mobile-nav-inner">
     <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
       <span class="nav-icon">🏠</span>
       Главная
     </a>
-    <a href="#" onclick="document.querySelector('textarea').scrollIntoView({behavior:'smooth'});return false;">
+    <a href="#" onclick="document.getElementById('question').scrollIntoView({behavior:'smooth'});return false;">
       <span class="nav-icon">✍️</span>
-      Вопрос
+      AI-помощник
     </a>
-    <a href="#answer">
-      <span class="nav-icon">📋</span>
-      Ответ
+    <a href="#clinical-tools">
+      <span class="nav-icon">🩺</span>
+      Калькуляторы
+    </a>
+    <a href="#sofa-calculator">
+      <span class="nav-icon">📊</span>
+      SOFA
     </a>
   </div>
 </nav>
