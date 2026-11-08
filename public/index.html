@@ -1640,10 +1640,10 @@ async function askAI(){
     {name:"Преэклампсия и эклампсия",year:"",id:"",terms:"акушерство преэклампсия эклампсия судороги магния сульфат",summary:"Контроль тяжёлой гипертензии, профилактика судорог, магния сульфат и выбор срока родоразрешения."},
     {name:"Острое повреждение почек",year:"",id:"",terms:"опп почечная недостаточность острое повреждение почек диализ",summary:"Диагностика и стадирование ОПП, коррекция причин, водно-электролитных нарушений и показания к заместительной почечной терапии."}
   ];
-  function ruNormalize(value){return String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").replace(/[^\\p{L}\\p{N}]+/gu," ").trim();}
+  function ruNormalize(value){return String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").replace(/[^\p{L}\p{N}]+/gu," ").trim();}
   function searchRussianGuidelines(){
     const query=ruQuery?ruQuery.value.trim():"";
-    const terms=ruNormalize(query).split(/\\s+/).filter(Boolean);
+    const terms=ruNormalize(query).split(/\s+/).filter(Boolean);
     const ranked=ruGuidelines.map((item,index)=>{
       const hay=ruNormalize(item.name+" "+item.terms+" "+item.summary);
       const score=terms.length?terms.reduce((sum,term)=>sum+(hay.includes(term)?3:0),0):0;
@@ -2302,16 +2302,16 @@ body.mp-knowledge-tab-scientific-publications #knowledge-base > :not(#scientific
   document.querySelectorAll("main > section[id],body > section[id]").forEach(section=>{
    const sectionId=section.id;
    const sectionTitle=section.querySelector("h1,h2")?.textContent.trim()||sectionId;
-   push({title:sectionTitle,description:section.textContent.trim().replace(/\\s+/g," ").slice(0,260),sectionId,target:section,group:"Разделы сайта"});
+   push({title:sectionTitle,description:section.textContent.trim().replace(/\s+/g," ").slice(0,260),sectionId,target:section,group:"Разделы сайта"});
    section.querySelectorAll(".knowledge-item,.drug-item,.protocol-card,.calculator-link,article,[data-search-item],.knowledge-source,.source-card").forEach(card=>{
     const heading=card.querySelector("h2,h3,h4,h5,strong")||card;
-    const title=heading.textContent.trim().replace(/\\s+/g," ").slice(0,150);
+    const title=heading.textContent.trim().replace(/\s+/g," ").slice(0,150);
     if(!title||title===sectionTitle)return;
-    const description=(card.getAttribute("data-search")||card.textContent||"").trim().replace(/\\s+/g," ").slice(0,650);
+    const description=(card.getAttribute("data-search")||card.textContent||"").trim().replace(/\s+/g," ").slice(0,650);
     push({title,description,sectionId,target:card,group:sectionId==="drug-reference"?"Лекарственные препараты":sectionId==="knowledge-base"?"Медицинские источники":sectionId==="clinical-protocols"?"Клинические протоколы":"Материалы сайта"});
    });
    section.querySelectorAll("a[href]").forEach(link=>{
-    const title=link.textContent.trim().replace(/\\s+/g," ").slice(0,150);
+    const title=link.textContent.trim().replace(/\s+/g," ").slice(0,150);
     const href=link.getAttribute("href")||"";
     if(!title||title.length<3||href.startsWith("#")||link.closest(".mp-side-menu"))return;
     push({title,description:(link.getAttribute("title")||link.href||sectionTitle).slice(0,400),sectionId,target:link,group:sectionId==="knowledge-base"?"Медицинские источники":sectionId==="clinical-protocols"?"Клинические протоколы":"Материалы сайта"});
