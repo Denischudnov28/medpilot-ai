@@ -32,8 +32,10 @@ body.specialty-selected .specialty-tool-list{display:block}
 .specialty-tool-item small{display:block;margin-top:3px;color:#718397;font-size:11px;line-height:1.35}
 .specialty-tool-item b{flex:none;color:#168078;font-size:12px}
 .specialty-tool-back{display:none;width:100%;min-height:44px;margin:0 0 12px;padding:10px;border:0;border-radius:11px;background:#eaf3f8;color:#145b87;font:inherit;font-weight:750;text-align:left}
-body.tool-open .specialty-tool-list{display:none}
+body.tool-open .specialty-tool-list{display:block}
+body.tool-open #specialty-tool-list-content{display:none}
 body.tool-open .specialty-tool-back{display:block}
+body.tool-open .specialty-back{display:none}
 body.specialty-selected:not(.tool-open) .tool,body.specialty-selected:not(.tool-open) .category{display:none!important}
 body.tool-open .tool:not(.tool-active),body.tool-open .category:not(.category-active){display:none!important}
 body.tool-open .tool.tool-active{display:block!important}
