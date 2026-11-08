@@ -1284,15 +1284,28 @@ function filterProtocols(){
 }
 findButton.addEventListener("click",filterProtocols);
 search.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();filterProtocols();}});
-list.querySelectorAll(".protocol-toggle").forEach(button=>button.addEventListener("click",function(){
-  const panel=document.getElementById(button.getAttribute("aria-controls"));
+list.addEventListener("click",event=>{
+  const button=event.target.closest(".protocol-toggle");
+  if(!button||!list.contains(button))return;
+  event.preventDefault();
+  event.stopPropagation();
+  const panelId=button.getAttribute("aria-controls");
+  const panel=panelId?document.getElementById(panelId):null;
   if(!panel)return;
-  const opening=panel.hidden;
-  panel.hidden=!opening;
-  panel.style.setProperty("display",opening?"block":"none","important");
+  const opening=panel.hidden||panel.getAttribute("aria-hidden")==="true";
+  if(opening){
+    panel.hidden=false;
+    panel.removeAttribute("aria-hidden");
+    panel.style.setProperty("display","block","important");
+  }else{
+    panel.hidden=true;
+    panel.setAttribute("aria-hidden","true");
+    panel.style.setProperty("display","none","important");
+  }
   button.setAttribute("aria-expanded",String(opening));
-  button.textContent=opening?"Свернуть алгоритм":"Открыть алгоритм";
-}));
+  button.textContent=opening?(panelId.startsWith("specialty-")?"Свернуть список":"Свернуть алгоритм"):(panelId.startsWith("specialty-")?"Открыть список":"Открыть алгоритм");
+},true);
+filterProtocols();
 })();
 </script>
 
