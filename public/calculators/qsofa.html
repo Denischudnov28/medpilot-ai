@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b87"><title>Калькулятор qSOFA — MedPilot AI</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:20px 14px 40px}.wrap{max-width:720px;margin:0 auto}.top{display:flex;align-items:center;gap:12px;margin:0 0 18px}.back{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:13px;background:#fff;color:#145b87;text-decoration:none;font-size:22px;box-shadow:0 3px 12px #173b5b12}.brand{font-size:12px;letter-spacing:.12em;color:#66829a;font-weight:800}.page-title{font-size:25px;line-height:1.2;margin:2px 0 0;color:#153e63}.card{background:#fff;border:1px solid #e0e9f1;border-radius:20px;padding:22px;box-shadow:0 8px 28px #173b5b0c}h2{font-size:22px;margin:0 0 12px;color:#153e63}h3{font-size:17px;margin:20px 0 12px}p{line-height:1.55;color:#536a7e}label{display:block;margin:14px 0 7px;font-size:14px;font-weight:650;color:#29445f}input,select{width:100%;min-height:48px;padding:12px 13px;border:1px solid #d7e2ed;border-radius:12px;background:#fbfdff;color:#17243a;font:inherit;font-size:16px;margin-bottom:8px}button.send{width:100%;min-height:50px;margin-top:16px;padding:12px 16px;border:0;border-radius:13px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font:inherit;font-weight:750}.warning{padding:13px 15px;border-radius:12px;background:#fff8eb;color:#785b2d;font-size:13px}.status{font-size:13px;color:#70869a}@media(max-width:480px){body{padding:14px 10px 30px}.card{padding:17px}.page-title{font-size:22px}}
+</style></head><body><main class="wrap"><header class="top"><a class="back" href="../index.html#clinical-tools" aria-label="Назад к калькуляторам">‹</a><div><div class="brand">MEDPILOT AI · КАЛЬКУЛЯТОРЫ</div><h1 class="page-title">🧭 Калькулятор qSOFA</h1></div></header><section class="card" id="qsofa-calculator">
+  <h2>🧭 Калькулятор qSOFA</h2>
+  <p>Быстрая оценка риска неблагоприятного исхода у пациентов с подозрением на инфекцию.</p>
+
+  <label for="qsofa-rr">Частота дыхания (в минуту)</label>
+  <input class="sofa-input" id="qsofa-rr" type="number" min="0" step="1" inputmode="numeric" placeholder="Например, 24">
+
+  <label for="qsofa-sbp">Систолическое артериальное давление (мм рт. ст.)</label>
+  <input class="sofa-input" id="qsofa-sbp" type="number" min="0" step="1" inputmode="numeric" placeholder="Например, 95">
+
+  <label for="qsofa-gcs">Шкала комы Глазго (GCS)</label>
+  <input class="sofa-input" id="qsofa-gcs" type="number" min="3" max="15" step="1" inputmode="numeric" placeholder="От 3 до 15">
+
+  <button class="send" type="button" onclick="calculateQSOFA()">Рассчитать qSOFA</button>
+  <div id="qsofa-result" role="status" aria-live="polite" style="margin-top:18px;font-weight:700;line-height:1.7"></div>
+  <p class="warning">qSOFA не является самостоятельным диагностическим критерием сепсиса и не должен использоваться как единственный инструмент скрининга. Низкий балл не исключает сепсис. Интерпретируйте результат вместе с клинической картиной и локальными протоколами.</p>
+</section>
+
+<script>
+function calculateQSOFA() {
+  const rrRaw = document.getElementById("qsofa-rr").value.trim();
+  const sbpRaw = document.getElementById("qsofa-sbp").value.trim();
+  const gcsRaw = document.getElementById("qsofa-gcs").value.trim();
+  const result = document.getElementById("qsofa-result");
+
+  if (rrRaw === "" || sbpRaw === "" || gcsRaw === "") {
+    result.textContent = "Заполните все три обязательных показателя.";
+    return;
+  }
+
+  const rr = Number(rrRaw);
+  const sbp = Number(sbpRaw);
+  const gcs = Number(gcsRaw);
+
+  if (!Number.isFinite(rr) || !Number.isFinite(sbp) ||
+      !Number.isFinite(gcs) || rr < 0 || sbp < 0 ||
+      !Number.isInteger(rr) || !Number.isInteger(sbp) ||
+      !Number.isInteger(gcs) || gcs < 3 || gcs > 15) {
+    result.textContent = "Проверьте введённые значения: ЧДД и САД должны быть неотрицательными целыми числами, GCS — целым числом от 3 до 15.";
+    return;
+  }
+
+  const rrScore = rr >= 22 ? 1 : 0;
+  const sbpScore = sbp <= 100 ? 1 : 0;
+  const gcsScore = gcs < 15 ? 1 : 0;
+  const total = rrScore + sbpScore + gcsScore;
+
+  result.innerHTML =
+    "qSOFA: " + total + " / 3<br><br>" +
+    "ЧДД ≥22/мин: " + rrScore + " балл<br>" +
+    "САД ≤100 мм рт. ст.: " + sbpScore + " балл<br>" +
+    "Изменение сознания (GCS <15): " + gcsScore + " балл<br><br>" +
+    (total >= 2
+      ? "Набрано ≥2 баллов: повышенный риск неблагоприятного исхода; требуется своевременная клиническая оценка."
+      : "Менее 2 баллов: это не исключает сепсис или ухудшение состояния.");
+}
+</script></main></body></html>
