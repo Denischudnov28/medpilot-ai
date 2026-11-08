@@ -218,6 +218,13 @@ body {
 </style>
 <style>
 /* MEDICINES REFERENCE */
+.drug-details{margin:10px 0 2px;border:1px solid #dfe8f1;border-radius:10px;background:#fff;padding:9px 11px}
+.drug-details summary{cursor:pointer;font-size:13px;font-weight:700;color:#145b87}
+.drug-detail-body{padding-top:7px}
+.drug-detail-row{font-size:12px;line-height:1.5;color:#52647a;margin:6px 0}
+.drug-detail-row strong{color:#263d55}
+.drug-actions button{border:0;cursor:pointer}
+
 .drug-search,.drug-filter,.drug-context{width:100%;padding:13px 14px;border:1px solid #d9e1ed;border-radius:12px;font-size:16px;margin:7px 0 12px;background:#fff;color:#17243a}
 .drug-results{display:grid;gap:10px}
 .drug-item{border:1px solid #e0e8f1;border-radius:14px;padding:13px;background:#fbfdff}
@@ -780,13 +787,37 @@ async function askAI(){
       const title=document.createElement("h3");title.textContent=d.inn;
       const groupText=document.createElement("div");groupText.className="drug-tag";groupText.textContent=d.groupName;
       const aliases=document.createElement("p");aliases.textContent="Синонимы и варианты написания: "+d.aliases;
+      const details=document.createElement("details");details.className="drug-details";
+      const summary=document.createElement("summary");summary.textContent="Формы выпуска, концентрации и безопасность";
+      const detailBody=document.createElement("div");detailBody.className="drug-detail-body";
+      const fields=[
+        ["Формы выпуска","Проверить по конкретному торговому наименованию и производителю."],
+        ["Концентрации и дозировки","Зависят от производителя и лекарственной формы; сверить упаковку и официальную инструкцию."],
+        ["Пути введения","Проверить для зарегистрированной формы; не переносить путь введения с одной формы на другую."],
+        ["Противопоказания и ограничения","Проверить возрастные ограничения, беременность/лактацию и гиперчувствительность в актуальной инструкции."],
+        ["Почечная/печёночная коррекция","Проверить для конкретного показания и пациента; при отсутствии данных не экстраполировать."],
+        ["Источник проверки","Официальная инструкция/характеристика препарата в реестре страны применения."]
+      ];
+      fields.forEach(([label,value])=>{
+        const row=document.createElement("p");row.className="drug-detail-row";
+        const strong=document.createElement("strong");strong.textContent=label+": ";
+        row.append(strong,document.createTextNode(value));detailBody.appendChild(row);
+      });
+      details.append(summary,detailBody);
       const actions=document.createElement("div");actions.className="drug-actions";
       const copy=document.createElement("button");copy.type="button";copy.textContent="Копировать название";
       copy.addEventListener("click",()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(d.inn).then(()=>{copy.textContent="Скопировано";}).catch(()=>{copy.textContent="Не удалось скопировать";});}});
-      const grls=document.createElement("a");grls.href="https://grls.rosminzdrav.ru/";grls.target="_blank";grls.rel="noopener noreferrer";grls.textContent="ГРЛС России — официальный реестр";
+      const prepare=document.createElement("button");prepare.type="button";prepare.textContent="Подготовить клиническую справку";
+      prepare.addEventListener("click",()=>{
+        search.value=d.inn;render();
+        const indication=document.getElementById("drug-indication");
+        indication.focus();indication.scrollIntoView({behavior:"smooth",block:"center"});
+        document.getElementById("drug-status").textContent="Препарат выбран: "+d.inn+". Укажите показание и особенности пациента, затем подготовьте запрос.";
+      });
+      const grls=document.createElement("a");grls.href="https://grls.rosminzdrav.ru/";grls.target="_blank";grls.rel="noopener noreferrer";grls.textContent="ГРЛС России";
       const ema=document.createElement("a");ema.href="https://www.ema.europa.eu/en/medicines";ema.target="_blank";ema.rel="noopener noreferrer";ema.textContent="EMA";
       const de=document.createElement("a");de.href="https://www.bfarm.de/DE/Arzneimittel/Arzneimittelinformationen/Arzneimittel-recherchieren/AMIce/_node.html";de.target="_blank";de.rel="noopener noreferrer";de.textContent="BfArM / AMIce";
-      actions.append(copy,grls,ema,de);card.append(title,groupText,aliases,actions);results.appendChild(card);
+      actions.append(copy,prepare,grls,ema,de);card.append(title,groupText,aliases,details,actions);results.appendChild(card);
     });
   }
   search.addEventListener("input",render);
