@@ -2040,7 +2040,8 @@ async function askAI(){
     }
     const q=submittedQuery.toLocaleLowerCase("ru");
     const group=filter.value;
-    const queryTerms=q.split(/\s+/).filter(Boolean);\n    const found=drugs.filter(d=>{const hay=(d.inn+" "+d.aliases).toLocaleLowerCase("ru").replace(/ё/g,"е");return (group==="all"||d.group===group)&&queryTerms.every(term=>hay.includes(term));});
+    const queryTerms=q.split(/\s+/).filter(Boolean);
+    const found=drugs.filter(d=>{const hay=(d.inn+" "+d.aliases).toLocaleLowerCase("ru").replace(/ё/g,"е");return (group==="all"||d.group===group)&&queryTerms.every(term=>hay.includes(term));});
     results.replaceChildren();
     if(!found.length){
       const empty=document.createElement("div");empty.className="knowledge-empty";
