@@ -499,7 +499,12 @@ if (vasoValue === "" || vasoValue === null) {
    return;
  }
 
- const support = Number(document.getElementById("sofa-resp").value);
+ const supportValue = document.getElementById("sofa-resp").value;
+ if (supportValue === "") {
+   result.textContent = "⚠️ Укажите, проводится ли респираторная поддержка (Да/Нет).";
+   return;
+ }
+ const support = supportValue === "1";
  const vaso = Number(document.getElementById("sofa-vaso").value);
 
  let r = pf >= 400 ? 0 :
