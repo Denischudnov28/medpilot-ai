@@ -792,6 +792,32 @@ async function askAI(){
     <option value="general">Общая медицина</option>
   </select>
   <div id="knowledge-list" class="knowledge-list" aria-live="polite"></div>
+
+  <div class="knowledge-research">
+    <h3>🔬 Поиск научных публикаций</h3>
+    <p class="status">Поиск по PubMed с аннотациями и переходом к первоисточнику. Для Cochrane доступен официальный поиск библиотеки.</p>
+    <label for="publication-query">Клиническая тема или ключевые слова</label>
+    <input id="publication-query" class="knowledge-search" type="search" placeholder="Например: septic shock vasopressors, acute kidney injury">
+    <label for="publication-type">Тип публикации PubMed</label>
+    <select id="publication-type" class="knowledge-filter">
+      <option value="">Все типы публикаций</option>
+      <option value="Systematic Review">Систематические обзоры</option>
+      <option value="Meta-Analysis">Метаанализы</option>
+      <option value="Randomized Controlled Trial">Рандомизированные исследования</option>
+      <option value="Clinical Trial">Клинические исследования</option>
+      <option value="Guideline">Рекомендации и руководства</option>
+      <option value="Review">Обзорные статьи</option>
+    </select>
+    <button type="button" class="send" id="publication-search-button">Искать в PubMed</button>
+    <div id="publication-search-status" class="knowledge-meta" role="status" aria-live="polite">Введите запрос и нажмите «Искать в PubMed».</div>
+    <div id="publication-results" class="knowledge-list" aria-live="polite"></div>
+    <div class="cochrane-search-actions">
+      <a class="knowledge-link" id="cochrane-search-link" href="https://onlinelibrary.wiley.com/cochranelibrary/search" target="_blank" rel="noopener noreferrer">Открыть официальный поиск Cochrane Library ↗</a>
+      <p class="knowledge-meta">Для поиска в Cochrane используйте те же ключевые слова в поле Title Abstract Keyword. Полный текст отдельных обзоров может требовать подписку.</p>
+    </div>
+    <div class="knowledge-note">PubMed предоставляет библиографические записи и доступные аннотации, а не гарантирует полный текст. Публикации и аннотации могут быть защищены авторским правом. Проверяйте дизайн исследования, популяцию, дату, статус отзыва/обновления и применимость к пациенту. Cochrane Library открывается на официальном сайте издателя; поиск и доступ к полным текстам регулируются Cochrane/Wiley.</div>
+  </div>
+
   <div class="knowledge-note">В каталоге размещены ссылки на внешние официальные ресурсы, а не копии их документов. Перед клиническим применением откройте первоисточник и проверьте дату публикации, версию, срок действия, популяцию пациентов и локальные протоколы. Доступность и язык документов зависят от издателя.</div>
 </section>
 <script>
@@ -848,7 +874,94 @@ async function askAI(){
   search.addEventListener("input",render);
   filter.addEventListener("change",render);
   render();
+
+<style id="medpilot-literature-search-style">
+.knowledge-research{margin-top:20px;padding-top:18px;border-top:1px solid #e5edf4}
+.knowledge-research h3{margin:0 0 8px;color:#174f78;font-size:16px}
+.knowledge-research>p{line-height:1.55}
+#publication-search-button{width:100%;margin:3px 0 10px;min-height:48px}
+.publication-item{border:1px solid #e0e8f1;border-radius:14px;padding:14px;background:#fbfdff}
+.publication-item h4{margin:0 0 7px;color:#145b87;font-size:15px;line-height:1.45}
+.publication-item p{font-size:13px;line-height:1.55;margin:6px 0;color:#52647a;overflow-wrap:anywhere}
+.publication-item .publication-meta{font-size:11px;color:#64748b}
+.publication-item a{display:inline-block;margin-top:6px;color:#1765a5;font-weight:700;text-decoration:none}
+.cochrane-search-actions{padding:12px;border:1px solid #e0e8f1;border-radius:13px;background:#f8fbfe;margin-top:12px}
+</style>
+
+
 })();</script>
+<script id="medpilot-pubmed-search">
+(function(){
+ const queryInput=document.getElementById("publication-query");
+ const typeInput=document.getElementById("publication-type");
+ const button=document.getElementById("publication-search-button");
+ const status=document.getElementById("publication-search-status");
+ const results=document.getElementById("publication-results");
+ const cochrane=document.getElementById("cochrane-search-link");
+ if(!queryInput||!typeInput||!button||!status||!results)return;
+ const esc=value=>String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+ function textOf(node,selector){const el=node.querySelector(selector);return el?el.textContent.trim():"";}
+ button.addEventListener("click",async function(){
+  const query=queryInput.value.trim();
+  if(!query){status.textContent="Введите клиническую тему или ключевые слова.";queryInput.focus();return;}
+  button.disabled=true;button.textContent="Поиск...";
+  status.textContent="Выполняется поиск в PubMed...";
+  results.replaceChildren();
+  if(cochrane)cochrane.dataset.query=query;
+  try{
+   let term=query;
+   if(typeInput.value)term+=" AND "+typeInput.value+'[Publication Type]';
+   const searchParams=new URLSearchParams({db:"pubmed",term,retmode:"json",retmax:"10",sort:"relevance"});
+   const searchResponse=await fetch("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?"+searchParams.toString());
+   if(!searchResponse.ok)throw new Error("PubMed не ответил (HTTP "+searchResponse.status+").");
+   const searchData=await searchResponse.json();
+   const ids=searchData.esearchresult&&searchData.esearchresult.idlist||[];
+   const count=Number(searchData.esearchresult&&searchData.esearchresult.count||0);
+   if(!ids.length){status.textContent="В PubMed ничего не найдено. Попробуйте расширить запрос или изменить тип публикации.";return;}
+   status.textContent="Найдено в PubMed: "+count+". Загружаю первые "+ids.length+" записей...";
+   const fetchParams=new URLSearchParams({db:"pubmed",id:ids.join(","),retmode:"xml"});
+   const fetchResponse=await fetch("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"+fetchParams.toString());
+   if(!fetchResponse.ok)throw new Error("Не удалось загрузить библиографические записи (HTTP "+fetchResponse.status+").");
+   const xmlText=await fetchResponse.text();
+   const xml=new DOMParser().parseFromString(xmlText,"text/xml");
+   if(xml.querySelector("parsererror"))throw new Error("PubMed вернул некорректный формат ответа.");
+   const articles=[...xml.querySelectorAll("PubmedArticle")];
+   articles.forEach(article=>{
+    const pmid=textOf(article,"PMID");
+    const title=textOf(article,"ArticleTitle")||"Без названия";
+    const journal=textOf(article,"Journal Title");
+    const year=textOf(article,"PubDate Year")||textOf(article,"PubDate MedlineDate").slice(0,4)||"Год не указан";
+    const authors=[...article.querySelectorAll("AuthorList Author")].slice(0,4).map(a=>{
+      const collective=textOf(a,"CollectiveName");
+      return collective||[textOf(a,"LastName"),textOf(a,"Initials")].filter(Boolean).join(" ");
+    }).filter(Boolean);
+    const abstract=[...article.querySelectorAll("Abstract AbstractText")].map(a=>{
+      const label=a.getAttribute("Label");
+      return (label?label+": ":"")+a.textContent.trim();
+    }).filter(Boolean).join(" ");
+    const types=[...article.querySelectorAll("PublicationTypeList PublicationType")].map(x=>x.textContent.trim()).filter(Boolean);
+    const doiNode=article.querySelector('ArticleId[IdType="doi"]');
+    const doi=doiNode?doiNode.textContent.trim():"";
+    const card=document.createElement("article");card.className="publication-item";
+    const heading=document.createElement("h4");heading.textContent=title;
+    const meta=document.createElement("p");meta.className="publication-meta";
+    meta.textContent=[authors.join(", "),year,journal,types.join(" · ")].filter(Boolean).join(" | ");
+    const summary=document.createElement("p");summary.textContent=abstract||"Аннотация в записи PubMed отсутствует.";
+    const link=document.createElement("a");link.href="https://pubmed.ncbi.nlm.nih.gov/"+encodeURIComponent(pmid)+"/";link.target="_blank";link.rel="noopener noreferrer";link.textContent="Открыть PubMed · PMID "+pmid+" ↗";
+    card.append(heading,meta,summary,link);
+    if(doi){const doiLink=document.createElement("a");doiLink.href="https://doi.org/"+encodeURIComponent(doi);doiLink.target="_blank";doiLink.rel="noopener noreferrer";doiLink.textContent="Открыть DOI ↗";doiLink.style.marginLeft="14px";card.appendChild(doiLink);}
+    results.appendChild(card);
+   });
+   status.textContent="Показано записей: "+articles.length+" из "+count+" найденных в PubMed. Сортировка: по релевантности.";
+  }catch(error){
+   status.textContent="Ошибка поиска: "+error.message+" Проверьте подключение к интернету или откройте PubMed напрямую.";
+  }finally{
+   button.disabled=false;button.textContent="Искать в PubMed";
+  }
+ });
+ queryInput.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();button.click();}});
+})();
+</script>
 
 <section class="card" id="drug-reference">
   <h2>💊 Справочник лекарственных препаратов</h2>
