@@ -753,33 +753,45 @@ async function askAI(){
   const search=document.getElementById("knowledge-search");
   const filter=document.getElementById("knowledge-filter");
   if(!list||!search||!filter)return;
+  function normalize(value){
+    return String(value||"")
+      .toLocaleLowerCase("ru")
+      .replace(/ё/g,"е")
+      .replace(/[\\u2010-\\u2015]/g,"-")
+      .replace(/[^\\p{L}\\p{N}]+/gu," ")
+      .trim()
+      .replace(/\\s+/g," ");
+  }
   function render(){
-    const q=search.value.trim().toLocaleLowerCase("ru");
-    const tag=filter.value;
-    const matches=sources.filter(item=>{
-      const haystack=[item.name,item.org,item.topic,item.label].join(" ").toLocaleLowerCase("ru");
-      return (!q||haystack.includes(q))&&(tag==="all"||item.tags.includes(tag));
+    const q=normalize(search.value);
+    const group=filter.value;
+    const found=drugs.filter(d=>{
+      const haystack=normalize([d.inn,d.aliases,d.groupName].join(" "));
+      return (group==="all"||d.group===group)&&(!q||haystack.includes(q));
     });
-    list.replaceChildren();
-    if(!matches.length){
-      const empty=document.createElement("div");
-      empty.className="knowledge-empty";
-      empty.textContent="По вашему запросу источники не найдены. Попробуйте изменить поиск или фильтр.";
-      list.appendChild(empty);return;
+    results.innerHTML="";
+    if(!found.length){
+      const empty=document.createElement("div");empty.className="knowledge-empty";
+      empty.textContent="Совпадений не найдено. Проверьте написание, попробуйте МНН на русском или латинице либо выберите «Все группы».";
+      results.appendChild(empty);return;
     }
-    matches.forEach(item=>{
-      const card=document.createElement("article");card.className="knowledge-item";
-      const title=document.createElement("h3");title.textContent=item.name;
-      const org=document.createElement("p");org.textContent=item.org;
-      const desc=document.createElement("p");desc.textContent=item.topic;
-      const meta=document.createElement("div");meta.className="knowledge-meta";meta.textContent=item.label;
-      const link=document.createElement("a");link.className="knowledge-link";
-      link.href=item.url;link.target="_blank";link.rel="noopener noreferrer";
-      link.textContent="Открыть официальный источник ↗";
-      card.append(title,org,desc,meta,link);list.appendChild(card);
+    found.forEach(d=>{
+      const card=document.createElement("article");card.className="drug-item";
+      const title=document.createElement("h3");title.textContent=d.inn;
+      const groupText=document.createElement("div");groupText.className="drug-tag";groupText.textContent=d.groupName;
+      const aliases=document.createElement("p");aliases.textContent="Синонимы и варианты написания: "+d.aliases;
+      const actions=document.createElement("div");actions.className="drug-actions";
+      const copy=document.createElement("button");copy.type="button";copy.textContent="Копировать название";
+      copy.addEventListener("click",()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(d.inn).then(()=>{copy.textContent="Скопировано";}).catch(()=>{copy.textContent="Не удалось скопировать";});}});
+      const grls=document.createElement("a");grls.href="https://grls.rosminzdrav.ru/";grls.target="_blank";grls.rel="noopener noreferrer";grls.textContent="ГРЛС России — официальный реестр";
+      const ema=document.createElement("a");ema.href="https://www.ema.europa.eu/en/medicines";ema.target="_blank";ema.rel="noopener noreferrer";ema.textContent="EMA";
+      const de=document.createElement("a");de.href="https://www.bfarm.de/DE/Arzneimittel/Arzneimittelinformationen/Arzneimittel-recherchieren/AMIce/_node.html";de.target="_blank";de.rel="noopener noreferrer";de.textContent="BfArM / AMIce";
+      actions.append(copy,grls,ema,de);card.append(title,groupText,aliases,actions);results.appendChild(card);
     });
   }
-  search.addEventListener("input",render);filter.addEventListener("change",render);render();
+  search.addEventListener("input",render);
+  filter.addEventListener("change",render);
+  render();
 })();
 </script>
 
