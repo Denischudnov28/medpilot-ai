@@ -1,10 +1,20 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b87"><title>Клинические калькуляторы — MedPilot AI</title>
 <style>
-:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:16px 12px 40px}.wrap{max-width:760px;margin:auto}.top{display:flex;gap:12px;align-items:center;margin:4px 0 18px}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#fff;color:#145b87;text-decoration:none;font-size:22px}.brand{font-size:11px;letter-spacing:.12em;color:#66829a;font-weight:800}.title{margin:3px 0;color:#153e63;font-size:24px}.intro,.note{color:#60758a;font-size:13px;line-height:1.55}.category{margin:20px 0 10px;color:#145b87;font-size:18px}.tool{background:white;border:1px solid #e0e9f1;border-radius:18px;padding:17px;margin:12px 0;box-shadow:0 5px 20px #173b5b0a;scroll-margin-top:12px}.tool h3{margin:0 0 7px;color:#153e63;font-size:17px}.tool p{font-size:12px;color:#718397;line-height:1.45}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:12px;font-weight:700;margin:8px 0 5px;color:#405a72}.field input,.field select{width:100%;min-height:44px;border:1px solid #d7e2ed;border-radius:11px;padding:10px;font:inherit;font-size:16px;background:#fbfdff;color:#18324b}.calc{width:100%;margin-top:13px;min-height:47px;border:0;border-radius:12px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font-weight:750;font-size:15px}.result{margin-top:12px;padding:12px;border-radius:12px;background:#eef7fb;color:#174c6b;font-weight:700;line-height:1.5;white-space:pre-line}.warn{padding:13px;border-radius:12px;background:#fff8eb;color:#785b2d;font-size:12px;line-height:1.5;margin-top:16px}@media(max-width:430px){.grid{grid-template-columns:1fr}.title{font-size:21px}}
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:16px 12px 40px}.wrap{max-width:760px;margin:auto}.top{display:flex;gap:12px;align-items:center;margin:4px 0 18px}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#fff;color:#145b87;text-decoration:none;font-size:22px}.brand{font-size:11px;letter-spacing:.12em;color:#66829a;font-weight:800}.title{margin:3px 0;color:#153e63;font-size:24px}.intro,.note{color:#60758a;font-size:13px;line-height:1.55}.category{margin:20px 0 10px;color:#145b87;font-size:18px}.tool{background:white;border:1px solid #e0e9f1;border-radius:18px;padding:17px;margin:12px 0;box-shadow:0 5px 20px #173b5b0a;scroll-margin-top:12px}.tool h3{margin:0 0 7px;color:#153e63;font-size:17px}.tool p{font-size:12px;color:#718397;line-height:1.45}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:12px;font-weight:700;margin:8px 0 5px;color:#405a72}.field input,.field select{width:100%;min-height:44px;border:1px solid #d7e2ed;border-radius:11px;padding:10px;font:inherit;font-size:16px;background:#fbfdff;color:#18324b}.calc{width:100%;margin-top:13px;min-height:47px;border:0;border-radius:12px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font-weight:750;font-size:15px}.result{margin-top:12px;padding:12px;border-radius:12px;background:#eef7fb;color:#174c6b;font-weight:700;line-height:1.5;white-space:pre-line}.warn{padding:13px;border-radius:12px;background:#fff8eb;color:#785b2d;font-size:12px;line-height:1.5;margin-top:16px}
+.calculator-search{position:sticky;top:8px;z-index:20;margin:18px 0 8px;padding:13px;background:rgba(243,247,251,.96);border:1px solid #dce7f0;border-radius:16px;box-shadow:0 6px 18px rgba(23,59,91,.08);backdrop-filter:blur(10px)}
+.calculator-search label{display:block;margin:0 0 7px;color:#244d6d;font-size:13px;font-weight:800}
+.calculator-search-row{display:flex;gap:8px}
+.calculator-search input{flex:1;min-width:0;min-height:48px;padding:11px 13px;border:1px solid #d2e0eb;border-radius:11px;background:#fff;color:#18324b;font:inherit;font-size:16px}
+.calculator-search button{min-width:48px;border:0;border-radius:11px;background:#e5eff6;color:#145b87;font-size:20px}
+#calculator-search-status{margin:8px 2px 0;color:#60758a;font-size:12px;line-height:1.4}
+.tool[hidden],.category[hidden]{display:none!important}
+@media(max-width:430px){.grid{grid-template-columns:1fr}.title{font-size:21px}}
 </style></head><body><main class="wrap">
 <header class="top"><a class="back" href="../index.html#clinical-tools" aria-label="Назад">‹</a><div><div class="brand">MEDPILOT AI · КАЛЬКУЛЯТОРЫ</div><h1 class="title">Клинические расчёты</h1></div></header>
 <p class="intro">Инструменты сгруппированы по клиническим направлениям. Вводите значения в указанных единицах. Расчёты поддерживают клиническое решение, но не заменяют оценку пациента и локальные протоколы.</p>
+<div class="calculator-search"><label for="calculator-search-input">Поиск по всем калькуляторам</label><div class="calculator-search-row"><input id="calculator-search-input" type="search" placeholder="Например: SOFA, креатинин, натрий, QTc..." autocomplete="off" aria-controls="calculator-search-results"><button type="button" id="calculator-search-clear" aria-label="Очистить поиск" title="Очистить">×</button></div><div id="calculator-search-status" role="status" aria-live="polite">Показаны все доступные калькуляторы.</div></div><div id="calculator-search-results"></div>
+
 <h2 class="category" id="anesthesia">🫁 Анестезиология и реаниматология</h2>
 <section class="tool" id="map"><h3>Среднее артериальное давление (MAP)</h3><p>Расчёт по систолическому и диастолическому АД, мм рт. ст.</p><div class="grid"><div class="field"><label>Систолическое АД</label><input id="map-s" type="number" min="1" placeholder="120"></div><div class="field"><label>Диастолическое АД</label><input id="map-d" type="number" min="1" placeholder="80"></div></div><button class="calc" onclick="runCalc('map')">Рассчитать MAP</button><div class="result" id="map-r" hidden></div></section>
 <section class="tool" id="pf"><h3>Индекс оксигенации PaO₂/FiO₂</h3><p>PaO₂ — мм рт. ст.; FiO₂ — доля от 0 до 1 (например, 0,40).</p><div class="grid"><div class="field"><label>PaO₂, мм рт. ст.</label><input id="pf-p" type="number" min="1" placeholder="80"></div><div class="field"><label>FiO₂, доля</label><input id="pf-f" type="number" min="0.21" max="1" step="0.01" placeholder="0.40"></div></div><button class="calc" onclick="runCalc('pf')">Рассчитать P/F</button><div class="result" id="pf-r" hidden></div></section>
@@ -60,6 +70,38 @@
 <section class="tool specialty-coming"><p>Раздел для радиологических индексов и расчётов. Инструменты будут добавлены после проверки методик.</p><p class="coming-note">Каталог этой специальности пополняется. Не используйте калькуляторы других возрастных групп или клинических ситуаций без проверки применимости.</p></section>
 <div class="warn"><b>Медицинское предупреждение.</b> Калькуляторы предназначены для поддержки принятия решений. Проверяйте единицы измерения, исходные данные, применимость формулы и локальные рекомендации. Не используйте расчёт как единственное основание для назначения лечения. CrCl по Cockcroft–Gault не равен лабораторной eGFR; у пациентов с нестабильным креатинином, крайними значениями массы тела и в особых популяциях формула может быть неточной.</div>
 </main>
+<script>
+(function(){
+ const input=document.getElementById('calculator-search-input');
+ const clear=document.getElementById('calculator-search-clear');
+ const status=document.getElementById('calculator-search-status');
+ const tools=[...document.querySelectorAll('main.wrap .tool:not(.specialty-coming)')];
+ if(!input||!status||!tools.length)return;
+ const categories=tools.map(tool=>{
+   let node=tool.previousElementSibling;
+   while(node&&!node.classList.contains('category'))node=node.previousElementSibling;
+   return node;
+ });
+ const normalize=value=>String(value||'').toLocaleLowerCase('ru').replace(/ё/g,'е').replace(/\s+/g,' ').trim();
+ const searchable=tools.map((tool,index)=>normalize(tool.innerText+' '+(categories[index]?.innerText||'')));
+ function filter(){
+   const query=normalize(input.value);
+   let count=0;
+   tools.forEach((tool,index)=>{
+     const match=!query||searchable[index].includes(query);
+     tool.hidden=!match;
+     if(match)count++;
+   });
+   [...new Set(categories.filter(Boolean))].forEach(category=>{
+     const categoryTools=tools.filter((tool,index)=>categories[index]===category);
+     category.hidden=!categoryTools.some(tool=>!tool.hidden);
+   });
+   status.textContent=query?(count?'Найдено калькуляторов: '+count:'Ничего не найдено. Попробуйте другое название или сокращение.'):'Показаны все доступные калькуляторы.';
+ }
+ input.addEventListener('input',filter);
+ clear.addEventListener('click',()=>{input.value='';filter();input.focus();});
+})();
+</script>
 <script>
 function val(id){return Number(document.getElementById(id).value)}
 function show(id,msg){const el=document.getElementById(id+'-r');el.hidden=false;el.textContent=msg}
