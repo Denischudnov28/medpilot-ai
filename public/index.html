@@ -2133,6 +2133,11 @@ async function askAI(){
  if(new URLSearchParams(window.location.search).get("openMenu")==="1")openMenu();
 })();
 </script>
+<style id="medpilot-knowledge-tab-routing">
+body.mp-knowledge-tab-ru-guidelines #knowledge-base > :not(#ru-guidelines),
+body.mp-knowledge-tab-international-guidelines #knowledge-base > :not(#international-guidelines),
+body.mp-knowledge-tab-scientific-publications #knowledge-base > :not(#scientific-publications){display:none!important}
+</style>
 <script id="medpilot-page-router">
 (function(){
  const directSections=[...document.querySelectorAll('body > main > section, body > section')];
@@ -2146,6 +2151,11 @@ async function askAI(){
    section.dataset.page = id || (index<=4 ? 'ai' : 'other');
  });
  function activate(page,remember=true){
+   const knowledgeTabs=['ru-guidelines','international-guidelines','scientific-publications'];
+   const knowledgeTab=knowledgeTabs.includes(page)?page:'';
+   if(knowledgeTab)page='knowledge-base';
+   document.body.classList.remove('mp-knowledge-tab-ru-guidelines','mp-knowledge-tab-international-guidelines','mp-knowledge-tab-scientific-publications');
+   if(knowledgeTab)document.body.classList.add('mp-knowledge-tab-'+knowledgeTab);
    const current=directSections.find(section=>section.classList.contains('mp-page-active'));
    const currentPage=current?(current.dataset.page||'home'):'home';
    if(remember&&currentPage!==page)pageHistory.push(currentPage);
