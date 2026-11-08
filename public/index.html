@@ -902,6 +902,35 @@ async function askAI(){
  if(!queryInput||!typeInput||!button||!status||!results)return;
  const esc=value=>String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
  function textOf(node,selector){const el=node.querySelector(selector);return el?el.textContent.trim():"";}
+ const russianTerms={
+  "острое повреждение почек":"acute kidney injury","септический шок":"septic shock",
+  "инфаркт миокарда":"myocardial infarction","острый коронарный синдром":"acute coronary syndrome",
+  "фибрилляция предсердий":"atrial fibrillation","тромбоэмболия легочной артерии":"pulmonary embolism",
+  "тромбоэмболия лёгочной артерии":"pulmonary embolism","сердечно-легочная реанимация":"cardiopulmonary resuscitation",
+  "сердечно-лёгочная реанимация":"cardiopulmonary resuscitation","искусственная вентиляция легких":"mechanical ventilation",
+  "искусственная вентиляция лёгких":"mechanical ventilation","бронхиальная астма":"asthma",
+  "почечная недостаточность":"renal failure","дыхательная недостаточность":"respiratory failure",
+  "антибактериальная терапия":"antibiotic therapy","внебольничная пневмония":"community acquired pneumonia",
+  "внутрибольничная пневмония":"hospital acquired pneumonia","сепсис":"sepsis","вазопрессоры":"vasopressors",
+  "вазопрессор":"vasopressor","норадреналин":"norepinephrine","норэпинефрин":"norepinephrine",
+  "адреналин":"epinephrine","эпинефрин":"epinephrine","допамин":"dopamine","добутамин":"dobutamine",
+  "опп":"acute kidney injury","хбп":"chronic kidney disease","ивл":"mechanical ventilation",
+  "ордс":"acute respiratory distress syndrome","респираторный дистресс-синдром":"acute respiratory distress syndrome",
+  "инсульт":"stroke","пневмония":"pneumonia","анестезия":"anesthesia","реанимация":"resuscitation",
+  "кровотечение":"hemorrhage","травма":"trauma","панкреатит":"pancreatitis","диабет":"diabetes",
+  "гипотермия":"hypothermia","гипертермия":"hyperthermia","антибиотики":"antibiotics"
+ };
+ function expandRussianQuery(value){
+  let translated=value.toLocaleLowerCase("ru");
+  const entries=Object.entries(russianTerms).sort((a,b)=>b[0].length-a[0].length);
+  for(const [ru,en] of entries){
+   const escaped=ru.replace(/[.*+?^${}()|[\]\\]/g,"\\ function textOf(node,selector){const el=node.querySelector(selector);return el?el.textContent.trim():"";}
+");
+   const pattern=new RegExp("(^|[^\\p{L}\\p{N}])"+escaped+"(?=$|[^\\p{L}\\p{N}])","giu");
+   translated=translated.replace(pattern," $1"+en+" ");
+  }
+  return translated.replace(/\\s+/g," ").trim();
+ }
  button.addEventListener("click",async function(){
   const query=queryInput.value.trim();
   if(!query){status.textContent="Введите клиническую тему или ключевые слова.";queryInput.focus();return;}
@@ -910,8 +939,10 @@ async function askAI(){
   results.replaceChildren();
   if(cochrane)cochrane.dataset.query=query;
   try{
-   let term=query;
+   const translatedQuery=expandRussianQuery(query);
+   let term=translatedQuery;
    if(typeInput.value)term+=" AND "+typeInput.value+'[Publication Type]';
+   if(/[А-Яа-яЁё]/.test(query)&&translatedQuery!==query.toLocaleLowerCase("ru"))status.textContent="Русский запрос расширен английскими медицинскими терминами: "+translatedQuery+". Ищу в PubMed...";
    const searchParams=new URLSearchParams({db:"pubmed",term,retmode:"json",retmax:"10",sort:"relevance"});
    const searchResponse=await fetch("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?"+searchParams.toString());
    if(!searchResponse.ok)throw new Error("PubMed не ответил (HTTP "+searchResponse.status+").");
