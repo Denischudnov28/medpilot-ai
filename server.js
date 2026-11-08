@@ -101,9 +101,40 @@ app.post("/api/chat", async (req, res) => {
       ]
     });
 
-    res.json({
-      answer: response.choices?.[0]?.message?.content || "Нет ответа от модели."
-    });
+    const rawAnswer = response.choices?.[0]?.message?.content || "Нет ответа от модели.";
+    let finalAnswer = rawAnswer;
+
+    // Отдельная редакторская проверка перед показом ответа пользователю.
+    // При сбое редактора сохраняем исходный ответ, не прерывая консультацию.
+    try {
+      const proofreading = await client.chat.completions.create({
+        model: process.env.OPENROUTER_PROOFREAD_MODEL || model,
+        temperature: 0,
+        messages: [
+          {
+            role: "system",
+            content:
+              "Ты — медицинский корректор и редактор русского языка. Твоя задача — только вычитать и исправить предоставленный медицинский текст. " +
+              "Исправляй орфографию, грамматику, пунктуацию, опечатки, согласование, падежи, окончания и неестественные формулировки. " +
+              "Сохраняй исходные смысл, клинические рекомендации, последовательность действий, структуру, Markdown-разметку и списки. " +
+              "СТРОГО ЗАПРЕЩЕНО менять диагнозы, клинические выводы, дозировки, числа, единицы измерения, названия препаратов, противопоказания, пороги шкал, даты, ссылки и источники. " +
+              "Не добавляй новых медицинских сведений, советов, разделов или пояснений. Не удаляй клинически значимые оговорки. " +
+              "Международные аббревиатуры и общепринятые названия шкал сохраняй. Если фрагмент нельзя безопасно исправить без изменения смысла, оставь его без изменений. " +
+              "Верни только полностью вычитанный текст, без вступления, кавычек и комментариев."
+          },
+          {
+            role: "user",
+            content: rawAnswer
+          }
+        ]
+      });
+      const editedAnswer = proofreading.choices?.[0]?.message?.content?.trim();
+      if (editedAnswer) finalAnswer = editedAnswer;
+    } catch (proofreadError) {
+      console.error("Medical answer proofreading failed:", proofreadError.message);
+    }
+
+    res.json({ answer: finalAnswer });
 
   } catch (err) {
     console.error("Chat request failed:", err.message);
