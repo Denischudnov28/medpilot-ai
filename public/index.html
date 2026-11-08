@@ -471,6 +471,12 @@ function calculateSOFA() {
  );
 
  const result = document.getElementById("sofa-result");
+ const vasoValue = document.getElementById("sofa-vaso").value;
+
+if (vasoValue === "") {
+    result.textContent = "⚠️ Укажите данные о вазопрессорах перед расчётом SOFA.";
+    return;
+}
 
  if (values.some(v => v === "")) {
    result.textContent = "Заполните все обязательные показатели.";
