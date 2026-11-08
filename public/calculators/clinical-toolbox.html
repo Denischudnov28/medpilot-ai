@@ -9,9 +9,23 @@
 .calculator-search button{min-width:48px;border:0;border-radius:11px;background:#e5eff6;color:#145b87;font-size:20px}
 #calculator-search-status{margin:8px 2px 0;color:#60758a;font-size:12px;line-height:1.4}
 .tool[hidden],.category[hidden]{display:none!important}
-@media(max-width:430px){.grid{grid-template-columns:1fr}.title{font-size:21px}}
+.specialty-picker{margin:16px 0 20px;padding:16px;background:#fff;border:1px solid #dce7f0;border-radius:18px;box-shadow:0 5px 20px #173b5b0a}
+.specialty-picker h2{margin:0 0 6px;color:#153e63;font-size:19px}
+.specialty-picker p{margin:0 0 14px;color:#60758a;font-size:13px;line-height:1.5}
+.specialty-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.specialty-choice{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:58px;padding:12px;border:1px solid #dce7f0;border-radius:13px;background:#f9fcff;color:#244d6d;text-align:left;font:600 14px/1.35 inherit;cursor:pointer}
+.specialty-choice span{min-width:0}
+.specialty-choice small{flex:none;color:#6b8499;font-size:11px}
+.specialty-toolbar{display:flex;align-items:center;gap:10px;margin:14px 0 8px}
+.specialty-back{display:none;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border:0;border-radius:12px;background:#e7f0f7;color:#145b87;font-size:24px}
+.specialty-current{display:none;margin:0;color:#153e63;font-size:19px;font-weight:800}
+body.specialty-selected .specialty-picker{display:none}
+body.specialty-selected .specialty-back,body.specialty-selected .specialty-current{display:flex}
+body.specialty-selected .specialty-current{display:block}
+@media(max-width:430px){.grid{grid-template-columns:1fr}.title{font-size:21px}.specialty-grid{grid-template-columns:1fr}.specialty-choice{min-height:52px}}
 </style></head><body><main class="wrap">
 <header class="top"><a class="back" href="../index.html#clinical-tools" aria-label="Назад">‹</a><div><div class="brand">MEDPILOT AI · КАЛЬКУЛЯТОРЫ</div><h1 class="title">Клинические расчёты</h1></div></header>
+<section class="specialty-picker" id="specialty-picker"><h2>Выберите специальность</h2><p>Показываются только калькуляторы выбранного клинического направления.</p><div class="specialty-grid" id="specialty-grid"></div></section><div class="specialty-toolbar"><button type="button" class="specialty-back" id="specialty-back" aria-label="Назад к выбору специальности">‹</button><h2 class="specialty-current" id="specialty-current"></h2></div>
 <p class="intro">Инструменты сгруппированы по клиническим направлениям. Вводите значения в указанных единицах. Расчёты поддерживают клиническое решение, но не заменяют оценку пациента и локальные протоколы.</p>
 <div class="calculator-search"><label for="calculator-search-input">Поиск по всем калькуляторам</label><div class="calculator-search-row"><input id="calculator-search-input" type="search" placeholder="Например: SOFA, креатинин, натрий, QTc..." autocomplete="off" aria-controls="calculator-search-results"><button type="button" id="calculator-search-clear" aria-label="Очистить поиск" title="Очистить">×</button></div><div id="calculator-search-status" role="status" aria-live="polite">Показаны все доступные калькуляторы.</div></div><div id="calculator-search-results"></div>
 
@@ -69,31 +83,72 @@
  const input=document.getElementById('calculator-search-input');
  const clear=document.getElementById('calculator-search-clear');
  const status=document.getElementById('calculator-search-status');
+ const picker=document.getElementById('specialty-picker');
+ const grid=document.getElementById('specialty-grid');
+ const back=document.getElementById('specialty-back');
+ const current=document.getElementById('specialty-current');
  const tools=[...document.querySelectorAll('main.wrap .tool:not(.specialty-coming)')];
- if(!input||!status||!tools.length)return;
- const categories=tools.map(tool=>{
-   let node=tool.previousElementSibling;
-   while(node&&!node.classList.contains('category'))node=node.previousElementSibling;
-   return node;
- });
+ const headings=[...document.querySelectorAll('main.wrap h2.category')];
+ const groups=headings.map(category=>({category,tools:tools.filter(tool=>{let node=tool.previousElementSibling;while(node&&!node.classList.contains('category'))node=node.previousElementSibling;return node===category;})}));
  const normalize=value=>String(value||'').toLocaleLowerCase('ru').replace(/ё/g,'е').replace(/\s+/g,' ').trim();
- const searchable=tools.map((tool,index)=>normalize(tool.innerText+' '+(categories[index]?.innerText||'')));
- function filter(){
-   const query=normalize(input.value);
-   let count=0;
-   tools.forEach((tool,index)=>{
-     const match=!query||searchable[index].includes(query);
-     tool.hidden=!match;
-     if(match)count++;
-   });
-   [...new Set(categories.filter(Boolean))].forEach(category=>{
-     const categoryTools=tools.filter((tool,index)=>categories[index]===category);
-     category.hidden=!categoryTools.some(tool=>!tool.hidden);
-   });
-   status.textContent=query?(count?'Найдено калькуляторов: '+count:'Ничего не найдено. Попробуйте другое название или сокращение.'):'Показаны все доступные калькуляторы.';
+ let active=null;
+ const labels={anesthesia:'Анестезиология и реаниматология',pulmonology:'Пульмонология',cardiology:'Кардиология',nephrology:'Нефрология',therapy:'Терапия',emergency:'Неотложная медицина',general:'Общая медицина',surgery:'Хирургия',neurology:'Неврология',neurosurgery:'Нейрохирургия',pediatrics:'Педиатрия',obgyn:'Акушерство и гинекология',oncology:'Онкология',trauma:'Травматология и ортопедия',infectious:'Инфекционные болезни',endocrinology:'Эндокринология',gastro:'Гастроэнтерология',urology:'Урология',dermatology:'Дерматология',ophthalmology:'Офтальмология',ent:'Оториноларингология',radiology:'Радиология и лучевая диагностика'};
+ const emojis={anesthesia:'🫁',pulmonology:'🫁',cardiology:'❤️',nephrology:'🧪',therapy:'🩺',emergency:'🚑',general:'🩺',surgery:'🩻',neurology:'🧠',neurosurgery:'🧠',pediatrics:'🧸',obgyn:'🤰',oncology:'🎗️',trauma:'🦴',infectious:'🦠',endocrinology:'🧬',gastro:'🍽️',urology:'🚻',dermatology:'🧴',ophthalmology:'👁️',ent:'👂',radiology:'🩻'};
+ function renderPicker(){
+  grid.innerHTML='';
+  groups.filter(g=>g.tools.length).forEach(g=>{
+   const id=g.category.id;
+   const label=labels[id]||g.category.textContent.replace(/^\S+\s*/,'').trim();
+   const button=document.createElement('button');
+   button.type='button';button.className='specialty-choice';
+   const name=document.createElement('span');name.textContent=(emojis[id]||'✚')+' '+label;
+   const count=document.createElement('small');count.textContent=g.tools.length+' '+(g.tools.length===1?'калькулятор':'калькулятора');
+   button.append(name,count);button.addEventListener('click',()=>selectSpecialty(id,true));grid.append(button);
+  });
  }
- input.addEventListener('input',filter);
- clear.addEventListener('click',()=>{input.value='';filter();input.focus();});
+ function applySearch(){
+  const query=normalize(input.value);
+  const group=groups.find(g=>g.category.id===active);
+  if(!group)return;
+  let count=0;
+  group.tools.forEach(tool=>{
+   const match=!query||normalize(tool.innerText+' '+group.category.innerText).includes(query);
+   tool.hidden=!match;if(match)count++;
+  });
+  group.category.hidden=false;
+  groups.filter(g=>g!==group).forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
+  status.textContent=query?(count?'Найдено в этой специальности: '+count:'В этой специальности ничего не найдено.'):'Показаны калькуляторы выбранной специальности.';
+ }
+ function selectSpecialty(id,updateHash){
+  const group=groups.find(g=>g.category.id===id&&g.tools.length);
+  if(!group){showPicker(updateHash);return;}
+  active=id;document.body.classList.add('specialty-selected');
+  current.textContent=(emojis[id]||'✚')+' '+(labels[id]||group.category.textContent.trim());
+  input.value='';applySearch();
+  if(updateHash)history.pushState({specialty:id},'', '#specialty-'+id);
+  window.scrollTo({top:0,behavior:'smooth'});
+ }
+ function showPicker(updateHash){
+  active=null;document.body.classList.remove('specialty-selected');
+  groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
+  input.value='';status.textContent='Сначала выберите специальность.';
+  if(updateHash)history.pushState({specialty:null},'', '#specialties');
+  window.scrollTo({top:0,behavior:'smooth'});
+ }
+ back.addEventListener('click',()=>showPicker(true));
+ input.addEventListener('input',applySearch);
+ clear.addEventListener('click',()=>{input.value='';if(active)applySearch();input.focus();});
+ window.addEventListener('popstate',()=>routeFromHash());
+ function routeFromHash(){
+  const hash=decodeURIComponent(location.hash.replace(/^#/,''));
+  if(hash.startsWith('specialty-')){selectSpecialty(hash.slice(10),false);return;}
+  if(hash==='specialties'||!hash){showPicker(false);return;}
+  const target=document.getElementById(hash);
+  const category=target?.classList.contains('category')?target:target?.closest('.tool')?groups.find(g=>g.tools.includes(target.closest('.tool')))?.category:null;
+  if(category){selectSpecialty(category.id,false);if(target&&target!==category)setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),80);return;}
+  showPicker(false);
+ }
+ renderPicker();routeFromHash();
 })();
 </script>
 <script>
