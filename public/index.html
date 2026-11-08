@@ -811,71 +811,44 @@ async function askAI(){
   const search=document.getElementById("knowledge-search");
   const filter=document.getElementById("knowledge-filter");
   if(!list||!search||!filter)return;
+  const status=document.createElement("p");
+  status.className="knowledge-meta";
+  status.id="knowledge-search-status";
+  status.setAttribute("role","status");
+  status.setAttribute("aria-live","polite");
+  list.before(status);
+  const categoryNames={critical:"анестезиология реанимация интенсивная терапия",cardio:"кардиология сердце",renal:"нефрология почки",resp:"пульмонология дыхательная система",infection:"инфекционные болезни инфекции",peds:"педиатрия акушерство дети",general:"общая медицина"};
   function normalize(value){
-    return String(value||"")
-      .toLocaleLowerCase("ru")
-      .replace(/ё/g,"е")
-      .replace(/[\u2010-\u2015]/g,"-")
-      .replace(/[^\p{L}\p{N}]+/gu," ")
-      .trim()
-      .replace(/\s+/g," ");
+    return String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\u2010-\u2015]/g,"-").replace(/[^\p{L}\p{N}]+/gu," ").trim().replace(/\s+/g," ");
   }
   function render(){
     const q=normalize(search.value);
+    const terms=q.split(" ").filter(Boolean);
     const group=filter.value;
-    const found=drugs.filter(d=>{
-      const haystack=normalize([d.inn,d.aliases,d.groupName].join(" "));
-      return (group==="all"||d.group===group)&&(!q||haystack.includes(q));
+    const found=sources.filter(item=>{
+      const searchable=normalize([item.name,item.org,item.topic,item.label,...item.tags.map(tag=>categoryNames[tag]||tag)].join(" "));
+      return (group==="all"||item.tags.includes(group))&&terms.every(term=>searchable.includes(term));
     });
-    results.innerHTML="";
+    list.replaceChildren();
+    status.textContent=q||group!=="all"?"Найдено источников: "+found.length:"Доступно источников: "+found.length;
     if(!found.length){
       const empty=document.createElement("div");empty.className="knowledge-empty";
-      empty.textContent="Совпадений не найдено. Проверьте написание, попробуйте МНН на русском или латинице либо выберите «Все группы».";
-      results.appendChild(empty);return;
+      empty.textContent="Ничего не найдено. Попробуйте другое ключевое слово или выберите «Все направления».";
+      list.appendChild(empty);return;
     }
-    found.forEach(d=>{
-      const card=document.createElement("article");card.className="drug-item";
-      const title=document.createElement("h3");title.textContent=d.inn;
-      const groupText=document.createElement("div");groupText.className="drug-tag";groupText.textContent=d.groupName;
-      const aliases=document.createElement("p");aliases.textContent="Синонимы и варианты написания: "+d.aliases;
-      const details=document.createElement("details");details.className="drug-details";
-      const summary=document.createElement("summary");summary.textContent="Формы выпуска, концентрации и безопасность";
-      const detailBody=document.createElement("div");detailBody.className="drug-detail-body";
-      const fields=[
-        ["Формы выпуска","Проверить по конкретному торговому наименованию и производителю."],
-        ["Концентрации и дозировки","Зависят от производителя и лекарственной формы; сверить упаковку и официальную инструкцию."],
-        ["Пути введения","Проверить для зарегистрированной формы; не переносить путь введения с одной формы на другую."],
-        ["Противопоказания и ограничения","Проверить возрастные ограничения, беременность/лактацию и гиперчувствительность в актуальной инструкции."],
-        ["Почечная/печёночная коррекция","Проверить для конкретного показания и пациента; при отсутствии данных не экстраполировать."],
-        ["Источник проверки","Официальная инструкция/характеристика препарата в реестре страны применения."]
-      ];
-      fields.forEach(([label,value])=>{
-        const row=document.createElement("p");row.className="drug-detail-row";
-        const strong=document.createElement("strong");strong.textContent=label+": ";
-        row.append(strong,document.createTextNode(value));detailBody.appendChild(row);
-      });
-      details.append(summary,detailBody);
-      const actions=document.createElement("div");actions.className="drug-actions";
-      const copy=document.createElement("button");copy.type="button";copy.textContent="Копировать название";
-      copy.addEventListener("click",()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(d.inn).then(()=>{copy.textContent="Скопировано";}).catch(()=>{copy.textContent="Не удалось скопировать";});}});
-      const prepare=document.createElement("button");prepare.type="button";prepare.textContent="Подготовить клиническую справку";
-      prepare.addEventListener("click",()=>{
-        search.value=d.inn;render();
-        const indication=document.getElementById("drug-indication");
-        indication.focus();indication.scrollIntoView({behavior:"smooth",block:"center"});
-        document.getElementById("drug-status").textContent="Препарат выбран: "+d.inn+". Укажите показание и особенности пациента, затем подготовьте запрос.";
-      });
-      const grls=document.createElement("a");grls.href="https://grls.rosminzdrav.ru/";grls.target="_blank";grls.rel="noopener noreferrer";grls.textContent="ГРЛС России";
-      const ema=document.createElement("a");ema.href="https://www.ema.europa.eu/en/medicines";ema.target="_blank";ema.rel="noopener noreferrer";ema.textContent="EMA";
-      const de=document.createElement("a");de.href="https://www.bfarm.de/DE/Arzneimittel/Arzneimittelinformationen/Arzneimittel-recherchieren/AMIce/_node.html";de.target="_blank";de.rel="noopener noreferrer";de.textContent="BfArM / AMIce";
-      actions.append(copy,prepare,grls,ema,de);card.append(title,groupText,aliases,details,actions);results.appendChild(card);
+    found.forEach(item=>{
+      const card=document.createElement("article");card.className="knowledge-item";
+      const title=document.createElement("h3");title.textContent=item.name;
+      const topic=document.createElement("p");topic.textContent=item.topic;
+      const org=document.createElement("div");org.className="knowledge-meta";org.textContent=item.org+" · "+item.label;
+      const link=document.createElement("a");link.className="knowledge-link";link.href=item.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="Открыть официальный источник ↗";
+      card.append(title,topic,org,link);list.appendChild(card);
     });
   }
   search.addEventListener("input",render);
   filter.addEventListener("change",render);
   render();
-})();
-</script>
+})();</script>
 
 <section class="card" id="drug-reference">
   <h2>💊 Справочник лекарственных препаратов</h2>
