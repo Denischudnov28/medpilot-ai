@@ -1264,20 +1264,33 @@ header{padding-bottom:20px}
 </section>
 <script>
 (function(){
-const search=document.getElementById("protocol-search"),list=document.getElementById("protocol-list");
+const search=document.getElementById("protocol-search");
+const list=document.getElementById("protocol-list");
 if(!search||!list)return;
+const cards=Array.from(list.querySelectorAll(".protocol-card"));
 function filterProtocols(){
   const q=search.value.trim().toLocaleLowerCase("ru");
-  list.querySelectorAll(".protocol-card").forEach(card=>{
-    card.hidden=!q||!card.dataset.search.toLocaleLowerCase("ru").includes(q);
+  let matches=0;
+  cards.forEach(card=>{
+    const haystack=(card.dataset.search||card.textContent||"").toLocaleLowerCase("ru");
+    const show=Boolean(q)&&haystack.includes(q);
+    card.hidden=!show;
+    card.style.setProperty("display",show?"":"none","important");
+    if(show)matches++;
   });
-  list.hidden=!q;
+  const showList=Boolean(q)&&matches>0;
+  list.hidden=!showList;
+  list.style.setProperty("display",showList?"grid":"none","important");
+  list.setAttribute("aria-hidden",String(!showList));
 }
 search.addEventListener("input",filterProtocols);
+search.addEventListener("search",filterProtocols);
 list.querySelectorAll(".protocol-toggle").forEach(button=>button.addEventListener("click",function(){
   const panel=document.getElementById(button.getAttribute("aria-controls"));
+  if(!panel)return;
   const opening=panel.hidden;
   panel.hidden=!opening;
+  panel.style.setProperty("display",opening?"block":"none","important");
   button.setAttribute("aria-expanded",String(opening));
   button.textContent=opening?"Свернуть алгоритм":"Открыть алгоритм";
 }));
@@ -1416,6 +1429,8 @@ async function askAI(){
 @media(max-width:440px){.calculator-grid{grid-template-columns:1fr}.calculator-link{min-height:112px}}
 /* Явно скрываем элементы с hidden: display:grid у списков не должен отменять скрытие. */
 [hidden]{display:none!important}
+#clinical-protocols #protocol-list[hidden],#clinical-protocols #protocol-list[aria-hidden="true"]{display:none!important}
+#clinical-protocols #protocol-list .protocol-card[hidden]{display:none!important}
 </style>
 
 <section class="card" id="knowledge-base">
