@@ -203,6 +203,12 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 <style>
+/* RUSSIAN CLINICAL GUIDELINE SEARCH */
+.ru-guideline-search{margin:16px 0 20px;padding:16px;border:1px solid #dce7f0;border-radius:16px;background:#f8fbfe}
+.ru-guideline-search h3{margin:0 0 8px;color:#174f78;font-size:16px}
+.ru-guideline-quick{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 12px}
+.ru-guideline-quick button{border:1px solid #d4e2ee;border-radius:999px;background:#fff;color:#285777;padding:7px 11px;font-size:12px;cursor:pointer}
+.ru-guideline-search>.knowledge-link{display:block;width:fit-content;margin-top:10px}
 /* CLINICAL KNOWLEDGE BASE */
 .knowledge-search,.knowledge-filter{width:100%;padding:13px 14px;border:1px solid #d9e1ed;border-radius:12px;font-size:16px;margin:8px 0 12px;background:#fff;color:#17243a}
 #knowledge-search-button{width:100%;min-height:46px;margin:0 0 12px}
@@ -793,6 +799,23 @@ async function askAI(){
 <section class="card" id="knowledge-base">
   <h2>📚 База медицинских знаний</h2>
   <p class="status">Российские и международные клинические рекомендации, официальные медицинские руководства и проверенные профессиональные источники.</p>
+  <div class="ru-guideline-search">
+    <h3>🇷🇺 Поиск российских клинических рекомендаций</h3>
+    <p class="status">Поиск по названию заболевания, аббревиатуре или коду МКБ-10. Результаты ищутся среди страниц официального рубрикатора Минздрава России.</p>
+    <label for="ru-guideline-query">Заболевание или клиническая тема</label>
+    <input id="ru-guideline-query" class="knowledge-search" type="search" placeholder="Например: сепсис, ОПП, ХОБЛ, I21" autocomplete="off">
+    <div class="ru-guideline-quick">
+      <button type="button" data-ru-query="сепсис">Сепсис</button>
+      <button type="button" data-ru-query="острое повреждение почек">ОПП</button>
+      <button type="button" data-ru-query="острый инфаркт миокарда">Инфаркт миокарда</button>
+      <button type="button" data-ru-query="внебольничная пневмония">Пневмония</button>
+      <button type="button" data-ru-query="бронхиальная астма">Бронхиальная астма</button>
+      <button type="button" data-ru-query="инсульт">Инсульт</button>
+    </div>
+    <button type="button" class="send" id="ru-guideline-search-button">Найти российские рекомендации</button>
+    <a class="knowledge-link knowledge-open-source" href="https://cr.minzdrav.gov.ru/clin_recomend" target="_blank" rel="noopener noreferrer">Открыть официальный рубрикатор Минздрава ↗</a>
+    <p class="knowledge-meta" id="ru-guideline-search-status" role="status" aria-live="polite">Поиск выполняется по индексированным страницам официального домена cr.minzdrav.gov.ru. Сверяйте найденную версию и статус документа на сайте Минздрава.</p>
+  </div>
   <label for="knowledge-search">Поиск по источникам и темам</label>
   <input id="knowledge-search" class="knowledge-search" type="search" placeholder="Например: сепсис, реанимация, почки">
   <button id="knowledge-search-button" class="send" type="button">Найти источники</button>
@@ -902,8 +925,22 @@ async function askAI(){
   filter.addEventListener("change",render);
   render();
 
-
-
+  const ruQuery=document.getElementById("ru-guideline-query");
+  const ruButton=document.getElementById("ru-guideline-search-button");
+  const ruStatus=document.getElementById("ru-guideline-search-status");
+  function searchRussianGuidelines(){
+    const query=ruQuery?ruQuery.value.trim():"";
+    if(!query){if(ruStatus)ruStatus.textContent="Введите заболевание, тему или код МКБ-10.";if(ruQuery)ruQuery.focus();return;}
+    const searchText='site:cr.minzdrav.gov.ru/recomend '+query;
+    const url='https://yandex.ru/search/?text='+encodeURIComponent(searchText);
+    if(ruStatus)ruStatus.textContent='Открываю результаты поиска по официальному домену Минздрава для запроса: '+query+'. Проверьте актуальность документа в рубрикаторе.';
+    window.open(url,"_blank","noopener,noreferrer");
+  }
+  if(ruButton)ruButton.addEventListener("click",searchRussianGuidelines);
+  if(ruQuery)ruQuery.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchRussianGuidelines();}});
+  document.querySelectorAll("[data-ru-query]").forEach(button=>button.addEventListener("click",()=>{
+    if(ruQuery){ruQuery.value=button.getAttribute("data-ru-query")||"";searchRussianGuidelines();}
+  }));
 
 })();</script>
 <script id="medpilot-pubmed-search">
