@@ -1031,9 +1031,9 @@ function calculateAPACHE2(){
       const actions=document.createElement("div");actions.className="drug-actions";
       const copy=document.createElement("button");copy.type="button";copy.textContent="Копировать название";
       copy.addEventListener("click",()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(d.inn).then(()=>{copy.textContent="Скопировано";}).catch(()=>{copy.textContent="Не удалось скопировать";});}});
-      const grls=document.createElement("a");grls.href="https://rlpdev.digitalms.ru/";grls.target="_blank";grls.rel="noopener noreferrer";grls.textContent="ГРЛС России";
+      const grls=document.createElement("a");grls.href="https://grls.rosminzdrav.ru/";grls.target="_blank";grls.rel="noopener noreferrer";grls.textContent="ГРЛС России — официальный реестр";
       const ema=document.createElement("a");ema.href="https://www.ema.europa.eu/en/medicines";ema.target="_blank";ema.rel="noopener noreferrer";ema.textContent="EMA";
-      const de=document.createElement("a");de.href="https://www.pharmnet-bund.de/";de.target="_blank";de.rel="noopener noreferrer";de.textContent="PharmNet.Bund";
+      const de=document.createElement("a");de.href="https://www.bfarm.de/DE/Arzneimittel/Arzneimittelinformationen/Arzneimittel-recherchieren/AMIce/_node.html";de.target="_blank";de.rel="noopener noreferrer";de.textContent="BfArM / AMIce";
       actions.append(copy,grls,ema,de);card.append(title,groupText,aliases,actions);results.appendChild(card);
     });
   }
