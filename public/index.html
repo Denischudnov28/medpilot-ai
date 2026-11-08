@@ -630,19 +630,41 @@ async function askAI(){
 
 <section class="card" id="clinical-tools">
   <h2>🩺 Клинические калькуляторы</h2>
-  <p>Выберите нужный инструмент. Каждый калькулятор открывается на отдельной странице.</p>
-  <div class="calculator-grid">
-    <a class="calculator-link" href="/calculators/gcs.html"><span>🧠</span><strong>Шкала комы Глазго</strong><small>GCS · оценка уровня сознания</small><b>Открыть →</b></a>
-    <a class="calculator-link" href="/calculators/sofa.html"><span>🫁</span><strong>SOFA</strong><small>Оценка органной дисфункции</small><b>Открыть →</b></a>
-    <a class="calculator-link" href="/calculators/qsofa.html"><span>🧭</span><strong>qSOFA</strong><small>Быстрая клиническая оценка</small><b>Открыть →</b></a>
-    <a class="calculator-link" href="/calculators/apache-ii.html"><span>📈</span><strong>APACHE II</strong><small>Оценка тяжести состояния в ОРИТ</small><b>Открыть →</b></a>
+  <p>Каталог разделён по специальностям. Выберите направление, чтобы открыть подходящие инструменты.</p>
+  <div class="calculator-specialties">
+    <section class="calculator-category"><h3>🫁 Анестезиология и реаниматология</h3><div class="calculator-grid">
+      <a class="calculator-link" href="/calculators/sofa.html"><span>🫁</span><strong>SOFA</strong><small>Органная дисфункция</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/qsofa.html"><span>🧭</span><strong>qSOFA</strong><small>Быстрая оценка риска</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/apache-ii.html"><span>📈</span><strong>APACHE II</strong><small>Тяжесть состояния в ОРИТ</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#map"><span>🩸</span><strong>Среднее АД (MAP)</strong><small>Гемодинамический расчёт</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#pf"><span>🫁</span><strong>PaO₂/FiO₂</strong><small>Индекс оксигенации</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#shock"><span>❤️</span><strong>Шоковый индекс</strong><small>ЧСС / систолическое АД</small><b>Открыть →</b></a>
+    </div></section>
+    <section class="calculator-category"><h3>🧠 Неврология и нейрореанимация</h3><div class="calculator-grid">
+      <a class="calculator-link" href="/calculators/gcs.html"><span>🧠</span><strong>Шкала комы Глазго (GCS)</strong><small>Оценка сознания</small><b>Открыть →</b></a>
+    </div></section>
+    <section class="calculator-category"><h3>❤️ Кардиология</h3><div class="calculator-grid">
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#qtc"><span>📉</span><strong>Коррекция QT (QTc)</strong><small>Формулы Bazett и Fridericia</small><b>Открыть →</b></a>
+    </div></section>
+    <section class="calculator-category"><h3>🧪 Нефрология и метаболизм</h3><div class="calculator-grid">
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#crcl"><span>🧪</span><strong>Клиренс креатинина</strong><small>Cockcroft–Gault</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#anion"><span>⚗️</span><strong>Анионная разница</strong><small>Оценка кислотно-основных нарушений</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#osm"><span>💧</span><strong>Осмолярность плазмы</strong><small>Расчётная оценка</small><b>Открыть →</b></a>
+    </div></section>
+    <section class="calculator-category"><h3>🩺 Терапия и общая медицина</h3><div class="calculator-grid">
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#bmi"><span>⚖️</span><strong>Индекс массы тела</strong><small>ИМТ для взрослых</small><b>Открыть →</b></a>
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#ibw"><span>📏</span><strong>Идеальная масса тела</strong><small>Формула Devine</small><b>Открыть →</b></a>
+    </div></section>
+    <section class="calculator-category"><h3>🚑 Неотложная медицина</h3><div class="calculator-grid">
+      <a class="calculator-link" href="/calculators/clinical-toolbox.html#corrected-na"><span>🧂</span><strong>Коррекция натрия</strong><small>При гипергликемии</small><b>Открыть →</b></a>
+    </div></section>
+    <p class="calculator-disclaimer">Каталог будет расширяться по специальностям. Перед клиническим применением проверяйте формулы, единицы измерения, ограничения и актуальные рекомендации.</p>
+    <a class="calculator-all" href="/calculators/clinical-toolbox.html">Открыть полный каталог расчётов →</a>
   </div>
 </section>
 <style>
-.calculator-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
-.calculator-link{display:flex;flex-direction:column;gap:8px;min-height:160px;padding:17px;border:1px solid #dce7f0;border-radius:16px;background:linear-gradient(145deg,#fff,#f6faff);text-decoration:none;color:#183b58;transition:transform .18s,box-shadow .18s}
-.calculator-link:active{transform:scale(.98)}.calculator-link span{font-size:25px}.calculator-link strong{font-size:16px}.calculator-link small{color:#71869a;line-height:1.4}.calculator-link b{margin-top:auto;color:#147c91;font-size:13px}
-@media(max-width:440px){.calculator-grid{grid-template-columns:1fr}.calculator-link{min-height:130px}}
+.calculator-specialties{display:grid;gap:18px;margin-top:16px}.calculator-category{padding:15px;border:1px solid #e1eaf2;border-radius:17px;background:#f9fcff}.calculator-category h3{margin:0 0 12px;color:#174f78;font-size:16px}.calculator-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.calculator-link{display:flex;flex-direction:column;gap:7px;min-height:145px;padding:14px;border:1px solid #dce7f0;border-radius:15px;background:#fff;text-decoration:none;color:#183b58}.calculator-link span{font-size:23px}.calculator-link strong{font-size:14px;line-height:1.3}.calculator-link small{color:#71869a;font-size:11px;line-height:1.4}.calculator-link b{margin-top:auto;color:#147c91;font-size:12px}.calculator-disclaimer{font-size:12px;line-height:1.5;color:#718397}.calculator-all{display:block;padding:14px;border-radius:13px;background:#eaf4fb;color:#145b87;text-align:center;text-decoration:none;font-weight:750}
+@media(max-width:440px){.calculator-grid{grid-template-columns:1fr}.calculator-link{min-height:112px}}
 </style>
 
 <section class="card" id="knowledge-base">
