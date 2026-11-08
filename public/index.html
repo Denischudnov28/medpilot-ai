@@ -375,6 +375,9 @@ body.mp-page-mode.mp-subpage header .logo,body.mp-page-mode.mp-subpage header .s
 @media(min-width:760px){.mp-back-button{left:max(18px,calc((100vw - 760px)/2))}}
 </style>
 <style id="medpilot-page-navigation">
+/* На главной странице глобальный поиск скрыт; в остальных разделах остаётся доступен. */
+body.mp-page-mode:not(.mp-subpage) .mp-global-search-trigger{display:none!important}
+
 .mp-home-page{display:none;text-align:center;margin-top:12px;padding:30px 22px}
 .mp-home-page.mp-page-active{display:block}
 .mp-home-mark{display:grid;place-items:center;width:66px;height:66px;margin:4px auto 18px;border-radius:22px;background:linear-gradient(135deg,#1766a5,#0d9488);color:#fff;font-size:34px;box-shadow:0 8px 20px rgba(23,102,165,.2)}
