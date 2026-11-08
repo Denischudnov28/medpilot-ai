@@ -475,7 +475,7 @@ header{padding-bottom:20px}
 </head>
 <body>
 <header>
-<button type="button" class="mp-back-button" id="mp-back-button" aria-label="Назад" title="Назад">‹</button>
+<button type="button" class="mp-back-button" id="mp-back-button" aria-label="На главную" title="На главную">⌂</button>
 <div class="logo">✚ MedPilot AI</div>
 <div class="sub">Интеллектуальный помощник для медицинских специалистов</div>
 <div class="mp-header-actions">
@@ -2075,12 +2075,7 @@ async function askAI(){
    });
    window.scrollTo({top:0,behavior:'instant'});
  }
- function goBack(){
-   pageHistory.length=0;
-   activate('home',false);
-   const menuTrigger=document.getElementById('mp-menu-trigger');
-   if(menuTrigger)menuTrigger.click();
- }
+ function goBack(){pageHistory.length=0;activate('home',false);window.scrollTo({top:0,behavior:'smooth'});}
  if(back)back.addEventListener('click',goBack);
  function pageFromLink(link){
    if(link.hasAttribute('data-mp-home'))return 'home';
