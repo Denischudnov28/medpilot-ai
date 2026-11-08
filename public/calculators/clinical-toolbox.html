@@ -372,7 +372,7 @@ function runAddedCalc2(k){
   out(k).textContent='Объём ≈ '+(0.523*n('ell-a')*n('ell-b')*n('ell-c')).toFixed(2)+' см³ (мл). Метод предполагает эллипсоидную форму; для неправильных образований предпочтительнее сегментация.';
  }
  if(k==='pedsbsa'||k==='bsa'){
-  const ids=k==='bsa'?['bsa-h','bsa-w']:['pbsa-h','pbsa-w'];
+  const ids=k==='bsa'?['added-bsa-h','added-bsa-w']:['pbsa-h','pbsa-w'];
   if(!ok(ids)||n(ids[0])<=0||n(ids[1])<=0){out(k).textContent='Введите положительные рост и массу.';out(k).hidden=false;return;}
   out(k).textContent='Площадь поверхности тела ≈ '+Math.sqrt(n(ids[0])*n(ids[1])/3600).toFixed(2)+' м² (Mosteller). У детей результат зависит от возраста и антропометрии; не используйте ППТ как единственное основание для назначения дозы.';
  }
