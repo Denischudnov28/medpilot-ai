@@ -1575,6 +1575,10 @@ async function askAI(){
  }
  function buildSiteIndex(){
   siteItems=[];
+  document.querySelectorAll(".mp-menu-links a[href^='#'],.mp-specialty-links a[href^='#']").forEach(link=>{
+   const sectionId=link.getAttribute("href").slice(1),title=link.textContent.trim();
+   if(title&&sectionId)siteItems.push({title,description:"Переход к разделу приложения",sectionId,target:null,group:"Разделы сайта"});
+  });
   document.querySelectorAll("main > section[id]").forEach(section=>{
    const sectionId=section.id;
    const sectionTitle=section.querySelector("h1,h2")?.textContent.trim()||sectionId;
