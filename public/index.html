@@ -199,6 +199,30 @@ body {
   margin-bottom: 4px;
 }
 
+
+/* Результаты поиска по протоколам показываем без навигационных карточек. */
+.protocol-card.protocol-catalog-flat{
+  display:block;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  padding:0!important;
+  margin:0!important;
+}
+.protocol-card.protocol-catalog-flat > .drug-tag,
+.protocol-card.protocol-catalog-flat > h3,
+.protocol-card.protocol-catalog-flat > p,
+.protocol-card.protocol-catalog-flat > .drug-actions{
+  display:none!important;
+}
+.protocol-card.protocol-catalog-flat > [id^="specialty-"]{
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
@@ -1267,6 +1291,10 @@ const findButton=document.getElementById("protocol-search-button");
 const list=document.getElementById("protocol-list");
 if(!search||!findButton||!list)return;
 const cards=Array.from(list.querySelectorAll(".protocol-card"));
+cards.forEach(card=>{
+  const tag=card.querySelector(":scope > .drug-tag");
+  if(tag&&tag.textContent.includes("Навигационный каталог"))card.classList.add("protocol-catalog-flat");
+});
 function filterProtocols(){
   const q=search.value.trim().toLocaleLowerCase("ru");
   let matches=0;
