@@ -303,6 +303,12 @@ body{padding-bottom:24px!important}
 .mp-menu-links a:active,.mp-menu-links a:focus-visible{background:#eaf4fb;color:#145b87;outline:none}
 .mp-menu-links a span{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:#edf5fb;color:#1766a5;font-size:19px;font-weight:700}
 .mp-menu-links a b{font-weight:700}
+.mp-menu-subtitle{padding:8px 12px 2px;color:#8294a8;font-size:10px;font-weight:800;letter-spacing:.08em}
+.mp-specialty-links{display:grid;gap:3px;padding:0 0 8px 9px;border-left:2px solid #dceaf4;margin-left:14px}
+.mp-specialty-links a{display:flex;align-items:center;gap:8px;min-height:38px;padding:7px 9px;border-radius:10px;text-decoration:none;color:#456078;font-size:12px;line-height:1.25}
+.mp-specialty-links a:active,.mp-specialty-links a:focus-visible{background:#eaf4fb;color:#145b87;outline:none}
+.mp-specialty-links a span{font-weight:650}
+.mp-side-menu{overflow-y:auto;overscroll-behavior:contain}
 .mp-menu-foot{margin-top:auto;padding:14px 10px;border-top:1px solid #e7eef5;color:#8191a2;font-size:11px}
 body.mp-menu-active{overflow:hidden}
 @media(min-width:760px){.mp-menu-trigger{top:24px;right:max(22px,calc((100vw - 760px)/2))}}
@@ -877,7 +883,17 @@ async function askAI(){
   <nav class="mp-menu-links" aria-label="Разделы приложения">
     <a href="#" data-mp-home><span>⌂</span><b>Главная</b></a>
     <a href="#question"><span>✦</span><b>AI-помощник</b></a>
-    <a href="#clinical-tools"><span>▦</span><b>Калькуляторы</b></a>
+    <a href="#clinical-tools"><span>▦</span><b>Все калькуляторы</b></a>
+    <div class="mp-menu-subtitle">КАЛЬКУЛЯТОРЫ ПО СПЕЦИАЛЬНОСТЯМ</div>
+    <div class="mp-specialty-links" aria-label="Выбор специальности">
+      <a href="/calculators/clinical-toolbox.html#anesthesia">🫁 <span>Анестезиология и реанимация</span></a>
+      <a href="/calculators/clinical-toolbox.html#pulmonology">🫁 <span>Пульмонология</span></a>
+      <a href="/calculators/clinical-toolbox.html#cardiology">❤️ <span>Кардиология</span></a>
+      <a href="/calculators/clinical-toolbox.html#nephrology">🧪 <span>Нефрология и метаболизм</span></a>
+      <a href="/calculators/clinical-toolbox.html#therapy">🩺 <span>Терапия</span></a>
+      <a href="/calculators/clinical-toolbox.html#emergency">🚑 <span>Неотложная медицина</span></a>
+      <a href="/calculators/gcs.html">🧠 <span>Неврология и нейрореанимация</span></a>
+    </div>
     <a href="#knowledge-base"><span>▤</span><b>База знаний</b></a>
     <a href="#drug-reference"><span>✚</span><b>Справочник препаратов</b></a>
     <a href="#clinical-protocols"><span>☷</span><b>Клинические протоколы</b></a>
@@ -928,8 +944,10 @@ async function askAI(){
    if(target==='question')return 'ai';
    return target;
  }
- document.querySelectorAll('.mp-menu-links a').forEach(link=>{
+ document.querySelectorAll('.mp-menu-links a, .mp-specialty-links a').forEach(link=>{
    link.addEventListener('click',event=>{
+     const href=link.getAttribute('href')||'';
+     if(href.startsWith('/calculators/'))return;
      event.preventDefault();
      activate(pageFromLink(link));
    },true);
