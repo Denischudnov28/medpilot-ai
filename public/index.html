@@ -1275,6 +1275,16 @@ function filterProtocols(){
     const show=Boolean(q)&&haystack.includes(q);
     card.hidden=!show;
     card.style.setProperty("display",show?"":"none","important");
+    const specialtyToggle=card.querySelector('.protocol-toggle[aria-controls^="specialty-"]');
+    if(specialtyToggle){
+      const panel=document.getElementById(specialtyToggle.getAttribute("aria-controls"));
+      specialtyToggle.remove();
+      if(panel){
+        panel.hidden=!show;
+        panel.setAttribute("aria-hidden",String(!show));
+        panel.style.setProperty("display",show?"block":"none","important");
+      }
+    }
     if(show)matches++;
   });
   const showList=Boolean(q)&&matches>0;
