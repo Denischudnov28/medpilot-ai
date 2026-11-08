@@ -1497,8 +1497,9 @@ async function askAI(){
     <label for="ru-guideline-query">Название клинической рекомендации</label>
     <input id="ru-guideline-query" class="knowledge-search" type="search" placeholder="Введите название рекомендации" autocomplete="off">
     <button type="button" class="send" id="ru-guideline-search-button">Найти</button>
-    <p class="knowledge-meta" id="ru-guideline-search-status" role="status" aria-live="polite">Результаты откроются по запросу на официальном домене Минздрава. Проверяйте дату утверждения и актуальную редакцию документа.</p>
-    <a class="knowledge-link knowledge-open-source" href="https://cr.minzdrav.gov.ru/clin_recomend" target="_blank" rel="noopener noreferrer">Открыть официальный рубрикатор Минздрава ↗</a>
+    <p class="knowledge-meta" id="ru-guideline-search-status" role="status" aria-live="polite">Введите заболевание или тему и нажмите «Найти». Сначала будут показаны наиболее важные рекомендации по теме.</p>
+    <div id="ru-guideline-results" class="knowledge-list" aria-live="polite"></div>
+    <a class="knowledge-link knowledge-open-source" href="https://cr.minzdrav.gov.ru/clin_recomend" target="_blank" rel="noopener noreferrer">Открыть полный официальный рубрикатор Минздрава ↗</a>
   </div>
   <div id="international-guidelines">
   <h3>🌐 Международные клинические рекомендации</h3>
@@ -1624,13 +1625,43 @@ async function askAI(){
   const ruQuery=document.getElementById("ru-guideline-query");
   const ruButton=document.getElementById("ru-guideline-search-button");
   const ruStatus=document.getElementById("ru-guideline-search-status");
+  const ruResults=document.getElementById("ru-guideline-results");
+  const ruGuidelines=[
+    {name:"Сепсис у взрослых",year:"2024",id:"898_1",terms:"сепсис септический шок инфекция бактериемия органная дисфункция",summary:"Распознавание сепсиса и септического шока, диагностика, антибактериальная терапия, инфузионная и вазопрессорная поддержка, контроль очага инфекции.",url:"https://cr.minzdrav.gov.ru/preview-cr/898_1"},
+    {name:"Внебольничная пневмония у взрослых",year:"2024",id:"654_2",terms:"пневмония дыхательная недостаточность инфекция легкие",summary:"Оценка тяжести, диагностика, антибактериальная терапия, показания к госпитализации и лечению в ОРИТ.",url:"https://cr.minzdrav.gov.ru/preview-cr/654_2"},
+    {name:"Анафилактический шок",year:"",id:"",terms:"анафилаксия анафилактический шок аллергия адреналин гипотензия",summary:"Неотложное распознавание анафилаксии, адреналин, обеспечение дыхательных путей, кислород и инфузионная терапия."},
+    {name:"Остановка сердца у взрослых",year:"",id:"",terms:"остановка сердца сердечно легочная реанимация слр асистолия фибрилляция желудочков",summary:"Алгоритмы сердечно-лёгочной реанимации, дефибрилляция, обратимые причины и постреанимационное ведение."},
+    {name:"Острый ишемический инсульт",year:"",id:"",terms:"инсульт ишемический тромболизис тромбэктомия",summary:"Диагностика в остром периоде, реперфузионная терапия, мониторинг и профилактика осложнений."},
+    {name:"Внутримозговое кровоизлияние",year:"",id:"",terms:"инсульт геморрагический внутримозговое кровоизлияние",summary:"Контроль гемодинамики, коррекция коагулопатии, нейровизуализация и нейрореанимационное наблюдение."},
+    {name:"Тромбоэмболия лёгочной артерии",year:"",id:"",terms:"тэла тромбоэмболия легочной артерии тромбоз шок",summary:"Стратификация риска, диагностика, антикоагулянтная и реперфузионная терапия при нестабильности."},
+    {name:"Острый коронарный синдром",year:"",id:"",terms:"окс инфаркт миокарда коронарный синдром кардиогенный шок",summary:"Ранняя диагностика, реперфузионная тактика, антитромботическая терапия и ведение осложнений."},
+    {name:"Острый панкреатит",year:"",id:"",terms:"панкреатит острый органная недостаточность",summary:"Оценка тяжести, инфузионная терапия, обезболивание, питание и лечение органной недостаточности."},
+    {name:"Послеродовое кровотечение",year:"",id:"",terms:"акушерство кровотечение геморрагический шок роды",summary:"Распознавание массивной кровопотери, утеротоники, гемостатическая и трансфузионная терапия."},
+    {name:"Преэклампсия и эклампсия",year:"",id:"",terms:"акушерство преэклампсия эклампсия судороги магния сульфат",summary:"Контроль тяжёлой гипертензии, профилактика судорог, магния сульфат и выбор срока родоразрешения."},
+    {name:"Острое повреждение почек",year:"",id:"",terms:"опп почечная недостаточность острое повреждение почек диализ",summary:"Диагностика и стадирование ОПП, коррекция причин, водно-электролитных нарушений и показания к заместительной почечной терапии."}
+  ];
+  function ruNormalize(value){return String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").replace(/[^\\p{L}\\p{N}]+/gu," ").trim();}
   function searchRussianGuidelines(){
     const query=ruQuery?ruQuery.value.trim():"";
-    if(!query){if(ruStatus)ruStatus.textContent="Введите заболевание, тему или код МКБ-10.";if(ruQuery)ruQuery.focus();return;}
-    const searchText='site:cr.minzdrav.gov.ru/ '+query+' клинические рекомендации';
-    const url='https://yandex.ru/search/?text='+encodeURIComponent(searchText);
-    if(ruStatus)ruStatus.textContent='Открываю результаты поиска по названию «'+query+'» на официальном домене Минздрава. Проверьте дату и статус найденной рекомендации.';
-    window.open(url,"_blank","noopener,noreferrer");
+    const terms=ruNormalize(query).split(/\\s+/).filter(Boolean);
+    const ranked=ruGuidelines.map((item,index)=>{
+      const hay=ruNormalize(item.name+" "+item.terms+" "+item.summary);
+      const score=terms.length?terms.reduce((sum,term)=>sum+(hay.includes(term)?3:0),0):0;
+      return {...item,index,score};
+    }).filter(item=>!terms.length||item.score>0).sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,8);
+    if(ruResults)ruResults.replaceChildren();
+    if(!ranked.length){if(ruStatus)ruStatus.textContent="В подборке точного совпадения нет. Попробуйте другое название или откройте официальный рубрикатор.";return;}
+    if(ruStatus)ruStatus.textContent=(terms.length?"Подходящие рекомендации по вашему запросу: ":"Приоритетные рекомендации: ")+ranked.length+". Сначала показаны наиболее релевантные.";
+    ranked.forEach(item=>{
+      const card=document.createElement("article");card.className="knowledge-item";
+      const title=document.createElement("h3");title.textContent=item.name;
+      const meta=document.createElement("div");meta.className="knowledge-meta";meta.textContent="Клинические рекомендации Минздрава РФ"+(item.year?" · "+item.year:"")+(item.id?" · ID "+item.id:"");
+      const summary=document.createElement("p");summary.textContent=item.summary;
+      const link=document.createElement("a");link.className="knowledge-link knowledge-open-source";link.target="_blank";link.rel="noopener noreferrer";
+      link.href=item.url||("https://yandex.ru/search/?text="+encodeURIComponent('site:cr.minzdrav.gov.ru/ "'+item.name+'"'));
+      link.textContent=item.url?"Открыть полный документ ↗":"Найти документ в официальном рубрикаторе ↗";
+      card.append(title,meta,summary,link);ruResults.appendChild(card);
+    });
   }
   if(ruButton)ruButton.addEventListener("click",searchRussianGuidelines);
   if(ruQuery)ruQuery.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchRussianGuidelines();}});
