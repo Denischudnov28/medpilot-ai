@@ -303,6 +303,88 @@ async function askAI(){
 }
 </script>
 
+<section class="card" id="clinical-tools">
+  <h2>🩺 Клинические калькуляторы</h2>
+  <h3>Шкала комы Глазго (GCS)</h3>
+
+  <label>Открывание глаз (E)</label>
+  <select id="gcs-e">
+    <option value="4">4 — Спонтанное</option>
+    <option value="3">3 — На речь</option>
+    <option value="2">2 — На боль</option>
+    <option value="1">1 — Отсутствует</option>
+  </select>
+
+  <label>Речевая реакция (V)</label>
+  <select id="gcs-v">
+    <option value="5">5 — Ориентирован</option>
+    <option value="4">4 — Спутанная речь</option>
+    <option value="3">3 — Отдельные слова</option>
+    <option value="2">2 — Нечленораздельные звуки</option>
+    <option value="1">1 — Отсутствует</option>
+    <option value="0">Невозможно оценить</option>
+  </select>
+
+  <label>Двигательная реакция (M)</label>
+  <select id="gcs-m">
+    <option value="6">6 — Выполняет команды</option>
+    <option value="5">5 — Локализует боль</option>
+    <option value="4">4 — Отдёргивает конечность</option>
+    <option value="3">3 — Патологическое сгибание</option>
+    <option value="2">2 — Разгибание</option>
+    <option value="1">1 — Отсутствует</option>
+    <option value="0">Невозможно оценить</option>
+  </select>
+  
+  
+  
+  
+  
+
+
+
+
+
+  <button class="send" onclick="calculateGCS()">
+    Рассчитать GCS
+  </button>
+
+  <div id="gcs-result" style="margin-top:15px;font-weight:700"></div>
+   </div>
+</section>
+
+<script>
+function calculateGCS() {
+  const e = Number(document.getElementById("gcs-e").value);
+  const v = Number(document.getElementById("gcs-v").value);
+  const m = Number(document.getElementById("gcs-m").value);
+  const result = document.getElementById("gcs-result");
+
+  if (e === 0 || v === 0 || m === 0) {
+    result.textContent =
+      "Невозможно определить полный балл GCS: один или несколько компонентов не поддаются оценке. Укажите причину.";
+    return;
+  }
+
+  const total = e + v + m;
+
+  let severity = "";
+
+  if (total <= 8) {
+    severity = "Тяжёлое нарушение сознания";
+  } else if (total <= 12) {
+    severity = "Умеренное нарушение сознания";
+  } else {
+    severity = "Лёгкое нарушение сознания";
+  }
+
+  result.innerHTML =
+    "GCS: " + total + "/15<br>" +
+    "E: " + e + " | V: " + v + " | M: " + m +
+    "<br>" + severity;
+}
+</script>
+
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
