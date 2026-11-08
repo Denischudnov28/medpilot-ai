@@ -551,7 +551,7 @@ header{padding-bottom:20px}
 <p class="status">Пошаговые алгоритмы для клинической практики · версия и первоисточник указаны в каждой карточке</p>
 <label for="protocol-search">Поиск по протоколам</label>
 <input id="protocol-search" class="drug-search" type="search" placeholder="Например: сепсис, шок, вазопрессор">
-<div id="protocol-list" class="drug-results" aria-live="polite">
+<div id="protocol-list" class="drug-results" aria-live="polite" hidden>
 <article class="drug-item protocol-card" data-search="анестезиология предоперационная оценка подготовка пациента анестезиологический риск голодание ASA">
 <div class="drug-tag">Анестезиология и реаниматология · Взрослые</div>
 <h3>Предоперационная оценка и подготовка пациента</h3>
@@ -1266,8 +1266,22 @@ header{padding-bottom:20px}
 (function(){
 const search=document.getElementById("protocol-search"),list=document.getElementById("protocol-list");
 if(!search||!list)return;
-search.addEventListener("input",function(){const q=search.value.trim().toLocaleLowerCase("ru");list.querySelectorAll(".protocol-card").forEach(card=>{card.hidden=!card.dataset.search.toLocaleLowerCase("ru").includes(q);});});
-list.querySelectorAll(".protocol-toggle").forEach(button=>button.addEventListener("click",function(){const panel=document.getElementById(button.getAttribute("aria-controls"));const opening=panel.hidden;panel.hidden=!opening;button.setAttribute("aria-expanded",String(opening));button.textContent=opening?"Свернуть алгоритм":"Открыть алгоритм";}));
+function filterProtocols(){
+  const q=search.value.trim().toLocaleLowerCase("ru");
+  list.querySelectorAll(".protocol-card").forEach(card=>{
+    card.hidden=!q||!card.dataset.search.toLocaleLowerCase("ru").includes(q);
+  });
+  list.hidden=!q;
+}
+search.addEventListener("input",filterProtocols);
+list.querySelectorAll(".protocol-toggle").forEach(button=>button.addEventListener("click",function(){
+  const panel=document.getElementById(button.getAttribute("aria-controls"));
+  const opening=panel.hidden;
+  panel.hidden=!opening;
+  button.setAttribute("aria-expanded",String(opening));
+  button.textContent=opening?"Свернуть алгоритм":"Открыть алгоритм";
+}));
+filterProtocols();
 })();
 </script>
 
