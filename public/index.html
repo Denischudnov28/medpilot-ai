@@ -1733,6 +1733,7 @@ async function askAI(){
   <p class="status">Поиск по МНН, синонимам и фармакологическим группам</p>
   <label for="drug-search">Название препарата или действующее вещество</label>
   <input id="drug-search" class="drug-search" type="search" placeholder="Например: норадреналин, пропофол, ceftriaxone">
+  <button id="drug-search-button" class="send" type="button">Найти</button>
   <label for="drug-filter">Фармакологическая группа</label>
   <select id="drug-filter" class="drug-filter">
     <option value="all">Все группы</option>
@@ -2025,11 +2026,19 @@ async function askAI(){
     {inn:"Ритуксимаб",aliases:"rituximab мабтера",group:"immuno",groupName:"Иммунология и ревматология",clinical:{form:"Концентрат для приготовления раствора для внутривенной инфузии (MabThera); химерное моноклональное антитело к CD20. Подкожные формы предназначены для отдельных показаний и имеют отдельную инструкцию.",concentration:"MabThera IV: 10 мг/мл; флакон 100 мг/10 мл или 500 мг/50 мл. Не путать с подкожной формой 1400 мг/11,7 мл.",route:"Только внутривенная инфузия после разведения до 1–4 мг/мл в 0,9% NaCl или 5% глюкозе по SmPC; не вводить болюсно. Перед каждой инфузией премедикация антипиретиком и антигистаминным препаратом; по показанию — ГКС. Первую инфузию проводить медленно с готовностью к реанимации.",contra:"Гиперчувствительность к ритуксимабу, белкам мыши или компонентам; активная тяжёлая инфекция; выраженная иммуносупрессия. Для аутоиммунных показаний учитывать ограничения при тяжёлой сердечной патологии по SmPC.",caution:"Риск тяжёлых инфузионных реакций/анафилаксии, синдрома высвобождения цитокинов, тяжёлых инфекций, реактивации HBV и PML. До начала скрининг HBsAg и anti-HBc, оценка иммунного статуса и инфекционного риска; при HBV — консультация специалиста и профилактика/мониторинг. Контролировать ОАК, инфекции и неврологические симптомы; при подозрении на PML немедленно прекратить и обследовать. Живые вакцины избегать во время терапии и до восстановления иммунитета.",organ:"При почечной/печёночной недостаточности специфическая коррекция дозы обычно не определена, данные ограничены. При цитопении, хроническом HBV, тяжёлой сердечной патологии или повторных инфекциях требуется индивидуальная оценка и усиленный мониторинг.",url:"https://www.medicines.org.uk/emc/product/3801/smpc",source:"SmPC MabThera 100/500 mg concentrate for solution for infusion, Roche; 23 Jun 2026."}}
   ];
   const search=document.getElementById("drug-search");
+  const searchButton=document.getElementById("drug-search-button");
   const filter=document.getElementById("drug-filter");
   const results=document.getElementById("drug-results");
-  if(!search||!filter||!results)return;
+  if(!search||!searchButton||!filter||!results)return;
+  let submittedQuery=null;
   function render(){
-    const q=search.value.trim().toLocaleLowerCase("ru");
+    if(submittedQuery===null){
+      results.replaceChildren();
+      const hint=document.createElement("div");hint.className="knowledge-empty";
+      hint.textContent="Введите название препарата или действующее вещество и нажмите «Найти».";
+      results.appendChild(hint);return;
+    }
+    const q=submittedQuery.toLocaleLowerCase("ru");
     const group=filter.value;
     const found=drugs.filter(d=>(group==="all"||d.group===group)&&(!q||(d.inn+" "+d.aliases).toLocaleLowerCase("ru").includes(q)));
     results.replaceChildren();
@@ -2065,7 +2074,14 @@ async function askAI(){
       actions.append(copy,grls,ema,de);card.append(title,groupText,aliases,actions);results.appendChild(card);
     });
   }
-  search.addEventListener("input",render);filter.addEventListener("change",render);render();
+  function runDrugSearch(){
+    submittedQuery=search.value.trim();
+    render();
+  }
+  searchButton.addEventListener("click",runDrugSearch);
+  search.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();runDrugSearch();}});
+  filter.addEventListener("change",()=>{if(submittedQuery!==null)render();});
+  render();
   document.getElementById("drug-ask").addEventListener("click",()=>{
     const name=search.value.trim();
     const age=document.getElementById("drug-patient-age").value.trim();
