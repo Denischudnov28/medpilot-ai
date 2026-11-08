@@ -772,13 +772,15 @@ async function askAI(){
  const results=document.getElementById("all-calculators-results");
  const status=document.getElementById("all-calculators-status");
  if(!input||!results||!status)return;
- let catalog=[];\n status.textContent="Загружаем каталог калькуляторов…";
+ let catalog=[];
+ status.textContent="Загружаем каталог калькуляторов…";
  const normalize=value=>String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").replace(/[‐‑‒–—]/g,"-").replace(/[^a-zа-я0-9]+/gi," ").trim().replace(/\s+/g," ");
  function render(){
   const query=normalize(input.value);
   results.replaceChildren();
   if(!query){const empty=document.createElement("div");empty.className="knowledge-empty";empty.textContent="Начните вводить название — покажем подходящие калькуляторы.";results.appendChild(empty);status.textContent="Поиск по полному каталогу клинических инструментов.";return;}
-  const terms=query.split(" ").filter(Boolean);\n  const matches=catalog.filter(item=>{const hay=normalize(item.name+" "+item.category+" "+item.description);return terms.every(term=>hay.includes(term));}).slice(0,30);
+  const terms=query.split(" ").filter(Boolean);
+  const matches=catalog.filter(item=>{const hay=normalize(item.name+" "+item.category+" "+item.description);return terms.every(term=>hay.includes(term));}).slice(0,30);
   if(!matches.length){const empty=document.createElement("div");empty.className="knowledge-empty";empty.textContent="Ничего не найдено. Попробуйте другое название или аббревиатуру.";results.appendChild(empty);status.textContent="Совпадений не найдено.";return;}
   matches.forEach(item=>{
    const link=document.createElement("a");link.className="calculator-search-result";link.href="/calculators/clinical-toolbox.html#"+encodeURIComponent(item.id);
