@@ -307,13 +307,33 @@ body{padding-bottom:24px!important}
 body.mp-menu-active{overflow:hidden}
 @media(min-width:760px){.mp-menu-trigger{top:24px;right:max(22px,calc((100vw - 760px)/2))}}
 @media(prefers-reduced-motion:reduce){.mp-side-menu,.mp-menu-backdrop{transition:none}}
-</style>\n</head>
+</style>\n
+<style id="medpilot-page-navigation">
+.mp-home-page{display:none;text-align:center;margin-top:12px;padding:30px 22px}
+.mp-home-page.mp-page-active{display:block}
+.mp-home-mark{display:grid;place-items:center;width:66px;height:66px;margin:4px auto 18px;border-radius:22px;background:linear-gradient(135deg,#1766a5,#0d9488);color:#fff;font-size:34px;box-shadow:0 8px 20px rgba(23,102,165,.2)}
+.mp-home-page h2{display:block!important;margin:0 0 10px!important;font-size:22px!important}
+.mp-home-page p{color:#65788d;line-height:1.55}
+.mp-home-page .send{max-width:300px;margin:18px auto 8px}
+body.mp-page-mode main>section:not(.mp-page-active),body.mp-page-mode>section:not(.mp-page-active){display:none!important}
+body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-active{display:block!important}
+</style>
+
+</head>
 <body>
 <header>
 <div class="logo">✚ MedPilot AI</div>
 <div class="sub">Интеллектуальный медицинский помощник</div>\n<button type="button" class="mp-menu-trigger" id="mp-menu-trigger" aria-controls="medpilot-side-menu" aria-expanded="false"><span class="mp-burger">☰</span><span>Меню</span></button>
 </header>
 <main>
+
+<section class="card mp-home-page" id="mp-home-page" data-page="home">
+  <div class="mp-home-mark">✚</div>
+  <h2>Добро пожаловать в MedPilot AI</h2>
+  <p>Медицинский помощник и клинические инструменты — в одном приложении.</p>
+  <button type="button" class="send" id="mp-home-start">Открыть AI-помощник</button>
+  <p class="status">Остальные разделы доступны через кнопку «Меню» вверху.</p>
+</section>
 <section class="card">
 <h2>🩺 Выберите специальность</h2>
 <label for="specialty">Медицинское направление</label>
@@ -1340,5 +1360,43 @@ function calculateAPACHE2(){
  }));
  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&menu.classList.contains("mp-open"))closeMenu();});
 })();
-</script>\n</body>
+</script>\n
+<script id="medpilot-page-router">
+(function(){
+ const directSections=[...document.querySelectorAll('body > main > section, body > section')];
+ const home=document.getElementById('mp-home-page');
+ if(!home)return;
+ directSections.forEach((section,index)=>{
+   if(section===home)return;
+   const id=section.id;
+   section.dataset.page = id || (index<=4 ? 'ai' : 'other');
+ });
+ function activate(page){
+   document.body.classList.add('mp-page-mode');
+   directSections.forEach(section=>{
+     const active=section.dataset.page===page;
+     section.classList.toggle('mp-page-active',active);
+     section.setAttribute('aria-hidden',active?'false':'true');
+   });
+   window.scrollTo({top:0,behavior:'instant'});
+ }
+ function pageFromLink(link){
+   if(link.hasAttribute('data-mp-home'))return 'home';
+   const target=(link.getAttribute('href')||'').replace(/^#/,'');
+   if(target==='question')return 'ai';
+   return target;
+ }
+ document.querySelectorAll('.mp-menu-links a').forEach(link=>{
+   link.addEventListener('click',event=>{
+     event.preventDefault();
+     activate(pageFromLink(link));
+   },true);
+ });
+ const start=document.getElementById('mp-home-start');
+ if(start)start.addEventListener('click',()=>activate('ai'));
+ activate('home');
+})();
+</script>
+
+</body>
 </html>
