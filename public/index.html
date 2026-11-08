@@ -1230,6 +1230,7 @@ async function askAI(){
   closeMenu();
  }));
  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&menu.classList.contains("mp-open"))closeMenu();});
+ if(new URLSearchParams(window.location.search).get("openMenu")==="1")openMenu();
 })();
 </script>
 <script id="medpilot-page-router">
