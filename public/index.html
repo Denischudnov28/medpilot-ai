@@ -213,8 +213,26 @@ body {
 .knowledge-link{display:inline-block;color:#1765a5;font-weight:700;font-size:14px;text-decoration:none;padding-top:5px}
 .knowledge-empty{padding:14px;color:#64748b;text-align:center}
 .knowledge-note{font-size:12px;line-height:1.55;color:#79551e;background:#fff8e8;border:1px solid #f3e2bd;border-radius:12px;padding:12px;margin-top:14px}
-.mobile-nav-inner{grid-template-columns:repeat(5,minmax(0,1fr))}
+.mobile-nav-inner{grid-template-columns:repeat(6,minmax(0,1fr))}
 .mobile-nav a{font-size:11px}
+</style>
+<style>
+/* MEDICINES REFERENCE */
+.drug-search,.drug-filter,.drug-context{width:100%;padding:13px 14px;border:1px solid #d9e1ed;border-radius:12px;font-size:16px;margin:7px 0 12px;background:#fff;color:#17243a}
+.drug-results{display:grid;gap:10px}
+.drug-item{border:1px solid #e0e8f1;border-radius:14px;padding:13px;background:#fbfdff}
+.drug-item h3{font-size:16px;margin:0 0 5px;color:#145b87}
+.drug-item p{font-size:13px;line-height:1.45;margin:5px 0;color:#52647a}
+.drug-tag{font-size:11px;color:#64748b}
+.drug-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.drug-actions a,.drug-actions button{font-size:13px;padding:9px 11px;border-radius:9px;text-decoration:none}
+.drug-actions a{background:#eaf3fa;color:#145b87;font-weight:700}
+.drug-actions button{background:#eef2f7;color:#334155}
+.drug-warning{font-size:12px;line-height:1.55;color:#79551e;background:#fff8e8;border:1px solid #f3e2bd;border-radius:12px;padding:12px;margin:12px 0}
+.drug-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.drug-grid label{font-size:12px}
+.drug-context{margin-top:5px}
+@media(max-width:390px){.drug-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -915,6 +933,136 @@ function calculateAPACHE2(){
 })();
 </script>
 
+<section class="card" id="drug-reference">
+  <h2>💊 Справочник лекарственных препаратов</h2>
+  <p class="status">Поиск по МНН, синонимам и фармакологическим группам</p>
+  <label for="drug-search">Название препарата или действующее вещество</label>
+  <input id="drug-search" class="drug-search" type="search" placeholder="Например: норадреналин, пропофол, ceftriaxone">
+  <label for="drug-filter">Фармакологическая группа</label>
+  <select id="drug-filter" class="drug-filter">
+    <option value="all">Все группы</option>
+    <option value="anesthesia">Анестезия и седация</option>
+    <option value="vaso">Вазопрессоры и инотропы</option>
+    <option value="antibiotic">Антибактериальные препараты</option>
+    <option value="analgesia">Анальгетики</option>
+    <option value="cardio">Кардиология</option>
+    <option value="anticoag">Антикоагулянты</option>
+    <option value="endocrine">Эндокринология</option>
+    <option value="resp">Пульмонология</option>
+  </select>
+  <div id="drug-results" class="drug-results" aria-live="polite"></div>
+  <div class="drug-warning"><b>Важно:</b> этот каталог — навигационный указатель, а не готовая инструкция по применению. Здесь намеренно не приводятся универсальные дозы. Проверяйте конкретную лекарственную форму, концентрацию, путь введения, показания, противопоказания, взаимодействия и актуальную инструкцию в реестре соответствующей страны.</div>
+  <h3>Сформировать клинический запрос по препарату</h3>
+  <div class="drug-grid">
+    <div><label for="drug-patient-age">Возраст, лет</label><input id="drug-patient-age" class="drug-context" type="number" min="0" max="120" placeholder="Возраст"></div>
+    <div><label for="drug-patient-weight">Масса тела, кг</label><input id="drug-patient-weight" class="drug-context" type="number" min="0" step="any" placeholder="Масса тела"></div>
+    <div><label for="drug-renal">Функция почек</label><select id="drug-renal" class="drug-context"><option value="">Не указано</option><option>Без известного нарушения</option><option>Снижена</option><option>Диализ</option><option>Острое повреждение почек</option></select></div>
+    <div><label for="drug-hepatic">Функция печени</label><select id="drug-hepatic" class="drug-context"><option value="">Не указано</option><option>Без известного нарушения</option><option>Снижена</option><option>Тяжёлая печёночная недостаточность</option></select></div>
+  </div>
+  <label for="drug-indication">Показание и клинический контекст</label>
+  <textarea id="drug-indication" placeholder="Диагноз, цель назначения, путь введения, сопутствующие препараты и важные особенности пациента..."></textarea>
+  <button class="send" type="button" id="drug-ask">Подготовить запрос для AI-помощника</button>
+  <p class="status" id="drug-status">Заполните препарат и клинический контекст. Не вводите персональные данные пациента.</p>
+  <div class="drug-warning">Перед использованием AI-ответа сверьте назначение с официальной инструкцией, локальным формуляром и клиническими рекомендациями. Для высокорисковых препаратов обязательна независимая проверка расчётов и концентраций.</div>
+</section>
+<script>
+(function(){
+  const drugs = [
+    {inn:"Пропофол",aliases:"propofol диприван",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Этомидат",aliases:"etomidate",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Кетамин",aliases:"ketamine кеталар",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Мидазолам",aliases:"midazolam дормикум",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Дексмедетомидин",aliases:"dexmedetomidine",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Севофлуран",aliases:"sevoflurane",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Рокуроний",aliases:"rocuronium эсмерон",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Суксаметоний",aliases:"succinylcholine сукцинилхолин",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Цисатракурий",aliases:"cisatracurium нимбекс",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Норадреналин",aliases:"norepinephrine левофед",group:"vaso",groupName:"Вазопрессоры и инотропы"},
+    {inn:"Адреналин",aliases:"epinephrine эпинефрин",group:"vaso",groupName:"Вазопрессоры и инотропы"},
+    {inn:"Вазопрессин",aliases:"vasopressin",group:"vaso",groupName:"Вазопрессоры и инотропы"},
+    {inn:"Добутамин",aliases:"dobutamine",group:"vaso",groupName:"Вазопрессоры и инотропы"},
+    {inn:"Допамин",aliases:"dopamine дофамин",group:"vaso",groupName:"Вазопрессоры и инотропы"},
+    {inn:"Цефтриаксон",aliases:"ceftriaxone роцефин",group:"antibiotic",groupName:"Антибактериальные препараты"},
+    {inn:"Цефепим",aliases:"cefepime максипим",group:"antibiotic",groupName:"Антибактериальные препараты"},
+    {inn:"Меропенем",aliases:"meropenem меронем",group:"antibiotic",groupName:"Антибактериальные препараты"},
+    {inn:"Пиперациллин/тазобактам",aliases:"piperacillin tazobactam тазоцин",group:"antibiotic",groupName:"Антибактериальные препараты"},
+    {inn:"Ванкомицин",aliases:"vancomycin",group:"antibiotic",groupName:"Антибактериальные препараты"},
+    {inn:"Линезолид",aliases:"linezolid зивокс",group:"antibiotic",groupName:"Антибактериальные препараты"},
+    {inn:"Метронидазол",aliases:"metronidazole трихопол",group:"antibiotic",groupName:"Антибактериальные препараты"},
+    {inn:"Парацетамол",aliases:"paracetamol acetaminophen",group:"analgesia",groupName:"Анальгетики"},
+    {inn:"Фентанил",aliases:"fentanyl",group:"analgesia",groupName:"Анальгетики"},
+    {inn:"Морфин",aliases:"morphine",group:"analgesia",groupName:"Анальгетики"},
+    {inn:"Трамадол",aliases:"tramadol",group:"analgesia",groupName:"Анальгетики"},
+    {inn:"Кеторолак",aliases:"ketorolac кеторол",group:"analgesia",groupName:"Анальгетики"},
+    {inn:"Амиодарон",aliases:"amiodarone кордарон",group:"cardio",groupName:"Кардиология"},
+    {inn:"Метопролол",aliases:"metoprolol беталок",group:"cardio",groupName:"Кардиология"},
+    {inn:"Нитроглицерин",aliases:"nitroglycerin glyceryl trinitrate",group:"cardio",groupName:"Кардиология"},
+    {inn:"Урапидил",aliases:"urapidil эбрантил",group:"cardio",groupName:"Кардиология"},
+    {inn:"Гепарин натрия",aliases:"heparin unfractionated heparin",group:"anticoag",groupName:"Антикоагулянты"},
+    {inn:"Эноксапарин",aliases:"enoxaparin клексан",group:"anticoag",groupName:"Антикоагулянты"},
+    {inn:"Апиксабан",aliases:"apixaban эликвис",group:"anticoag",groupName:"Антикоагулянты"},
+    {inn:"Варфарин",aliases:"warfarin",group:"anticoag",groupName:"Антикоагулянты"},
+    {inn:"Инсулин человеческий",aliases:"human insulin regular insulin",group:"endocrine",groupName:"Эндокринология"},
+    {inn:"Инсулин гларгин",aliases:"insulin glargine лантус",group:"endocrine",groupName:"Эндокринология"},
+    {inn:"Гидрокортизон",aliases:"hydrocortisone солу-кортеф",group:"endocrine",groupName:"Эндокринология"},
+    {inn:"Будесонид",aliases:"budesonide пульмикорт",group:"resp",groupName:"Пульмонология"},
+    {inn:"Сальбутамол",aliases:"salbutamol albuterol вентолин",group:"resp",groupName:"Пульмонология"},
+    {inn:"Ипратропия бромид",aliases:"ipratropium atrovent",group:"resp",groupName:"Пульмонология"}
+  ];
+  const search=document.getElementById("drug-search");
+  const filter=document.getElementById("drug-filter");
+  const results=document.getElementById("drug-results");
+  if(!search||!filter||!results)return;
+  function render(){
+    const q=search.value.trim().toLocaleLowerCase("ru");
+    const group=filter.value;
+    const found=drugs.filter(d=>(group==="all"||d.group===group)&&(!q||(d.inn+" "+d.aliases).toLocaleLowerCase("ru").includes(q)));
+    results.replaceChildren();
+    if(!found.length){
+      const empty=document.createElement("div");empty.className="knowledge-empty";
+      empty.textContent="В локальном указателе совпадений нет. Попробуйте другое написание или выполните поиск в официальном реестре.";
+      results.appendChild(empty);return;
+    }
+    found.forEach(d=>{
+      const card=document.createElement("article");card.className="drug-item";
+      const title=document.createElement("h3");title.textContent=d.inn;
+      const groupText=document.createElement("div");groupText.className="drug-tag";groupText.textContent=d.groupName;
+      const aliases=document.createElement("p");aliases.textContent="Синонимы и варианты написания: "+d.aliases;
+      const actions=document.createElement("div");actions.className="drug-actions";
+      const copy=document.createElement("button");copy.type="button";copy.textContent="Копировать название";
+      copy.addEventListener("click",()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(d.inn).then(()=>{copy.textContent="Скопировано";}).catch(()=>{copy.textContent="Не удалось скопировать";});}});
+      const grls=document.createElement("a");grls.href="https://rlpdev.digitalms.ru/";grls.target="_blank";grls.rel="noopener noreferrer";grls.textContent="ГРЛС России";
+      const ema=document.createElement("a");ema.href="https://www.ema.europa.eu/en/medicines";ema.target="_blank";ema.rel="noopener noreferrer";ema.textContent="EMA";
+      const de=document.createElement("a");de.href="https://www.pharmnet-bund.de/";de.target="_blank";de.rel="noopener noreferrer";de.textContent="PharmNet.Bund";
+      actions.append(copy,grls,ema,de);card.append(title,groupText,aliases,actions);results.appendChild(card);
+    });
+  }
+  search.addEventListener("input",render);filter.addEventListener("change",render);render();
+  document.getElementById("drug-ask").addEventListener("click",()=>{
+    const name=search.value.trim();
+    const age=document.getElementById("drug-patient-age").value.trim();
+    const weight=document.getElementById("drug-patient-weight").value.trim();
+    const renal=document.getElementById("drug-renal").value;
+    const hepatic=document.getElementById("drug-hepatic").value;
+    const indication=document.getElementById("drug-indication").value.trim();
+    const status=document.getElementById("drug-status");
+    if(!name||!indication){status.textContent="Укажите название препарата и клинический контекст.";return;}
+    const parts=["Проанализируй препарат: "+name+".","Клинический контекст: "+indication+"."];
+    if(age)parts.push("Возраст: "+age+" лет.");
+    if(weight)parts.push("Масса тела: "+weight+" кг.");
+    if(renal)parts.push("Функция почек: "+renal+".");
+    if(hepatic)parts.push("Функция печени: "+hepatic+".");
+    parts.push("Дай справку: зарегистрированные показания, формы выпуска, противопоказания, типичные взрослые/педиатрические дозы только при наличии достоверного источника и с точной ссылкой/версией инструкции, путь введения, коррекция при почечной/печёночной недостаточности, взаимодействия, мониторинг и важные риски. Не угадывай дозы. Если нет подтверждённого источника или конкретной формы выпуска, явно укажи это и попроси уточнить данные. Сопоставь инструкцию с официальным реестром для указанной страны; не подменяй инструкцию общими сведениями.");
+    const question=document.getElementById("question");
+    question.value=parts.join("\n");
+    document.getElementById("specialty").value="Анестезиология и реаниматология";
+    status.textContent="Запрос подготовлен в поле AI-помощника. Проверьте его и нажмите «Отправить вопрос».";
+    question.scrollIntoView({behavior:"smooth",block:"center"});
+    question.focus();
+  });
+})();
+</script>
+
 <nav class="mobile-nav" aria-label="Основная навигация">
   <div class="mobile-nav-inner">
     <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
@@ -936,6 +1084,10 @@ function calculateAPACHE2(){
     <a href="#knowledge-base">
       <span class="nav-icon">📚</span>
       База знаний
+    </a>
+    <a href="#drug-reference">
+      <span class="nav-icon">💊</span>
+      Препараты
     </a>
   </div>
 </nav>
