@@ -871,7 +871,11 @@ async function askAI(){
       const title=document.createElement("h3");title.textContent=item.name;
       const topic=document.createElement("p");topic.textContent=item.topic;
       const org=document.createElement("div");org.className="knowledge-meta";org.textContent=item.org+" · "+item.label;
-      const link=document.createElement("a");link.className="knowledge-link knowledge-open-source";link.href=item.url;link.target="_self";link.textContent="Открыть официальный источник ↗";link.setAttribute("aria-label","Открыть официальный источник: "+item.name);
+      const link=document.createElement("a");link.className="knowledge-link knowledge-open-source";link.href=item.url;link.target="_self";link.rel="noopener noreferrer";link.textContent="Перейти к документам и рекомендациям ↗";link.setAttribute("aria-label","Открыть официальный сайт источника: "+item.name);
+      link.addEventListener("click",event=>{event.preventDefault();window.location.assign(item.url);});
+      card.setAttribute("role","link");card.setAttribute("tabindex","0");card.setAttribute("aria-label","Открыть источник: "+item.name);
+      card.addEventListener("click",event=>{if(event.target.closest("a"))return;window.location.assign(item.url);});
+      card.addEventListener("keydown",event=>{if(event.target===card&&(event.key==="Enter"||event.key===" ")){event.preventDefault();window.location.assign(item.url);}});
       card.append(title,topic,org,link);list.appendChild(card);
     });
   }
