@@ -757,10 +757,10 @@ async function askAI(){
     return String(value||"")
       .toLocaleLowerCase("ru")
       .replace(/ё/g,"е")
-      .replace(/[\\u2010-\\u2015]/g,"-")
-      .replace(/[^\\p{L}\\p{N}]+/gu," ")
+      .replace(/[\u2010-\u2015]/g,"-")
+      .replace(/[^\p{L}\p{N}]+/gu," ")
       .trim()
-      .replace(/\\s+/g," ");
+      .replace(/\s+/g," ");
   }
   function render(){
     const q=normalize(search.value);
