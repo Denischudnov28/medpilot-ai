@@ -223,6 +223,13 @@ body {
 .drug-detail-body{padding-top:7px}
 .drug-detail-row{font-size:12px;line-height:1.5;color:#52647a;margin:6px 0}
 .drug-detail-row strong{color:#263d55}
+.drug-details a{display:inline-block;margin:7px 0;color:#12689a;font-weight:700}
+
+.drug-details{margin:10px 0 2px;border:1px solid #dfe8f1;border-radius:10px;background:#fff;padding:9px 11px}
+.drug-details summary{cursor:pointer;font-size:13px;font-weight:700;color:#145b87}
+.drug-detail-body{padding-top:7px}
+.drug-detail-row{font-size:12px;line-height:1.5;color:#52647a;margin:6px 0}
+.drug-detail-row strong{color:#263d55}
 .drug-actions button{border:0;cursor:pointer}
 
 .drug-search,.drug-filter,.drug-context{width:100%;padding:13px 14px;border:1px solid #d9e1ed;border-radius:12px;font-size:16px;margin:7px 0 12px;background:#fff;color:#17243a}
@@ -872,13 +879,13 @@ async function askAI(){
 <script>
 (function(){
   const drugs = [
-    {inn:"Пропофол",aliases:"propofol диприван",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Пропофол",aliases:"propofol диприван",group:"anesthesia",groupName:"Анестезия и седация",clinical:{form:"Эмульсия для инъекций/инфузий.",concentration:"Частые варианты: 10 мг/мл (1%) и 20 мг/мл (2%). Конкретные объёмы флаконов зависят от производителя.",route:"Внутривенно: инъекция или контролируемая инфузия.",contra:"Гиперчувствительность к пропофолу или компонентам конкретной эмульсии; для ряда форм — аллергия на сою/арахис. Ограничения различаются между инструкциями.",caution:"Риск гипотензии, брадикардии, апноэ и угнетения кровообращения. Требуются мониторинг и готовность обеспечить дыхательные пути. Для ICU-седации возрастные ограничения зависят от инструкции конкретной формы; учитывать риск propofol infusion syndrome при длительной/высокодозной инфузии.",organ:"Пожилым, ослабленным и пациентам ASA III–IV обычно требуется осторожная индивидуальная титрация. Учитывать гемодинамику, липидную нагрузку и сопутствующие инфузии.",url:"https://www.medicines.org.uk/emc/product/5492/smpc",source:"SmPC Propofol 10 mg/ml (Aspen), revision Aug 2025"}},
     {inn:"Этомидат",aliases:"etomidate",group:"anesthesia",groupName:"Анестезия и седация"},
-    {inn:"Кетамин",aliases:"ketamine кеталар",group:"anesthesia",groupName:"Анестезия и седация"},
-    {inn:"Мидазолам",aliases:"midazolam дормикум",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Кетамин",aliases:"ketamine кеталар",group:"anesthesia",groupName:"Анестезия и седация",clinical:{form:"Раствор для инъекций/инфузий.",concentration:"Проверенный пример: 50 мг/мл (кетамин-основание); существуют и другие концентрации/формы.",route:"Внутривенно или внутримышечно; инфузия — согласно конкретной инструкции и клиническому протоколу.",contra:"Гиперчувствительность; противопоказания и ограничения при состояниях, когда повышение артериального давления представляет серьёзную опасность, сверять с инструкцией конкретного препарата.",caution:"Возможны повышение АД и ЧСС, гиперсаливация, реакции пробуждения и угнетение дыхания, особенно при быстром введении/комбинациях. Обеспечить мониторинг и готовность к поддержке дыхания.",organ:"Оценивать сердечно-сосудистый статус, внутричерепные/офтальмологические риски и сопутствующие препараты; дозирование и ограничения зависят от показания и формы.",url:"https://www.medicines.org.uk/emc/product/6935/smpc",source:"SmPC Ketamine 50 mg/ml (hameln), revision 05 Aug 2025"}},
+    {inn:"Мидазолам",aliases:"midazolam дормикум",group:"anesthesia",groupName:"Анестезия и седация",clinical:{form:"Раствор для инъекций/инфузий; ампулы разных объёмов.",concentration:"Проверенный пример: 5 мг/мл; доступны и другие концентрации, включая 1 мг/мл и 2 мг/мл у отдельных производителей.",route:"Внутривенно, внутримышечно; ректально для отдельных показаний/возрастных групп. Инфузия — согласно конкретной инструкции.",contra:"Гиперчувствительность к мидазоламу/бензодиазепинам; для сознательной седации противопоказан при тяжёлой дыхательной недостаточности или острой дыхательной депрессии.",caution:"Возможны апноэ, угнетение дыхания и гемодинамические осложнения, особенно при быстром введении и сочетании с опиоидами. Нужны титрация и непрерывное наблюдение.",organ:"При печёночной недостаточности клиренс снижается, действие может удлиняться; рассмотреть снижение дозы и усиленный мониторинг. При почечной дисфункции возможна более длительная седация из-за активных метаболитов.",url:"https://www.medicines.org.uk/emc/product/15365/smpc",source:"SmPC Midazolam 5 mg/ml (AS Kalceks), revision 21 Jan 2025"}},
     {inn:"Дексмедетомидин",aliases:"dexmedetomidine",group:"anesthesia",groupName:"Анестезия и седация"},
     {inn:"Севофлуран",aliases:"sevoflurane",group:"anesthesia",groupName:"Анестезия и седация"},
-    {inn:"Рокуроний",aliases:"rocuronium эсмерон",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Рокуроний",aliases:"rocuronium эсмерон",group:"anesthesia",groupName:"Анестезия и седация",clinical:{form:"Раствор для инъекций/инфузий.",concentration:"Частая концентрация: 10 мг/мл; встречаются ампулы/флаконы 2,5 мл, 5 мл и 10 мл.",route:"Внутривенно болюсно или инфузионно — в зависимости от зарегистрированной формы.",contra:"Гиперчувствительность к рокуронию или компонентам препарата.",caution:"Вызывает паралич дыхательной мускулатуры: применять только при наличии оборудования и персонала для немедленной вентиляции/интубации. Обязателен количественный нейромышечный мониторинг; препарат не обеспечивает ни седации, ни анальгезии.",organ:"Действие может быть продолжительнее при печёночной/билиарной патологии и почечной недостаточности. Дозу подбирают индивидуально; учитывать взаимодействия, в том числе с летучими анестетиками, магнием и антибиотиками.",url:"https://www.medicines.org.uk/emc/product/553/smpc",source:"SmPC Rocuronium 10 mg/ml (hameln), revision 28 Apr 2026"}},
     {inn:"Суксаметоний",aliases:"succinylcholine сукцинилхолин",group:"anesthesia",groupName:"Анестезия и седация"},
     {inn:"Цисатракурий",aliases:"cisatracurium нимбекс",group:"anesthesia",groupName:"Анестезия и седация"},
     {inn:"Норадреналин",aliases:"norepinephrine левофед",group:"vaso",groupName:"Вазопрессоры и инотропы"},
@@ -894,7 +901,7 @@ async function askAI(){
     {inn:"Линезолид",aliases:"linezolid зивокс",group:"antibiotic",groupName:"Антибактериальные препараты"},
     {inn:"Метронидазол",aliases:"metronidazole трихопол",group:"antibiotic",groupName:"Антибактериальные препараты"},
     {inn:"Парацетамол",aliases:"paracetamol acetaminophen",group:"analgesia",groupName:"Анальгетики"},
-    {inn:"Фентанил",aliases:"fentanyl",group:"analgesia",groupName:"Анальгетики"},
+    {inn:"Фентанил",aliases:"fentanyl",group:"analgesia",groupName:"Анальгетики",clinical:{form:"Раствор для инъекций.",concentration:"Проверенный пример: 50 мкг/мл; ампулы 2 мл и 10 мл у указанного производителя.",route:"Внутривенно болюсно или инфузионно; внутримышечно — по инструкции.",contra:"Гиперчувствительность к фентанилу или компонентам препарата. Не применять вне условий, где можно контролировать дыхательные пути и поддерживать вентиляцию.",caution:"Может вызвать выраженное угнетение дыхания, брадикардию и ригидность грудной клетки; риск возрастает с другими депрессантами ЦНС. Требуются мониторинг и доступность средств респираторной поддержки/антагонистов опиоидов.",organ:"Дозу индивидуализируют по возрасту, массе, клиническому состоянию, сопутствующим средствам и функции органов; при повторном/длительном введении учитывать накопление и пролонгацию эффекта.",url:"https://www.medicines.org.uk/emc/product/100051/smpc",source:"SmPC Fentanyl 50 micrograms/ml (AS Kalceks), revision 15 May 2026"}},
     {inn:"Морфин",aliases:"morphine",group:"analgesia",groupName:"Анальгетики"},
     {inn:"Трамадол",aliases:"tramadol",group:"analgesia",groupName:"Анальгетики"},
     {inn:"Кеторолак",aliases:"ketorolac кеторол",group:"analgesia",groupName:"Анальгетики"},
@@ -968,7 +975,7 @@ async function askAI(){
     {inn:"Артикаин",aliases:"articaine ультракаин",group:"anesthesia",groupName:"Анестезия и седация"},
     {inn:"Атропин",aliases:"atropine",group:"anesthesia",groupName:"Анестезия и седация"},
     {inn:"Неостигмин",aliases:"neostigmine прозерин",group:"anesthesia",groupName:"Анестезия и седация"},
-    {inn:"Сугаммадекс",aliases:"sugammadex брайдан",group:"anesthesia",groupName:"Анестезия и седация"},
+    {inn:"Сугаммадекс",aliases:"sugammadex брайдан",group:"anesthesia",groupName:"Анестезия и седация",clinical:{form:"Раствор для инъекций.",concentration:"100 мг/мл; пример упаковки — флаконы 2 мл (200 мг) и 5 мл (500 мг).",route:"Внутривенно однократной инъекцией; доза зависит от глубины блока и мониторинга.",contra:"Гиперчувствительность к сугаммадексу или компонентам препарата.",caution:"Обеспечить нейромышечный мониторинг и подтвердить восстановление блока. Возможны реакции гиперчувствительности и выраженная брадикардия; продолжать наблюдение за дыханием и нервно-мышечной функцией.",organ:"При тяжёлой почечной недостаточности (CrCl <30 мл/мин) применение обычно не рекомендуется по SmPC. Учитывать возможность взаимодействия с гормональными контрацептивами и необходимость дополнительной контрацепции по инструкции.",url:"https://www.medicines.org.uk/emc/product/100033/smpc",source:"SmPC Sugammadex 100 mg/ml (hameln), revision 03 Feb 2026"}},
     {inn:"Флумазенил",aliases:"flumazenil анексат",group:"anesthesia",groupName:"Анестезия и седация"},
     {inn:"Налоксон",aliases:"naloxone",group:"anesthesia",groupName:"Анестезия и седация"},
     {inn:"Ондансетрон",aliases:"ondansetron зофран",group:"anesthesia",groupName:"Анестезия и седация"},
@@ -1141,6 +1148,19 @@ async function askAI(){
       const title=document.createElement("h3");title.textContent=d.inn;
       const groupText=document.createElement("div");groupText.className="drug-tag";groupText.textContent=d.groupName;
       const aliases=document.createElement("p");aliases.textContent="Синонимы и варианты написания: "+d.aliases;
+      if(d.clinical){
+        const details=document.createElement("details");details.className="drug-details";
+        const summary=document.createElement("summary");summary.textContent="Клиническая карточка · проверенная форма и безопасность";
+        const body=document.createElement("div");body.className="drug-detail-body";
+        [["Форма выпуска",d.clinical.form],["Концентрации",d.clinical.concentration],["Путь введения",d.clinical.route],["Противопоказания",d.clinical.contra],["Предупреждения и мониторинг",d.clinical.caution],["Почки/печень и особые группы",d.clinical.organ]].forEach(([label,value])=>{
+          const row=document.createElement("p");row.className="drug-detail-row";
+          const strong=document.createElement("strong");strong.textContent=label+": ";
+          row.append(strong,document.createTextNode(value));body.appendChild(row);
+        });
+        const source=document.createElement("a");source.href=d.clinical.url;source.target="_blank";source.rel="noopener noreferrer";source.textContent="Открыть официальную характеристику (SmPC)";
+        const sourceNote=document.createElement("p");sourceNote.className="drug-detail-row";sourceNote.textContent="Источник: "+d.clinical.source;
+        body.append(source,sourceNote);details.append(summary,body);card.append(details);
+      }
       const actions=document.createElement("div");actions.className="drug-actions";
       const copy=document.createElement("button");copy.type="button";copy.textContent="Копировать название";
       copy.addEventListener("click",()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(d.inn).then(()=>{copy.textContent="Скопировано";}).catch(()=>{copy.textContent="Не удалось скопировать";});}});
