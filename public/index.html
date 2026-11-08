@@ -202,6 +202,20 @@ body {
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+<style>
+/* CLINICAL KNOWLEDGE BASE */
+.knowledge-search,.knowledge-filter{width:100%;padding:13px 14px;border:1px solid #d9e1ed;border-radius:12px;font-size:16px;margin:8px 0 12px;background:#fff;color:#17243a}
+.knowledge-list{display:grid;gap:12px}
+.knowledge-item{border:1px solid #e0e8f1;border-radius:14px;padding:14px;background:#fbfdff}
+.knowledge-item h3{font-size:16px;margin:0 0 6px;color:#145b87}
+.knowledge-item p{font-size:13px;line-height:1.5;margin:5px 0;color:#52647a}
+.knowledge-meta{font-size:11px;color:#64748b;margin:8px 0}
+.knowledge-link{display:inline-block;color:#1765a5;font-weight:700;font-size:14px;text-decoration:none;padding-top:5px}
+.knowledge-empty{padding:14px;color:#64748b;text-align:center}
+.knowledge-note{font-size:12px;line-height:1.55;color:#79551e;background:#fff8e8;border:1px solid #f3e2bd;border-radius:12px;padding:12px;margin-top:14px}
+.mobile-nav-inner{grid-template-columns:repeat(5,minmax(0,1fr))}
+.mobile-nav a{font-size:11px}
+</style>
 </head>
 <body>
 <header>
@@ -835,6 +849,72 @@ function calculateAPACHE2(){
 }
 </script>
 
+<section class="card" id="knowledge-base">
+  <h2>📚 База медицинских знаний</h2>
+  <p class="status">Каталог официальных клинических рекомендаций и профессиональных руководств</p>
+  <label for="knowledge-search">Поиск по источникам и темам</label>
+  <input id="knowledge-search" class="knowledge-search" type="search" placeholder="Например: сепсис, реанимация, почки">
+  <label for="knowledge-filter">Фильтр по специальности</label>
+  <select id="knowledge-filter" class="knowledge-filter">
+    <option value="all">Все направления</option>
+    <option value="critical">Анестезиология и реаниматология</option>
+    <option value="cardio">Кардиология</option>
+    <option value="renal">Нефрология</option>
+    <option value="resp">Пульмонология</option>
+    <option value="infection">Инфекционные болезни</option>
+    <option value="peds">Педиатрия и акушерство</option>
+    <option value="general">Общая медицина</option>
+  </select>
+  <div id="knowledge-list" class="knowledge-list" aria-live="polite"></div>
+  <div class="knowledge-note">В каталоге размещены ссылки на внешние официальные ресурсы, а не копии их документов. Перед клиническим применением откройте первоисточник и проверьте дату публикации, версию, срок действия, популяцию пациентов и локальные протоколы. Доступность и язык документов зависят от издателя.</div>
+</section>
+<script>
+(function(){
+  const sources = [
+    {name:"Клинические рекомендации Минздрава России",org:"Минздрав России",topic:"Официальный рубрикатор российских клинических рекомендаций",url:"https://cr.minzdrav.gov.ru/",tags:["critical","cardio","renal","resp","infection","peds","general"],label:"Россия"},
+    {name:"Реестр клинических рекомендаций AWMF",org:"Arbeitsgemeinschaft der Wissenschaftlichen Medizinischen Fachgesellschaften",topic:"Немецкие междисциплинарные рекомендации; поиск по специальности, статусу и уровню S1–S3",url:"https://register.awmf.org/de/leitlinien/aktuelle-leitlinien",tags:["critical","cardio","renal","resp","infection","peds","general"],label:"Германия"},
+    {name:"NICE Guidance",org:"National Institute for Health and Care Excellence",topic:"Рекомендации по диагностике, лечению, профилактике и организации медицинской помощи",url:"https://www.nice.org.uk/guidance",tags:["critical","cardio","renal","resp","infection","peds","general"],label:"Великобритания"},
+    {name:"WHO Guidelines",org:"World Health Organization",topic:"Международные рекомендации и нормативные документы ВОЗ",url:"https://www.who.int/publications/who-guidelines",tags:["critical","infection","peds","general"],label:"Международный"},
+    {name:"Surviving Sepsis Campaign — Guidelines 2026",org:"SCCM / ESICM",topic:"Рекомендации по ведению взрослых с сепсисом и септическим шоком; версия 2026",url:"https://sccm.org/clinical-resources/guidelines/guidelines/surviving-sepsis-campaign-international-guidelines-for-management-of-sepsis-and-septic-shock-2026",tags:["critical","infection"],label:"2026 · взрослые"},
+    {name:"ERC Guidelines 2025",org:"European Resuscitation Council",topic:"Рекомендации по СЛР, расширенной реанимации, особым ситуациям и постреанимационной помощи",url:"https://www.erc.edu/science-research/guidelines/guidelines-2025",tags:["critical","cardio","peds"],label:"2025 · реанимация"},
+    {name:"ESC Clinical Practice Guidelines",org:"European Society of Cardiology",topic:"Рекомендации по сердечно-сосудистым заболеваниям",url:"https://www.escardio.org/guidelines/clinical-practice-guidelines",tags:["cardio","critical"],label:"Кардиология"},
+    {name:"KDIGO Clinical Practice Guidelines",org:"Kidney Disease: Improving Global Outcomes",topic:"Рекомендации по ОПП, ХБП, гломерулярным заболеваниям и другим болезням почек",url:"https://kdigo.org/guidelines/",tags:["renal","critical"],label:"Нефрология"},
+    {name:"GINA Strategy Reports 2026",org:"Global Initiative for Asthma",topic:"Международная стратегия диагностики и лечения бронхиальной астмы",url:"https://ginasthma.org/reports/",tags:["resp","peds"],label:"2026 · астма"}
+  ];
+  const list=document.getElementById("knowledge-list");
+  const search=document.getElementById("knowledge-search");
+  const filter=document.getElementById("knowledge-filter");
+  if(!list||!search||!filter)return;
+  function render(){
+    const q=search.value.trim().toLocaleLowerCase("ru");
+    const tag=filter.value;
+    const matches=sources.filter(item=>{
+      const haystack=[item.name,item.org,item.topic,item.label].join(" ").toLocaleLowerCase("ru");
+      return (!q||haystack.includes(q))&&(tag==="all"||item.tags.includes(tag));
+    });
+    list.replaceChildren();
+    if(!matches.length){
+      const empty=document.createElement("div");
+      empty.className="knowledge-empty";
+      empty.textContent="По вашему запросу источники не найдены. Попробуйте изменить поиск или фильтр.";
+      list.appendChild(empty);return;
+    }
+    matches.forEach(item=>{
+      const card=document.createElement("article");card.className="knowledge-item";
+      const title=document.createElement("h3");title.textContent=item.name;
+      const org=document.createElement("p");org.textContent=item.org;
+      const desc=document.createElement("p");desc.textContent=item.topic;
+      const meta=document.createElement("div");meta.className="knowledge-meta";meta.textContent=item.label;
+      const link=document.createElement("a");link.className="knowledge-link";
+      link.href=item.url;link.target="_blank";link.rel="noopener noreferrer";
+      link.textContent="Открыть официальный источник ↗";
+      card.append(title,org,desc,meta,link);list.appendChild(card);
+    });
+  }
+  search.addEventListener("input",render);filter.addEventListener("change",render);render();
+})();
+</script>
+
 <nav class="mobile-nav" aria-label="Основная навигация">
   <div class="mobile-nav-inner">
     <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
@@ -852,6 +932,10 @@ function calculateAPACHE2(){
     <a href="#sofa-calculator">
       <span class="nav-icon">📊</span>
       SOFA
+    </a>
+    <a href="#knowledge-base">
+      <span class="nav-icon">📚</span>
+      База знаний
     </a>
   </div>
 </nav>
