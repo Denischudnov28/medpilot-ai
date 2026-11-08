@@ -98,7 +98,7 @@ body.specialty-selected .specialty-current{display:block}
 <section class="tool" id="news2"><h3>NEWS2 — раннее выявление клинического ухудшения</h3><p>Выберите параметры по NEWS2. Шкалу SpO₂ 2 применяйте только при подтверждённой гиперкапнической дыхательной недостаточности и назначенной целевой сатурации.</p><div class="grid">
 <div class="field"><label>ЧДД, в минуту</label><select id="n2-rr"><option value="">Выберите</option><option value="3">≤8 — 3</option><option value="1">9–11 — 1</option><option value="0">12–20 — 0</option><option value="2">21–24 — 2</option><option value="3">≥25 — 3</option></select></div>
 <div class="field"><label>Шкала SpO₂</label><select id="n2-scale"><option value="1">Шкала 1 — стандартная</option><option value="2">Шкала 2 — назначенная при гиперкапнической ДН</option></select></div>
-<div class="field"><label>SpO₂</label><select id="n2-spo"><option value="">Выберите</option><option value="3">Шкала 1: ≤91% / шкала 2: ≤83% — 3</option><option value="2">Шкала 1: 92–93% / шкала 2: 84–85% — 2</option><option value="1">Шкала 1: 94–95% / шкала 2: 86–87% — 1</option><option value="0">Шкала 1: ≥96% / шкала 2: 88–92% — 0</option><option value="1">Шкала 2: 93–94% — 1</option><option value="2">Шкала 2: 95–96% — 2</option><option value="3">Шкала 2: ≥97% — 3</option></select></div>
+<div class="field"><label>SpO₂</label><select id="n2-spo"><option value="">Выберите</option><option value="3">Шкала 1: ≤91% — 3</option><option value="2">Шкала 1: 92–93% — 2</option><option value="1">Шкала 1: 94–95% — 1</option><option value="0">Шкала 1: ≥96% — 0</option><option value="3">Шкала 2: ≤83% — 3</option><option value="2">Шкала 2: 84–85% — 2</option><option value="1">Шкала 2: 86–87% — 1</option><option value="0">Шкала 2: 88–92% — 0</option><option value="0">Шкала 2: ≥93% на воздухе — 0</option><option value="1">Шкала 2: 93–94% на кислороде — 1</option><option value="2">Шкала 2: 95–96% на кислороде — 2</option><option value="3">Шкала 2: ≥97% на кислороде — 3</option></select></div>
 <div class="field"><label>Получает дополнительный кислород</label><select id="n2-o2"><option value="">Выберите</option><option value="2">Да — 2</option><option value="0">Нет — 0</option></select></div>
 <div class="field"><label>Систолическое АД, мм рт. ст.</label><select id="n2-sbp"><option value="">Выберите</option><option value="3">≤90 — 3</option><option value="2">91–100 — 2</option><option value="1">101–110 — 1</option><option value="0">111–219 — 0</option><option value="3">≥220 — 3</option></select></div>
 <div class="field"><label>Пульс, в минуту</label><select id="n2-hr"><option value="">Выберите</option><option value="3">≤40 — 3</option><option value="1">41–50 — 1</option><option value="0">51–90 — 0</option><option value="1">91–110 — 1</option><option value="2">111–130 — 2</option><option value="3">≥131 — 3</option></select></div>
@@ -542,7 +542,11 @@ function runNEWS2(){
  if(ids.some(id=>document.getElementById('n2-'+id).value==='')){show('news2','Заполните все параметры NEWS2.');return;}
  const scale=Number(val('n2-scale'));
  const spo=document.getElementById('n2-spo');
- if(scale===1&&spo.selectedIndex>=5){show('news2','Выбранный диапазон SpO₂ доступен только для шкалы 2. Проверьте выбранную шкалу.');return;}
+ const oxygen=Number(val('n2-o2'));
+ const index=spo.selectedIndex;
+ if(scale===1&&index>4){show('news2','Выбран диапазон SpO₂ для шкалы 2. Для шкалы 1 выберите один из четырёх диапазонов шкалы 1.');return;}
+ if(scale===2&&index<5){show('news2','Выбран диапазон SpO₂ для шкалы 1. Для шкалы 2 выберите диапазон шкалы 2.');return;}
+ if(scale===2&&((index===9&&oxygen===2)||(index>=10&&oxygen===0))){show('news2','Проверьте соответствие SpO₂ и кислородотерапии: диапазон «на воздухе» нельзя выбирать при дополнительном кислороде, а диапазоны «на кислороде» — без него.');return;}
  const scores=ids.map(id=>Number(val('n2-'+id)));
  const total=scores.reduce((a,b)=>a+b,0),single3=scores.some(x=>x===3);
  let risk=total>=7?'≥7: высокий риск, экстренная эскалация':total>=5?'5–6: срочная клиническая оценка':single3?'Есть параметр с 3 баллами: требуется срочная оценка даже при меньшей сумме':total>=1?'1–4: клиническая оценка и наблюдение':'0: стандартное наблюдение';
