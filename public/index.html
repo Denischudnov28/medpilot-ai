@@ -548,7 +548,7 @@ header{padding-bottom:20px}
 
 <section class="card" id="clinical-protocols">
 <label for="protocol-search">Поиск по протоколам</label>
-<input id="protocol-search" class="drug-search" type="search" placeholder="Например: сепсис, шок, вазопрессор">
+<div class="protocol-search-row"><input id="protocol-search" class="drug-search" type="search" placeholder="Введите название протокола или заболевания"><button id="protocol-search-button" type="button" class="primary-button">Найти</button></div>
 <div id="protocol-list" class="drug-results" aria-live="polite" hidden style="display:none!important" aria-hidden="true">
 <article class="drug-item protocol-card" data-search="анестезиология предоперационная оценка подготовка пациента анестезиологический риск голодание ASA">
 <div class="drug-tag">Анестезиология и реаниматология · Взрослые</div>
@@ -1258,13 +1258,14 @@ header{padding-bottom:20px}
 <p><a href="https://kdigo.org/guidelines/ckd-evaluation-and-management/" target="_blank" rel="noopener noreferrer">Открыть первоисточник ↗</a></p>
 </div></article>
 </div>
-<div class="knowledge-note">Алгоритм предназначен для взрослых. Рекомендации могут отличаться по стране, учреждению и клинической популяции. Перед применением проверьте актуальную версию первоисточника и локальные правила.</div>
+
 </section>
 <script>
 (function(){
 const search=document.getElementById("protocol-search");
+const findButton=document.getElementById("protocol-search-button");
 const list=document.getElementById("protocol-list");
-if(!search||!list)return;
+if(!search||!findButton||!list)return;
 const cards=Array.from(list.querySelectorAll(".protocol-card"));
 function filterProtocols(){
   const q=search.value.trim().toLocaleLowerCase("ru");
@@ -1281,8 +1282,8 @@ function filterProtocols(){
   list.style.setProperty("display",showList?"grid":"none","important");
   list.setAttribute("aria-hidden",String(!showList));
 }
-search.addEventListener("input",filterProtocols);
-search.addEventListener("search",filterProtocols);
+findButton.addEventListener("click",filterProtocols);
+search.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();filterProtocols();}});
 list.querySelectorAll(".protocol-toggle").forEach(button=>button.addEventListener("click",function(){
   const panel=document.getElementById(button.getAttribute("aria-controls"));
   if(!panel)return;
@@ -1292,7 +1293,6 @@ list.querySelectorAll(".protocol-toggle").forEach(button=>button.addEventListene
   button.setAttribute("aria-expanded",String(opening));
   button.textContent=opening?"Свернуть алгоритм":"Открыть алгоритм";
 }));
-filterProtocols();
 })();
 </script>
 
@@ -1429,7 +1429,7 @@ async function askAI(){
 [hidden]{display:none!important}
 #clinical-protocols #protocol-list[hidden],#clinical-protocols #protocol-list[aria-hidden="true"]{display:none!important}
 #clinical-protocols #protocol-list .protocol-card[hidden]{display:none!important}
-</style>
+.protocol-search-row{display:flex;gap:10px;align-items:stretch}.protocol-search-row .drug-search{flex:1;min-width:0}.protocol-search-row #protocol-search-button{flex:0 0 auto;min-width:88px;padding:0 20px;border:0;border-radius:14px;background:#176b91;color:#fff;font-weight:700;font-size:16px;cursor:pointer}@media(max-width:480px){.protocol-search-row{gap:8px}.protocol-search-row #protocol-search-button{padding:0 16px}}</style>
 
 <section class="card" id="knowledge-base">
   <h2>📚 База медицинских знаний</h2>
