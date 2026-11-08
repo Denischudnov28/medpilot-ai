@@ -425,6 +425,29 @@ body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-
 .cochrane-search-actions{padding:12px;border:1px solid #e0e8f1;border-radius:13px;background:#f8fbfe;margin-top:12px}
 .cochrane-copy{padding:10px 12px;margin:0 0 8px;background:#eaf4fb;color:#145b87;font-size:13px}
 </style>
+
+<style id="medpilot-global-search-style">
+.mp-global-search-trigger{position:absolute;right:105px;top:22px;z-index:2;display:flex;align-items:center;gap:7px;padding:10px 12px;border:1px solid rgba(255,255,255,.25);border-radius:13px;background:rgba(255,255,255,.13);color:#fff;font:700 14px inherit;cursor:pointer;backdrop-filter:blur(8px)}
+.mp-global-search-trigger span:first-child{font-size:18px}
+.mp-search-overlay{position:fixed;inset:0;z-index:3000;display:none;align-items:flex-start;justify-content:center;padding: max(7vh,24px) 14px 20px;background:rgba(7,22,39,.58);backdrop-filter:blur(5px)}
+.mp-search-overlay.mp-search-open{display:flex}
+.mp-search-dialog{width:min(100%,650px);max-height:86vh;overflow:auto;padding:18px;border:1px solid #dce8f1;border-radius:21px;background:#fff;box-shadow:0 24px 70px rgba(5,24,43,.3)}
+.mp-search-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.mp-search-head h2{margin:0;color:#153e63;font-size:19px}
+.mp-search-close{width:38px;height:38px;padding:0;border-radius:11px;background:#eef4f8;color:#31516d;font-size:24px}
+.mp-search-input{width:100%;min-height:54px;padding:13px 15px;border:1px solid #cdddea;border-radius:13px;background:#fbfdff;color:#17324b;font:inherit;font-size:17px}
+.mp-search-hint{margin:9px 2px 12px;color:#718397;font-size:12px;line-height:1.5}
+.mp-search-results{display:grid;gap:8px}
+.mp-search-group{margin:12px 2px 3px;color:#168078;font-size:11px;font-weight:850;letter-spacing:.07em;text-transform:uppercase}
+.mp-search-result{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;border:1px solid #e1eaf1;border-radius:12px;background:#fbfdff;color:#24445f;text-align:left;cursor:pointer}
+.mp-search-result strong{display:block;font-size:14px;line-height:1.35}
+.mp-search-result small{display:block;margin-top:4px;color:#718397;font-size:11px;line-height:1.35}
+.mp-search-result b{flex:none;color:#168078;font-size:12px}
+.mp-search-empty{padding:18px 12px;text-align:center;color:#718397;font-size:13px;line-height:1.5}
+@media(max-width:430px){.mp-global-search-trigger{right:94px;top:22px;padding:10px}.mp-global-search-trigger .mp-search-label{display:none}.mp-search-dialog{padding:14px;border-radius:17px}.mp-search-overlay{padding:18px 10px}}
+@media(min-width:760px){.mp-global-search-trigger{right:max(112px,calc((100vw - 760px)/2 + 92px))}}
+</style>
+
 </head>
 <body>
 <header>
@@ -432,6 +455,7 @@ body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-
 <div class="logo">✚ MedPilot AI</div>
 <div class="sub">Интеллектуальный помощник для медицинских специалистов</div>
 <button type="button" class="mp-menu-trigger" id="mp-menu-trigger" aria-controls="medpilot-side-menu" aria-expanded="false"><span class="mp-burger">☰</span><span>Меню</span></button>
+<button type="button" class="mp-global-search-trigger" id="mp-global-search-open" aria-label="Поиск по всему приложению"><span>⌕</span><span class="mp-search-label">Поиск</span></button>
 </header>
 <main>
 
@@ -666,6 +690,15 @@ list.querySelectorAll(".protocol-toggle").forEach(button=>button.addEventListene
 </script>
 
 </main>
+<div class="mp-search-overlay" id="mp-search-overlay" aria-hidden="true">
+  <div class="mp-search-dialog" role="dialog" aria-modal="true" aria-labelledby="mp-search-title">
+    <div class="mp-search-head"><h2 id="mp-search-title">Поиск по всему MedPilot AI</h2><button type="button" class="mp-search-close" id="mp-search-close" aria-label="Закрыть поиск">×</button></div>
+    <input class="mp-search-input" id="mp-global-search-input" type="search" placeholder="Препарат, шкала, калькулятор, заболевание…" autocomplete="off">
+    <p class="mp-search-hint">Ищет одновременно по калькуляторам, лекарствам, протоколам и медицинским источникам. Нажмите «/» на клавиатуре, чтобы открыть поиск.</p>
+    <div class="mp-search-results" id="mp-global-search-results" aria-live="polite"><div class="mp-search-empty">Начните вводить название или клиническую тему.</div></div>
+  </div>
+</div>
+
 <footer>MedPilot AI · Medical Intelligence</footer>
 <script>
 async function askAI(){
@@ -1497,5 +1530,63 @@ async function askAI(){
 })();
 </script>
 
+<script id="medpilot-global-search-script">
+(function(){
+ const openButton=document.getElementById("mp-global-search-open");
+ const overlay=document.getElementById("mp-search-overlay");
+ const closeButton=document.getElementById("mp-search-close");
+ const input=document.getElementById("mp-global-search-input");
+ const results=document.getElementById("mp-global-search-results");
+ if(!openButton||!overlay||!closeButton||!input||!results)return;
+ let calculators=[];
+ const normalize=value=>String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\u2010-\u2015]/g,"-").replace(/[^\p{L}\p{N}]+/gu," ").trim().replace(/\s+/g," ");
+ const open=()=>{overlay.classList.add("mp-search-open");overlay.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";input.focus();};
+ const close=()=>{overlay.classList.remove("mp-search-open");overlay.setAttribute("aria-hidden","true");document.body.style.overflow="";openButton.focus();};
+ openButton.addEventListener("click",open);closeButton.addEventListener("click",close);
+ overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+ document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&overlay.classList.contains("mp-search-open"))close();
+  if(e.key==="/"&&!overlay.classList.contains("mp-search-open")&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();open();}
+ });
+ function group(label){const h=document.createElement("div");h.className="mp-search-group";h.textContent=label;results.appendChild(h);}
+ function add(title,description,action,label){
+  const button=document.createElement("button");button.type="button";button.className="mp-search-result";
+  const info=document.createElement("span");const strong=document.createElement("strong");strong.textContent=title;
+  const small=document.createElement("small");small.textContent=description||"";info.append(strong,small);
+  const go=document.createElement("b");go.textContent=label||"Открыть →";button.append(info,go);
+  button.addEventListener("click",()=>{close();action();});results.appendChild(button);
+ }
+ function goSection(sectionId,fieldId,query){
+  const link=document.querySelector('.mp-menu-links a[href="#'+sectionId+'"]');
+  if(link)link.click();
+  window.setTimeout(()=>{
+   const field=document.getElementById(fieldId);
+   if(field){field.value=query;field.dispatchEvent(new Event(fieldId==="protocol-search"||fieldId==="drug-search"?"input":"change",{bubbles:true}));if(fieldId==="knowledge-search"){const b=document.getElementById("knowledge-search-button");if(b)b.click();}field.scrollIntoView({behavior:"smooth",block:"center"});field.focus({preventScroll:true});}
+  },90);
+ }
+ function render(){
+  const raw=input.value.trim(),q=normalize(raw),terms=q.split(" ").filter(Boolean);
+  results.replaceChildren();
+  if(!q){const shortcuts=[["AI-помощник","Задать клинический вопрос",()=>{const a=document.querySelector('.mp-menu-links a[href="#question"]');if(a)a.click();} ],["Все калькуляторы","Поиск по полному каталогу",()=>{const a=document.querySelector('.mp-menu-links a[href="#clinical-tools"]');if(a)a.click();} ],["Справочник препаратов","Поиск по МНН и синонимам",()=>{const a=document.querySelector('.mp-menu-links a[href="#drug-reference"]');if(a)a.click();} ],["База медицинских знаний","Рекомендации и научные источники",()=>{const a=document.querySelector('.mp-menu-links a[href="#knowledge-base"]');if(a)a.click();} ]];group("Быстрый переход");shortcuts.forEach(x=>add(x[0],x[1],x[2]));return;}
+  let count=0;
+  const calc=calculators.filter(x=>terms.every(t=>normalize(x.name+" "+x.category+" "+x.description).includes(t))).slice(0,8);
+  if(calc.length){group("Калькуляторы и шкалы");calc.forEach(x=>{count++;add(x.name,x.category+" · "+x.description,()=>{window.location.href="/calculators/clinical-toolbox.html#"+encodeURIComponent(x.id);});});}
+  const protocolInput=document.getElementById("protocol-search"),protocolList=document.getElementById("protocol-list");
+  const protocols=protocolList?[...protocolList.querySelectorAll(".protocol-card")].filter(x=>terms.every(t=>normalize(x.dataset.search+" "+x.textContent).includes(t))).slice(0,5):[];
+  if(protocols.length){group("Клинические протоколы");protocols.forEach(x=>{count++;add(x.querySelector("h3")?.textContent||"Клинический протокол",x.querySelector("p")?.textContent||"Алгоритм и первоисточник",()=>goSection("clinical-protocols","protocol-search",raw));});}
+  const drugInput=document.getElementById("drug-search");
+  if(drugInput){const previous=drugInput.value;drugInput.value=raw;drugInput.dispatchEvent(new Event("input",{bubbles:true}));const drugCards=[...document.querySelectorAll("#drug-results .drug-item")].slice(0,6);if(drugCards.length){group("Лекарственные препараты");drugCards.forEach(x=>{count++;add(x.querySelector("h3")?.textContent||"Препарат",x.querySelector(".drug-tag")?.textContent||"Справочник лекарств",()=>goSection("drug-reference","drug-search",raw));});}drugInput.value=previous;drugInput.dispatchEvent(new Event("input",{bubbles:true}));}
+  const knowledgeInput=document.getElementById("knowledge-search"),knowledgeButton=document.getElementById("knowledge-search-button");
+  if(knowledgeInput&&knowledgeButton){const previous=knowledgeInput.value;knowledgeInput.value=raw;knowledgeButton.click();const cards=[...document.querySelectorAll("#knowledge-list .knowledge-item")].slice(0,5);if(cards.length){group("Медицинские источники");cards.forEach(x=>{count++;add(x.querySelector("h3")?.textContent||"Медицинский источник",x.querySelector("p")?.textContent||"Рекомендации и руководства",()=>goSection("knowledge-base","knowledge-search",raw));});}knowledgeInput.value=previous;knowledgeButton.click();}
+  if(!count){const empty=document.createElement("div");empty.className="mp-search-empty";empty.textContent="Совпадений не найдено. Попробуйте МНН препарата, аббревиатуру шкалы, название заболевания или часть слова.";results.appendChild(empty);}
+ }
+ input.addEventListener("input",render);
+ fetch("/calculators/clinical-toolbox.html").then(r=>{if(!r.ok)throw new Error("catalog unavailable");return r.text();}).then(html=>{
+  const doc=new DOMParser().parseFromString(html,"text/html");let category="Клинические калькуляторы";
+  doc.querySelectorAll(".category,.tool").forEach(node=>{if(node.classList.contains("category")){category=node.textContent.trim();return;}const h=node.querySelector("h3");if(h&&node.id)calculators.push({id:node.id,name:h.textContent.trim(),category,description:node.querySelector("p")?.textContent.trim()||""});});
+  if(input.value.trim())render();
+ }).catch(()=>{});
+})();
+</script>
 </body>
 </html>
