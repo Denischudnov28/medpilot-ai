@@ -21,7 +21,7 @@
 .specialty-choice:active{transform:scale(.98)}
 .specialty-choice:focus-visible{outline:3px solid rgba(23,102,165,.2);outline-offset:2px}
 .specialty-choice .specialty-icon{display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border-radius:11px;background:#edf5fb;font-size:19px}
-.specialty-choice .specialty-label{display:block;min-width:0;flex:1;overflow-wrap:anywhere}
+.specialty-choice .specialty-label{display:block;min-width:0;flex:1;overflow-wrap:anywhere}.specialty-card-content{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}.specialty-scales{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;color:#718397;font-size:10px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}.specialty-no-scales{color:#9aa9b7;font-style:italic}
 .specialty-choice[hidden]{display:none!important}
 .specialty-toolbar{display:flex;align-items:center;gap:10px;margin:14px 0 12px;padding:10px 12px;background:#fff;border:1px solid #dce7f0;border-radius:15px}
 .specialty-back{display:none;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border:0;border-radius:12px;background:#e7f0f7;color:#145b87;font-size:24px}
@@ -196,18 +196,30 @@ body.specialty-selected .specialty-current{display:block}
  const emojis={general:'🩺',anesthesia:'🫁',cardiology:'❤️',therapy:'🩺',surgery:'🩻',neurology:'🧠',neurosurgery:'🧠',pediatrics:'🧸',obgyn:'🤰',oncology:'🎗️',trauma:'🦴',infectious:'🦠',endocrinology:'🧬',gastro:'🍽️',nephrology:'🧪',pulmonology:'🫁',urology:'🚻',dermatology:'🧴',ophthalmology:'👁️',ent:'👂',radiology:'🩻',emergency:'🚑',psychiatry:'🧠'};
  const specialtyOrder=['general','anesthesia','cardiology','therapy','surgery','neurology','neurosurgery','pediatrics','obgyn','oncology','trauma','infectious','endocrinology','gastro','nephrology','pulmonology','urology','dermatology','ophthalmology','ent','radiology','emergency','psychiatry'];
  const specialtyFilter=document.getElementById('specialty-filter');
+ const scaleIds=new Set(['extra-gcs','sofa','rass','camicu','extra-qsofa','apfel','asa-ps','aldrete','mallampati','extra-wells','curb65','crb65','perc-rule','wells-dvt','extra-hasbled','cha2ds2va','heart-score','timi-ua','kdigo-aki','padua','cfs','morse-fall','braden','news2','extra-alvarado','rcri','caprini2013','abcd2','barthel-index','nihss','mrs','extra-four','apgar-score','povoc','pediatric-gcs','added-bishop','obstetric-shock','extra-ecog','extra-rts','ottawa','iss-score','extra-sirs','mcisaac','findrisc','child-pugh','glasgow-blatchford','ipss','scorad','centor-ent','birads','phq9','gad7']);
  function renderPicker(){
   grid.innerHTML='';
   specialtyOrder.forEach(id=>{
    const g=groups.find(item=>item.category.id===id);
-   const count=g?g.tools.length:0;
    const label=labels[id]||(g?g.category.textContent.replace(/^\S+\s*/,'').trim():id);
    const button=document.createElement('button');
    button.type='button';button.className='specialty-choice';
    button.setAttribute('aria-label',label);
    const icon=document.createElement('span');icon.className='specialty-icon';icon.textContent=emojis[id]||'✚';
+   const content=document.createElement('span');content.className='specialty-card-content';
    const name=document.createElement('span');name.className='specialty-label';name.textContent=label;
-   button.append(icon,name);
+   content.append(name);
+   const scales=g?g.tools.filter(tool=>scaleIds.has(tool.id)).map(tool=>tool.querySelector('h3')?.textContent.trim()).filter(Boolean):[];
+   if(scales.length){
+    const preview=document.createElement('span');preview.className='specialty-scales';
+    preview.textContent='Шкалы: '+scales.join(' · ');
+    content.append(preview);
+   }else{
+    const preview=document.createElement('span');preview.className='specialty-scales specialty-no-scales';
+    preview.textContent='Шкалы добавляются';
+    content.append(preview);
+   }
+   button.append(icon,content);
    button.addEventListener('click',()=>selectSpecialty(id,true));
    grid.append(button);
   });
