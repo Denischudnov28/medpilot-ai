@@ -790,7 +790,9 @@ async function askAI(){
   });
   status.textContent="Найдено: "+matches.length+(matches.length===30?" (показаны первые 30)":"")+". Нажмите на нужный калькулятор, чтобы открыть его.";
  }
- input.addEventListener("input",render);\n document.getElementById("all-calculators-find")?.addEventListener("click",()=>{render();input.focus({preventScroll:true});});\n input.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();render();}});
+ input.addEventListener("input",render);
+ document.getElementById("all-calculators-find")?.addEventListener("click",()=>{render();input.focus({preventScroll:true});});
+ input.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();render();}});
  if(new URLSearchParams(window.location.search).get("openSearch")==="1"){document.getElementById("clinical-tools")?.scrollIntoView({behavior:"smooth",block:"start"});input.focus({preventScroll:true});}
  fetch("/calculators/clinical-toolbox.html").then(response=>{if(!response.ok)throw new Error("Каталог недоступен");return response.text();}).then(html=>{
   const doc=new DOMParser().parseFromString(html,"text/html");
