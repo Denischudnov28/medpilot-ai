@@ -25,7 +25,7 @@ body.specialty-selected .specialty-current{display:block}
 @media(max-width:430px){.grid{grid-template-columns:1fr}.title{font-size:21px}.specialty-grid{grid-template-columns:1fr}.specialty-choice{min-height:52px}}
 </style></head><body><main class="wrap">
 <header class="top"><a class="back" href="../index.html#clinical-tools" aria-label="Назад">‹</a><div><div class="brand">MEDPILOT AI · КАЛЬКУЛЯТОРЫ</div><h1 class="title">Клинические расчёты</h1></div></header>
-<section class="specialty-picker" id="specialty-picker"><h2>Выберите специальность</h2><p>Показываются только калькуляторы выбранного клинического направления.</p><div class="specialty-grid" id="specialty-grid"></div></section><div class="specialty-toolbar"><button type="button" class="specialty-back" id="specialty-back" aria-label="Назад к выбору специальности">‹</button><h2 class="specialty-current" id="specialty-current"></h2></div>
+<section class="specialty-picker" id="specialty-picker"><h2>Выберите специальность</h2><p>Показываются только калькуляторы выбранного клинического направления.</p><div class="specialty-grid" id="specialty-grid"></div></section><div class="specialty-toolbar"><button type="button" class="specialty-back" id="specialty-back" aria-label="Назад к выбору специальности">‹</button><h2 class="specialty-current" id="specialty-current"></h2></div><p id="specialty-empty" class="intro" hidden>Для этой специальности калькуляторы пока не добавлены. Нажмите стрелку назад, чтобы выбрать другое направление.</p>
 <p class="intro">Инструменты сгруппированы по клиническим направлениям. Вводите значения в указанных единицах. Расчёты поддерживают клиническое решение, но не заменяют оценку пациента и локальные протоколы.</p>
 <div class="calculator-search"><label for="calculator-search-input">Поиск по всем калькуляторам</label><div class="calculator-search-row"><input id="calculator-search-input" type="search" placeholder="Например: SOFA, креатинин, натрий, QTc..." autocomplete="off" aria-controls="calculator-search-results"><button type="button" id="calculator-search-clear" aria-label="Очистить поиск" title="Очистить">×</button></div><div id="calculator-search-status" role="status" aria-live="polite">Показаны все доступные калькуляторы.</div></div><div id="calculator-search-results"></div>
 
@@ -87,29 +87,33 @@ body.specialty-selected .specialty-current{display:block}
  const grid=document.getElementById('specialty-grid');
  const back=document.getElementById('specialty-back');
  const current=document.getElementById('specialty-current');
+ const empty=document.getElementById('specialty-empty');
  const tools=[...document.querySelectorAll('main.wrap .tool:not(.specialty-coming)')];
  const headings=[...document.querySelectorAll('main.wrap h2.category')];
  const groups=headings.map(category=>({category,tools:tools.filter(tool=>{let node=tool.previousElementSibling;while(node&&!node.classList.contains('category'))node=node.previousElementSibling;return node===category;})}));
  const normalize=value=>String(value||'').toLocaleLowerCase('ru').replace(/ё/g,'е').replace(/\s+/g,' ').trim();
  let active=null;
- const labels={anesthesia:'Анестезиология и реаниматология',pulmonology:'Пульмонология',cardiology:'Кардиология',nephrology:'Нефрология',therapy:'Терапия',emergency:'Неотложная медицина',general:'Общая медицина',surgery:'Хирургия',neurology:'Неврология',neurosurgery:'Нейрохирургия',pediatrics:'Педиатрия',obgyn:'Акушерство и гинекология',oncology:'Онкология',trauma:'Травматология и ортопедия',infectious:'Инфекционные болезни',endocrinology:'Эндокринология',gastro:'Гастроэнтерология',urology:'Урология',dermatology:'Дерматология',ophthalmology:'Офтальмология',ent:'Оториноларингология',radiology:'Радиология и лучевая диагностика'};
- const emojis={anesthesia:'🫁',pulmonology:'🫁',cardiology:'❤️',nephrology:'🧪',therapy:'🩺',emergency:'🚑',general:'🩺',surgery:'🩻',neurology:'🧠',neurosurgery:'🧠',pediatrics:'🧸',obgyn:'🤰',oncology:'🎗️',trauma:'🦴',infectious:'🦠',endocrinology:'🧬',gastro:'🍽️',urology:'🚻',dermatology:'🧴',ophthalmology:'👁️',ent:'👂',radiology:'🩻'};
+ const labels={general:'Общая медицина',anesthesia:'Анестезиология и реаниматология',cardiology:'Кардиология',therapy:'Терапия',surgery:'Хирургия',neurology:'Неврология',neurosurgery:'Нейрохирургия',pediatrics:'Педиатрия',obgyn:'Акушерство и гинекология',oncology:'Онкология',trauma:'Травматология и ортопедия',infectious:'Инфекционные болезни',endocrinology:'Эндокринология',gastro:'Гастроэнтерология',nephrology:'Нефрология',pulmonology:'Пульмонология',urology:'Урология',dermatology:'Дерматология',ophthalmology:'Офтальмология',ent:'Оториноларингология',radiology:'Радиология и лучевая диагностика',emergency:'Неотложная медицина'};
+ const emojis={general:'🩺',anesthesia:'🫁',cardiology:'❤️',therapy:'🩺',surgery:'🩻',neurology:'🧠',neurosurgery:'🧠',pediatrics:'🧸',obgyn:'🤰',oncology:'🎗️',trauma:'🦴',infectious:'🦠',endocrinology:'🧬',gastro:'🍽️',nephrology:'🧪',pulmonology:'🫁',urology:'🚻',dermatology:'🧴',ophthalmology:'👁️',ent:'👂',radiology:'🩻',emergency:'🚑'};
+ const specialtyOrder=['general','anesthesia','cardiology','therapy','surgery','neurology','neurosurgery','pediatrics','obgyn','oncology','trauma','infectious','endocrinology','gastro','nephrology','pulmonology','urology','dermatology','ophthalmology','ent','radiology','emergency'];
  function renderPicker(){
   grid.innerHTML='';
-  groups.filter(g=>g.tools.length).forEach(g=>{
-   const id=g.category.id;
+  specialtyOrder.forEach(id=>{
+   const g=groups.find(item=>item.category.id===id);
+   const count=g?g.tools.length:0;
    const label=labels[id]||g.category.textContent.replace(/^\S+\s*/,'').trim();
    const button=document.createElement('button');
    button.type='button';button.className='specialty-choice';
    const name=document.createElement('span');name.textContent=(emojis[id]||'✚')+' '+label;
-   const count=document.createElement('small');count.textContent=g.tools.length+' '+(g.tools.length===1?'калькулятор':'калькулятора');
-   button.append(name,count);button.addEventListener('click',()=>selectSpecialty(id,true));grid.append(button);
+   const countLabel=document.createElement('small');countLabel.textContent=count?count+' '+(count===1?'калькулятор':'калькулятора'):'Пока нет';
+   button.append(name,countLabel);button.addEventListener('click',()=>selectSpecialty(id,true));grid.append(button);
   });
  }
  function applySearch(){
   const query=normalize(input.value);
   const group=groups.find(g=>g.category.id===active);
-  if(!group)return;
+  if(!group||!group.tools.length){empty.hidden=false;return;}
+  empty.hidden=true;
   let count=0;
   group.tools.forEach(tool=>{
    const match=!query||normalize(tool.innerText+' '+group.category.innerText).includes(query);
@@ -120,16 +124,16 @@ body.specialty-selected .specialty-current{display:block}
   status.textContent=query?(count?'Найдено в этой специальности: '+count:'В этой специальности ничего не найдено.'):'Показаны калькуляторы выбранной специальности.';
  }
  function selectSpecialty(id,updateHash){
-  const group=groups.find(g=>g.category.id===id&&g.tools.length);
-  if(!group){showPicker(updateHash);return;}
   active=id;document.body.classList.add('specialty-selected');
-  current.textContent=(emojis[id]||'✚')+' '+(labels[id]||group.category.textContent.trim());
-  input.value='';applySearch();
+  const group=groups.find(g=>g.category.id===id&&g.tools.length);
+  current.textContent=(emojis[id]||'✚')+' '+labels[id];
+  input.value='';
+  if(group)applySearch();else{groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});empty.hidden=false;status.textContent='Для выбранной специальности пока нет доступных калькуляторов.';}
   if(updateHash)history.pushState({specialty:id},'', '#specialty-'+id);
   window.scrollTo({top:0,behavior:'smooth'});
  }
  function showPicker(updateHash){
-  active=null;document.body.classList.remove('specialty-selected');
+  active=null;empty.hidden=true;document.body.classList.remove('specialty-selected');
   groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
   input.value='';status.textContent='Сначала выберите специальность.';
   if(updateHash)history.pushState({specialty:null},'', '#specialties');
