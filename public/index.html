@@ -554,6 +554,65 @@ if (vasoValue === "" || vasoValue === null) {
    "Расчёт завершён. Проверьте клиническую интерпретацию.";
 }
 </script>
+
+<section class="card" id="qsofa-calculator">
+  <h2>🧭 Калькулятор qSOFA</h2>
+  <p>Быстрая оценка риска неблагоприятного исхода у пациентов с подозрением на инфекцию.</p>
+
+  <label for="qsofa-rr">Частота дыхания (в минуту)</label>
+  <input class="sofa-input" id="qsofa-rr" type="number" min="0" step="1" inputmode="numeric" placeholder="Например, 24">
+
+  <label for="qsofa-sbp">Систолическое артериальное давление (мм рт. ст.)</label>
+  <input class="sofa-input" id="qsofa-sbp" type="number" min="0" step="1" inputmode="numeric" placeholder="Например, 95">
+
+  <label for="qsofa-gcs">Шкала комы Глазго (GCS)</label>
+  <input class="sofa-input" id="qsofa-gcs" type="number" min="3" max="15" step="1" inputmode="numeric" placeholder="От 3 до 15">
+
+  <button class="send" type="button" onclick="calculateQSOFA()">Рассчитать qSOFA</button>
+  <div id="qsofa-result" role="status" aria-live="polite" style="margin-top:18px;font-weight:700;line-height:1.7"></div>
+  <p class="warning">qSOFA не является самостоятельным диагностическим критерием сепсиса и не должен использоваться как единственный инструмент скрининга. Низкий балл не исключает сепсис. Интерпретируйте результат вместе с клинической картиной и локальными протоколами.</p>
+</section>
+
+<script>
+function calculateQSOFA() {
+  const rrRaw = document.getElementById("qsofa-rr").value.trim();
+  const sbpRaw = document.getElementById("qsofa-sbp").value.trim();
+  const gcsRaw = document.getElementById("qsofa-gcs").value.trim();
+  const result = document.getElementById("qsofa-result");
+
+  if (rrRaw === "" || sbpRaw === "" || gcsRaw === "") {
+    result.textContent = "Заполните все три обязательных показателя.";
+    return;
+  }
+
+  const rr = Number(rrRaw);
+  const sbp = Number(sbpRaw);
+  const gcs = Number(gcsRaw);
+
+  if (!Number.isFinite(rr) || !Number.isFinite(sbp) ||
+      !Number.isFinite(gcs) || rr < 0 || sbp < 0 ||
+      !Number.isInteger(rr) || !Number.isInteger(sbp) ||
+      !Number.isInteger(gcs) || gcs < 3 || gcs > 15) {
+    result.textContent = "Проверьте введённые значения: ЧДД и САД должны быть неотрицательными целыми числами, GCS — целым числом от 3 до 15.";
+    return;
+  }
+
+  const rrScore = rr >= 22 ? 1 : 0;
+  const sbpScore = sbp <= 100 ? 1 : 0;
+  const gcsScore = gcs < 15 ? 1 : 0;
+  const total = rrScore + sbpScore + gcsScore;
+
+  result.innerHTML =
+    "qSOFA: " + total + " / 3<br><br>" +
+    "ЧДД ≥22/мин: " + rrScore + " балл<br>" +
+    "САД ≤100 мм рт. ст.: " + sbpScore + " балл<br>" +
+    "Изменение сознания (GCS <15): " + gcsScore + " балл<br><br>" +
+    (total >= 2
+      ? "Набрано ≥2 баллов: повышенный риск неблагоприятного исхода; требуется своевременная клиническая оценка."
+      : "Менее 2 баллов: это не исключает сепсис или ухудшение состояния.");
+}
+</script>
+
 <nav class="mobile-nav" aria-label="Основная навигация">
   <div class="mobile-nav-inner">
     <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
