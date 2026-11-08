@@ -1548,73 +1548,60 @@ async function askAI(){
 
 <script id="medpilot-global-search-script">
 (function(){
- const openButton=document.getElementById("mp-global-search-open");
- const overlay=document.getElementById("mp-search-overlay");
- const closeButton=document.getElementById("mp-search-close");
- const input=document.getElementById("mp-global-search-input");
- const results=document.getElementById("mp-global-search-results");
+ const openButton=document.getElementById("mp-global-search-open"),overlay=document.getElementById("mp-search-overlay"),closeButton=document.getElementById("mp-search-close"),input=document.getElementById("mp-global-search-input"),results=document.getElementById("mp-global-search-results");
  if(!openButton||!overlay||!closeButton||!input||!results)return;
- let calculators=[];
- const normalize=value=>String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\u2010-\u2015]/g,"-").replace(/[^\p{L}\p{N}]+/gu," ").trim().replace(/\s+/g," ");
+ let calculators=[],siteItems=[];
+ const normalize=v=>String(v||"").toLocaleLowerCase("ru").replace(/ё/g,"е").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\u2010-\u2015]/g,"-").replace(/[^\p{L}\p{N}]+/gu," ").trim().replace(/\s+/g," ");
  const open=()=>{overlay.classList.add("mp-search-open");overlay.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";input.focus();};
- const close=()=>{overlay.classList.remove("mp-search-open");overlay.setAttribute("aria-hidden","true");document.body.style.overflow="";openButton.focus();};
+ const close=()=>{overlay.classList.remove("mp-search-open");overlay.setAttribute("aria-hidden","true");document.body.style.overflow="";};
  openButton.addEventListener("click",open);closeButton.addEventListener("click",close);
  overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
- document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"&&overlay.classList.contains("mp-search-open"))close();
-  if(e.key==="/"&&!overlay.classList.contains("mp-search-open")&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();open();}
- });
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("mp-search-open"))close();if(e.key==="/"&&!overlay.classList.contains("mp-search-open")&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();open();}});
  function group(label){const h=document.createElement("div");h.className="mp-search-group";h.textContent=label;results.appendChild(h);}
- function add(title,description,action,label){
-  const button=document.createElement("button");button.type="button";button.className="mp-search-result";
-  const info=document.createElement("span");const strong=document.createElement("strong");strong.textContent=title;
-  const small=document.createElement("small");small.textContent=description||"";info.append(strong,small);
-  const go=document.createElement("b");go.textContent=label||"Открыть →";button.append(info,go);
-  button.addEventListener("click",()=>{close();action();});results.appendChild(button);
+ function add(title,description,action,label){const b=document.createElement("button");b.type="button";b.className="mp-search-result";const info=document.createElement("span"),strong=document.createElement("strong"),small=document.createElement("small"),go=document.createElement("b");strong.textContent=title;small.textContent=description||"";info.append(strong,small);go.textContent=label||"Открыть →";b.append(info,go);b.addEventListener("click",()=>{close();action();});results.appendChild(b);}
+ function openSection(sectionId,target,query){
+  const nav=document.querySelector('.mp-menu-links a[href="#'+sectionId+'"],.mp-specialty-links a[href="#'+sectionId+'"]');
+  if(nav)nav.click();
+  setTimeout(()=>{
+   if(target){
+    target.hidden=false;target.scrollIntoView({behavior:"smooth",block:"center"});
+    const opener=target.querySelector('button[aria-controls],button.protocol-toggle,button.knowledge-toggle');
+    if(opener&&opener.getAttribute("aria-expanded")==="false")opener.click();
+    const link=target.querySelector('a[href]');
+    if(link&&target.classList.contains("knowledge-item"))link.click();
+   }
+   if(query){const field=document.getElementById(query.field);if(field){field.value=query.value;field.dispatchEvent(new Event("input",{bubbles:true}));if(query.field==="knowledge-search")document.getElementById("knowledge-search-button")?.click();field.scrollIntoView({behavior:"smooth",block:"center"});}}
+  },160);
  }
- function goSection(sectionId,fieldId,query){
-  const link=document.querySelector('.mp-menu-links a[href="#'+sectionId+'"]');
-  if(link)link.click();
-  window.setTimeout(()=>{
-   const field=document.getElementById(fieldId);
-   if(field){field.value=query;field.dispatchEvent(new Event(fieldId==="protocol-search"||fieldId==="drug-search"?"input":"change",{bubbles:true}));if(fieldId==="knowledge-search"){const b=document.getElementById("knowledge-search-button");if(b)b.click();}field.scrollIntoView({behavior:"smooth",block:"center"});field.focus({preventScroll:true});}
-  },90);
+ function buildSiteIndex(){
+  siteItems=[];
+  document.querySelectorAll("main > section[id]").forEach(section=>{
+   const sectionId=section.id;
+   const sectionTitle=section.querySelector("h1,h2")?.textContent.trim()||sectionId;
+   siteItems.push({title:sectionTitle,description:"Раздел сайта",sectionId,target:section,group:"Разделы сайта"});
+   section.querySelectorAll(".knowledge-item,.drug-item,.protocol-card,.calculator-link,article").forEach(card=>{
+    const title=card.querySelector("h3,h4,strong")?.textContent.trim();
+    if(!title||title===sectionTitle)return;
+    siteItems.push({title,description:card.querySelector("p,.drug-tag,.knowledge-meta")?.textContent.trim()||sectionTitle,sectionId,target:card,group:sectionId==="drug-reference"?"Лекарственные препараты":sectionId==="knowledge-base"?"Медицинские источники":sectionId==="clinical-protocols"?"Клинические протоколы":"Материалы сайта"});
+   });
+  });
  }
  function render(){
-  const raw=input.value.trim(),q=normalize(raw),terms=q.split(" ").filter(Boolean);
-  results.replaceChildren();
-  if(!q){const shortcuts=[["AI-помощник","Задать клинический вопрос",()=>{const a=document.querySelector('.mp-menu-links a[href="#question"]');if(a)a.click();} ],["Все калькуляторы","Поиск по полному каталогу",()=>{const a=document.querySelector('.mp-menu-links a[href="#clinical-tools"]');if(a)a.click();} ],["Справочник препаратов","Поиск по МНН и синонимам",()=>{const a=document.querySelector('.mp-menu-links a[href="#drug-reference"]');if(a)a.click();} ],["База медицинских знаний","Рекомендации и научные источники",()=>{const a=document.querySelector('.mp-menu-links a[href="#knowledge-base"]');if(a)a.click();} ]];group("Быстрый переход");shortcuts.forEach(x=>add(x[0],x[1],x[2]));return;}
-  let count=0;
-  const calc=calculators.filter(x=>terms.every(t=>normalize(x.name+" "+x.category+" "+x.description).includes(t))).slice(0,8);
-  if(calc.length){group("Калькуляторы и шкалы");calc.forEach(x=>{count++;add(x.name,x.category+" · "+x.description,()=>{window.location.href="/calculators/clinical-toolbox.html#"+encodeURIComponent(x.id);});});}
-  const protocolInput=document.getElementById("protocol-search"),protocolList=document.getElementById("protocol-list");
-  const protocols=protocolList?[...protocolList.querySelectorAll(".protocol-card")].filter(x=>terms.every(t=>normalize(x.dataset.search+" "+x.textContent).includes(t))).slice(0,5):[];
-  if(protocols.length){group("Клинические протоколы");protocols.forEach(x=>{count++;add(x.querySelector("h3")?.textContent||"Клинический протокол",x.querySelector("p")?.textContent||"Алгоритм и первоисточник",()=>goSection("clinical-protocols","protocol-search",raw));});}
-  const drugInput=document.getElementById("drug-search");
-  if(drugInput){
-   const drugFilter=document.getElementById("drug-filter"),previous=drugInput.value,previousGroup=drugFilter?.value;
-   if(drugFilter)drugFilter.value="all";
-   drugInput.value=raw;drugInput.dispatchEvent(new Event("input",{bubbles:true}));
-   const drugCards=[...document.querySelectorAll("#drug-results .drug-item")].slice(0,6);
-   if(drugCards.length){group("Лекарственные препараты");drugCards.forEach(x=>{count++;add(x.querySelector("h3")?.textContent||"Препарат",x.querySelector(".drug-tag")?.textContent||"Справочник лекарств",()=>goSection("drug-reference","drug-search",raw));});}
-   drugInput.value=previous;if(drugFilter&&previousGroup)drugFilter.value=previousGroup;
-   drugInput.dispatchEvent(new Event("input",{bubbles:true}));
-  }
-  const knowledgeInput=document.getElementById("knowledge-search"),knowledgeButton=document.getElementById("knowledge-search-button"),knowledgeFilter=document.getElementById("knowledge-filter");
-  if(knowledgeInput&&knowledgeButton){
-   const previous=knowledgeInput.value,previousGroup=knowledgeFilter?.value;
-   if(knowledgeFilter)knowledgeFilter.value="all";
-   knowledgeInput.value=raw;knowledgeButton.click();
-   const cards=[...document.querySelectorAll("#knowledge-list .knowledge-item")].slice(0,5);
-   if(cards.length){group("Медицинские источники");cards.forEach(x=>{count++;add(x.querySelector("h3")?.textContent||"Медицинский источник",x.querySelector("p")?.textContent||"Рекомендации и руководства",()=>goSection("knowledge-base","knowledge-search",raw));});}
-   knowledgeInput.value=previous;if(knowledgeFilter&&previousGroup)knowledgeFilter.value=previousGroup;knowledgeButton.click();
-  }
-  const publicationInput=document.getElementById("publication-query");
-  if(publicationInput){group("Научные публикации");count++;add("Искать научные публикации","Поиск по PubMed и Cochrane по этой теме",()=>{const a=document.querySelector('.mp-menu-links a[href="#knowledge-base"]');if(a)a.click();window.setTimeout(()=>{const field=document.getElementById("publication-query");if(field){field.value=raw;field.scrollIntoView({behavior:"smooth",block:"center"});field.focus();}},90);},"Искать →");}
-  if(!count){const empty=document.createElement("div");empty.className="mp-search-empty";empty.textContent="Совпадений не найдено. Попробуйте МНН препарата, аббревиатуру шкалы, название заболевания или часть слова.";results.appendChild(empty);}
+  const raw=input.value.trim(),q=normalize(raw),terms=q.split(" ").filter(Boolean);results.replaceChildren();
+  if(!q){group("Быстрый переход");[["AI-помощник","Клинические вопросы",()=>openSection("question")],["Калькуляторы и шкалы","Все специальности",()=>openSection("clinical-tools")],["Лекарственные препараты","Справочник и поиск",()=>openSection("drug-reference")],["База медицинских знаний","Источники и публикации",()=>openSection("knowledge-base")],["Клинические протоколы","Алгоритмы ведения пациентов",()=>openSection("clinical-protocols")]].forEach(x=>add(x[0],x[1],x[2]));return;}
+  let count=0;const matches=(obj)=>terms.every(t=>normalize(obj.title+" "+obj.description+" "+(obj.category||"")).includes(t));
+  const sections=siteItems.filter(x=>x.group==="Разделы сайта"&&matches(x)).slice(0,8);
+  if(sections.length){group("Разделы сайта");sections.forEach(x=>{count++;add(x.title,x.description,()=>openSection(x.sectionId,x.target));});}
+  const cats=["Лекарственные препараты","Медицинские источники","Клинические протоколы","Материалы сайта"];
+  cats.forEach(cat=>{const list=siteItems.filter(x=>x.group===cat&&matches(x)).slice(0,7);if(list.length){group(cat);list.forEach(x=>{count++;add(x.title,x.description,()=>openSection(x.sectionId,x.target));});}});
+  const calcs=calculators.filter(x=>matches(x)).slice(0,10);
+  if(calcs.length){group("Калькуляторы и шкалы");calcs.forEach(x=>{count++;add(x.name,x.category+" · "+x.description,()=>{window.location.href="/calculators/clinical-toolbox.html#"+encodeURIComponent(x.id);});});}
+  if(document.getElementById("publication-query")&&terms.length){group("Научные публикации");count++;add("Искать публикации по запросу «"+raw+"»","PubMed и Cochrane",()=>{openSection("knowledge-base");setTimeout(()=>{const f=document.getElementById("publication-query");if(f){f.value=raw;f.scrollIntoView({behavior:"smooth",block:"center"});f.focus();}},220);},"Искать →");}
+  if(!count){const e=document.createElement("div");e.className="mp-search-empty";e.textContent="Ничего не найдено. Попробуйте другое название, МНН, аббревиатуру или часть слова.";results.appendChild(e);}
  }
  input.addEventListener("input",render);
- fetch("/calculators/clinical-toolbox.html").then(r=>{if(!r.ok)throw new Error("catalog unavailable");return r.text();}).then(html=>{
+ buildSiteIndex();
+ fetch("/calculators/clinical-toolbox.html").then(r=>{if(!r.ok)throw Error("catalog unavailable");return r.text();}).then(html=>{
   const doc=new DOMParser().parseFromString(html,"text/html");let category="Клинические калькуляторы";
   doc.querySelectorAll(".category,.tool").forEach(node=>{if(node.classList.contains("category")){category=node.textContent.trim();return;}const h=node.querySelector("h3");if(h&&node.id)calculators.push({id:node.id,name:h.textContent.trim(),category,description:node.querySelector("p")?.textContent.trim()||""});});
   if(input.value.trim())render();
