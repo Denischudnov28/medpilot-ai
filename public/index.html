@@ -285,11 +285,33 @@ footer{color:#8293a5}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
 </style>
 
-</head>
+<style id="medpilot-side-menu-style">
+body{padding-bottom:24px!important}
+.mobile-nav{display:none!important}
+.mp-menu-trigger{position:absolute;right:18px;top:22px;z-index:2;display:flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid rgba(255,255,255,.25);border-radius:13px;background:rgba(255,255,255,.13);color:#fff;font-size:14px;font-weight:750;backdrop-filter:blur(8px)}
+.mp-menu-trigger .mp-burger{font-size:20px;line-height:1}
+.mp-menu-backdrop{position:fixed;inset:0;z-index:1998;background:rgba(8,24,42,.48);opacity:0;transition:opacity .22s}
+.mp-menu-backdrop.mp-visible{opacity:1}
+.mp-side-menu{position:fixed;z-index:1999;inset:0 auto 0 0;width:min(84vw,330px);padding:0 14px calc(18px + env(safe-area-inset-bottom));background:#fff;box-shadow:18px 0 45px rgba(9,31,53,.2);transform:translateX(-105%);transition:transform .25s ease;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
+.mp-side-menu.mp-open{transform:translateX(0)}
+.mp-menu-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:28px 8px 22px;border-bottom:1px solid #e7eef5}
+.mp-menu-head strong{display:block;color:#153e63;font-size:20px;letter-spacing:-.4px}
+.mp-menu-head span{display:block;margin-top:4px;color:#718399;font-size:11px}
+.mp-menu-close{width:38px;height:38px;padding:0;border-radius:12px;background:#f0f5f9;color:#36536e;font-size:27px;line-height:1}
+.mp-menu-links{display:grid;gap:6px;padding:18px 0}
+.mp-menu-links a{display:flex;align-items:center;gap:13px;min-height:49px;padding:10px 12px;border-radius:13px;text-decoration:none;color:#29445f;font-size:14px}
+.mp-menu-links a:active,.mp-menu-links a:focus-visible{background:#eaf4fb;color:#145b87;outline:none}
+.mp-menu-links a span{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:#edf5fb;color:#1766a5;font-size:19px;font-weight:700}
+.mp-menu-links a b{font-weight:700}
+.mp-menu-foot{margin-top:auto;padding:14px 10px;border-top:1px solid #e7eef5;color:#8191a2;font-size:11px}
+body.mp-menu-active{overflow:hidden}
+@media(min-width:760px){.mp-menu-trigger{top:24px;right:max(22px,calc((100vw - 760px)/2))}}
+@media(prefers-reduced-motion:reduce){.mp-side-menu,.mp-menu-backdrop{transition:none}}
+</style>\n</head>
 <body>
 <header>
 <div class="logo">✚ MedPilot AI</div>
-<div class="sub">Интеллектуальный медицинский помощник</div>
+<div class="sub">Интеллектуальный медицинский помощник</div>\n<button type="button" class="mp-menu-trigger" id="mp-menu-trigger" aria-controls="medpilot-side-menu" aria-expanded="false"><span class="mp-burger">☰</span><span>Меню</span></button>
 </header>
 <main>
 <section class="card">
@@ -1283,37 +1305,40 @@ function calculateAPACHE2(){
 })();
 </script>
 
-<nav class="mobile-nav" aria-label="Основная навигация">
-  <div class="mobile-nav-inner">
-    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
-      <span class="nav-icon">🏠</span>
-      Главная
-    </a>
-    <a href="#" onclick="document.getElementById('question').scrollIntoView({behavior:'smooth'});return false;">
-      <span class="nav-icon">✍️</span>
-      AI-помощник
-    </a>
-    <a href="#clinical-tools">
-      <span class="nav-icon">🩺</span>
-      Калькуляторы
-    </a>
-    <a href="#sofa-calculator">
-      <span class="nav-icon">📊</span>
-      SOFA
-    </a>
-    <a href="#knowledge-base">
-      <span class="nav-icon">📚</span>
-      База знаний
-    </a>
-    <a href="#drug-reference">
-      <span class="nav-icon">💊</span>
-      Препараты
-    </a>
-    <a href="#clinical-protocols">
-      <span class="nav-icon">🧭</span>
-      Протоколы
-    </a>
+<div class="mp-menu-backdrop" id="mp-menu-backdrop" hidden></div>
+<aside class="mp-side-menu" id="medpilot-side-menu" aria-label="Навигация" aria-hidden="true">
+  <div class="mp-menu-head">
+    <div><strong>MedPilot AI</strong><span>Медицинский помощник</span></div>
+    <button type="button" class="mp-menu-close" id="mp-menu-close" aria-label="Закрыть меню">×</button>
   </div>
-</nav>
-</body>
+  <nav class="mp-menu-links" aria-label="Разделы приложения">
+    <a href="#" data-mp-home><span>⌂</span><b>Главная</b></a>
+    <a href="#question"><span>✦</span><b>AI-помощник</b></a>
+    <a href="#clinical-tools"><span>▦</span><b>Калькуляторы</b></a>
+    <a href="#sofa-calculator"><span>◷</span><b>SOFA</b></a>
+    <a href="#knowledge-base"><span>▤</span><b>База знаний</b></a>
+    <a href="#drug-reference"><span>✚</span><b>Справочник препаратов</b></a>
+    <a href="#clinical-protocols"><span>☷</span><b>Клинические протоколы</b></a>
+  </nav>
+  <div class="mp-menu-foot">Выберите нужный раздел</div>
+</aside>
+<script>
+(function(){
+ const menu=document.getElementById("medpilot-side-menu");
+ const trigger=document.getElementById("mp-menu-trigger");
+ const close=document.getElementById("mp-menu-close");
+ const backdrop=document.getElementById("mp-menu-backdrop");
+ if(!menu||!trigger||!close||!backdrop)return;
+ function openMenu(){menu.classList.add("mp-open");backdrop.hidden=false;requestAnimationFrame(()=>backdrop.classList.add("mp-visible"));menu.setAttribute("aria-hidden","false");trigger.setAttribute("aria-expanded","true");document.body.classList.add("mp-menu-active");close.focus();}
+ function closeMenu(){menu.classList.remove("mp-open");backdrop.classList.remove("mp-visible");menu.setAttribute("aria-hidden","true");trigger.setAttribute("aria-expanded","false");document.body.classList.remove("mp-menu-active");window.setTimeout(()=>{backdrop.hidden=true;},250);trigger.focus();}
+ trigger.addEventListener("click",openMenu);
+ close.addEventListener("click",closeMenu);
+ backdrop.addEventListener("click",closeMenu);
+ menu.querySelectorAll("a").forEach(link=>link.addEventListener("click",event=>{
+  if(link.hasAttribute("data-mp-home")){event.preventDefault();window.scrollTo({top:0,behavior:"smooth"});}
+  closeMenu();
+ }));
+ document.addEventListener("keydown",event=>{if(event.key==="Escape"&&menu.classList.contains("mp-open"))closeMenu();});
+})();
+</script>\n</body>
 </html>
