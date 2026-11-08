@@ -205,6 +205,7 @@ body {
 <style>
 /* CLINICAL KNOWLEDGE BASE */
 .knowledge-search,.knowledge-filter{width:100%;padding:13px 14px;border:1px solid #d9e1ed;border-radius:12px;font-size:16px;margin:8px 0 12px;background:#fff;color:#17243a}
+#knowledge-search-button{width:100%;min-height:46px;margin:0 0 12px}
 .knowledge-list{display:grid;gap:12px}
 .knowledge-item{border:1px solid #e0e8f1;border-radius:14px;padding:14px;background:#fbfdff}
 .knowledge-item h3{font-size:16px;margin:0 0 6px;color:#145b87}
@@ -780,6 +781,7 @@ async function askAI(){
   <p class="status">Каталог официальных клинических рекомендаций и профессиональных руководств</p>
   <label for="knowledge-search">Поиск по источникам и темам</label>
   <input id="knowledge-search" class="knowledge-search" type="search" placeholder="Например: сепсис, реанимация, почки">
+  <button id="knowledge-search-button" class="send" type="button">Найти источники</button>
   <label for="knowledge-filter">Фильтр по специальности</label>
   <select id="knowledge-filter" class="knowledge-filter">
     <option value="all">Все направления</option>
@@ -872,7 +874,9 @@ async function askAI(){
       card.append(title,topic,org,link);list.appendChild(card);
     });
   }
-  search.addEventListener("input",render);
+  const searchButton=document.getElementById("knowledge-search-button");
+  if(searchButton)searchButton.addEventListener("click",render);
+  search.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();render();}});
   filter.addEventListener("change",render);
   render();
 
