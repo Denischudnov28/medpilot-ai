@@ -427,7 +427,7 @@ body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-
 </style>
 
 <style id="medpilot-global-search-style">
-.mp-global-search-trigger{position:absolute;right:105px;top:22px;z-index:2;display:flex;align-items:center;gap:7px;padding:10px 12px;border:1px solid rgba(255,255,255,.25);border-radius:13px;background:rgba(255,255,255,.13);color:#fff;font:700 14px inherit;cursor:pointer;backdrop-filter:blur(8px)}
+.mp-global-search-trigger{position:absolute;right:105px;top:22px;z-index:2;display:flex;align-items:center;gap:7px;padding:10px 12px;border:1px solid rgba(255,255,255,.25);border-radius:13px;background:rgba(255,255,255,.13);color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px)}
 .mp-global-search-trigger span:first-child{font-size:18px}
 .mp-search-overlay{position:fixed;inset:0;z-index:3000;display:none;align-items:flex-start;justify-content:center;padding: max(7vh,24px) 14px 20px;background:rgba(7,22,39,.58);backdrop-filter:blur(5px)}
 .mp-search-overlay.mp-search-open{display:flex}
@@ -797,6 +797,7 @@ async function askAI(){
   status.textContent="Найдено: "+matches.length+(matches.length===30?" (показаны первые 30)":"")+". Нажмите на нужный калькулятор, чтобы открыть его.";
  }
  input.addEventListener("input",render);
+ if(new URLSearchParams(window.location.search).get("openSearch")==="1")open();
  fetch("/calculators/clinical-toolbox.html").then(response=>{if(!response.ok)throw new Error("Каталог недоступен");return response.text();}).then(html=>{
   const doc=new DOMParser().parseFromString(html,"text/html");
   let category="Клинические калькуляторы";
