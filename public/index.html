@@ -753,7 +753,7 @@ async function askAI(){
   <h2>Поиск калькуляторов</h2>
   <p>Введите название калькулятора или клинической шкалы. Выберите найденный инструмент, чтобы открыть его.</p>
   <label for="all-calculators-search">Название калькулятора</label>
-  <div class="all-calculators-search-row"><input id="all-calculators-search" class="knowledge-search" type="search" placeholder="Например: SOFA, NEWS2, креатинин, QTc…" autocomplete="off"><button type="button" id="all-calculators-find">Найти</button></div>
+  <form id="all-calculators-search-form"><div class="all-calculators-search-row"><input id="all-calculators-search" class="knowledge-search" type="search" placeholder="Например: SOFA, NEWS2, креатинин, QTc…" autocomplete="off"><button type="submit" id="all-calculators-find">Найти</button></div></form>
   <div id="all-calculators-results" class="knowledge-list" aria-live="polite">
     <div class="knowledge-empty">Начните вводить название — покажем подходящие калькуляторы.</div>
   </div>
@@ -790,9 +790,9 @@ async function askAI(){
   });
   status.textContent="Найдено: "+matches.length+(matches.length===30?" (показаны первые 30)":"")+". Нажмите на нужный калькулятор, чтобы открыть его.";
  }
- input.addEventListener("input",render);
- document.getElementById("all-calculators-find")?.addEventListener("click",()=>{render();input.focus({preventScroll:true});});
- input.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();render();}});
+ const searchForm=document.getElementById("all-calculators-search-form");
+ if(searchForm){searchForm.addEventListener("submit",event=>{event.preventDefault();render();});}
+ input.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();searchForm?.requestSubmit();}});
  if(new URLSearchParams(window.location.search).get("openSearch")==="1"){document.getElementById("clinical-tools")?.scrollIntoView({behavior:"smooth",block:"start"});input.focus({preventScroll:true});}
  render();
 })();
