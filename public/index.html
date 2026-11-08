@@ -319,6 +319,33 @@ body.mp-page-mode main>section:not(.mp-page-active),body.mp-page-mode>section:no
 body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-active{display:block!important}
 </style>
 
+
+<style id="medpilot-ai-workspace">
+/* Dedicated AI workspace */
+.mp-ai-specialty{background:linear-gradient(135deg,#f5fbff,#eef8f7);border-color:#d9eaf2}
+.mp-ai-specialty h2{margin-bottom:8px!important}
+.mp-ai-hint{margin:0 0 14px;color:#687d91;font-size:13px;line-height:1.55}
+.mp-ai-specialty select{background:#fff;border:1px solid #cddfea;min-height:50px;font-weight:650}
+.mp-ai-kicker{display:inline-flex;align-items:center;gap:7px;margin-bottom:9px;color:#0d8c89;font-size:10px;font-weight:850;letter-spacing:1.25px}
+.mp-ai-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#13a89b;box-shadow:0 0 0 4px #dff5f0}
+.mp-ai-chat{border-color:#d7e8f2;background:linear-gradient(160deg,#fff 0%,#f9fcff 100%)}
+.mp-ai-chat h2{margin-bottom:8px!important}
+.mp-ai-chat textarea{min-height:155px;padding:16px;border:1px solid #d4e2ed;background:#fff;line-height:1.65;box-shadow:inset 0 1px 2px rgba(20,50,80,.025)}
+.mp-ai-chat .send{min-height:52px;font-size:15px;letter-spacing:.01em}
+.mp-ai-chat .status{display:flex;align-items:center;gap:7px;margin-top:12px;color:#168276;font-weight:650}
+.mp-ai-chat .status:before{content:"";width:7px;height:7px;border-radius:50%;background:#18a58f}
+.mp-ai-answer{border-color:#dce9f1;background:#fff}
+.mp-ai-answer-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.mp-ai-answer-head h2{margin:0!important}
+.mp-ai-answer-head p{margin:4px 0 0;color:#718398;font-size:12px}
+.mp-ai-answer-icon{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#e5f3ff,#e3f7f2);color:#1766a5;font-size:23px}
+.mp-ai-answer #answer{min-height:110px;padding:18px;border:1px solid #e1ebf2;border-radius:16px;background:linear-gradient(180deg,#fbfdff,#f7fafc);line-height:1.7}
+.mp-ai-answer #answer:empty:before{content:"Здесь появится структурированный ответ: оценка ситуации, ключевые решения, тактика и источники.";display:block;color:#8495a6;line-height:1.6}
+.mp-ai-safety{padding:13px 16px;background:#fffaf0;border-color:#f1e5c9;box-shadow:none}
+.mp-ai-safety .warning{color:#80602c;line-height:1.55}
+@media(max-width:480px){.mp-ai-chat textarea{min-height:145px}.mp-ai-answer #answer{padding:15px}.mp-ai-answer-head{gap:10px}}
+</style>
+
 </head>
 <body>
 <header>
@@ -334,8 +361,9 @@ body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-
   <button type="button" class="send" id="mp-home-start">Открыть AI-помощник</button>
   <p class="status">Остальные разделы доступны через кнопку «Меню» вверху.</p>
 </section>
-<section class="card">
-<h2>🩺 Выберите специальность</h2>
+<section class="card mp-ai-specialty">
+<h2>🩺 Ваше медицинское направление</h2>
+<p class="mp-ai-hint">Выберите профиль — помощник адаптирует клинический ответ под вашу специальность.</p>
 <label for="specialty">Медицинское направление</label>
 <select id="specialty">
 <option>Общая медицина</option>
@@ -369,18 +397,20 @@ body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-
 <option>Другая специальность</option>
 </select>
 </section>
-<section class="card">
-<h2>🤖 Медицинский AI-помощник</h2>
+<section class="card mp-ai-chat">
+<div class="mp-ai-kicker">MEDPILOT INTELLIGENCE</div>
+<h2>🤖 AI-клинический помощник</h2>
+<p class="mp-ai-hint">Опишите клиническую ситуацию или задайте вопрос. Чем точнее исходные данные, тем полезнее будет разбор.</p>
 <label for="question">Ваш клинический вопрос</label>
 <textarea id="question" placeholder="Опишите клиническую задачу, симптомы, результаты анализов или задайте медицинский вопрос..."></textarea>
 <button class="send" id="send" onclick="askAI()">Отправить вопрос</button>
 <div class="status" id="status">Готов к работе</div>
 </section>
-<section class="card">
-<h2>📋 Ответ MedPilot AI</h2>
+<section class="card mp-ai-answer">
+<div class="mp-ai-answer-head"><span class="mp-ai-answer-icon">✦</span><div><h2>Ответ MedPilot AI</h2><p>Клинический разбор и рекомендации</p></div></div>
 <div id="answer"></div>
 </section>
-<section class="card">
+<section class="card mp-ai-safety">
 <div class="warning">
 ⚠️ MedPilot AI — справочный инструмент для медицинских специалистов. Ответы необходимо проверять по актуальным клиническим рекомендациям и локальным протоколам. Не используйте сервис вместо клинического решения врача. Не вводите персональные данные пациентов.
 </div>
