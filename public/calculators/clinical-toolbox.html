@@ -2,12 +2,7 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b87"><title>Клинические калькуляторы — MedPilot AI</title>
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:16px 12px 40px}.wrap{max-width:760px;margin:auto}.top{position:sticky;top:0;z-index:30;display:flex;gap:12px;align-items:center;margin:4px 0 18px;padding:8px 0;background:rgba(243,247,251,.96);backdrop-filter:blur(10px)}.back{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#fff;color:#145b87;text-decoration:none;font-size:22px}.brand{font-size:11px;letter-spacing:.12em;color:#66829a;font-weight:800}.title{margin:3px 0;color:#153e63;font-size:24px}.intro,.note{color:#60758a;font-size:13px;line-height:1.55}.category{margin:20px 0 10px;color:#145b87;font-size:18px}.tool{background:white;border:1px solid #e0e9f1;border-radius:18px;padding:17px;margin:12px 0;box-shadow:0 5px 20px #173b5b0a;scroll-margin-top:12px}.tool h3{margin:0 0 7px;color:#153e63;font-size:17px}.tool p{font-size:12px;color:#718397;line-height:1.45}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:12px;font-weight:700;margin:8px 0 5px;color:#405a72}.field input,.field select{width:100%;min-height:44px;border:1px solid #d7e2ed;border-radius:11px;padding:10px;font:inherit;font-size:16px;background:#fbfdff;color:#18324b}.calc{width:100%;margin-top:13px;min-height:47px;border:0;border-radius:12px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font-weight:750;font-size:15px}.result{margin-top:12px;padding:12px;border-radius:12px;background:#eef7fb;color:#174c6b;font-weight:700;line-height:1.5;white-space:pre-line}.warn{padding:13px;border-radius:12px;background:#fff8eb;color:#785b2d;font-size:12px;line-height:1.5;margin-top:16px}
-.calculator-search{position:sticky;top:8px;z-index:20;margin:18px 0 8px;padding:13px;background:rgba(243,247,251,.96);border:1px solid #dce7f0;border-radius:16px;box-shadow:0 6px 18px rgba(23,59,91,.08);backdrop-filter:blur(10px)}
-.calculator-search label{display:block;margin:0 0 7px;color:#244d6d;font-size:13px;font-weight:800}
-.calculator-search-row{display:flex;gap:8px}
-.calculator-search input{flex:1;min-width:0;min-height:48px;padding:11px 13px;border:1px solid #d2e0eb;border-radius:11px;background:#fff;color:#18324b;font:inherit;font-size:16px}
-.calculator-search button{min-width:48px;border:0;border-radius:11px;background:#e5eff6;color:#145b87;font-size:20px}
-#calculator-search-status{margin:8px 2px 0;color:#60758a;font-size:12px;line-height:1.4}
+
 .tool[hidden],.category[hidden]{display:none!important}.risk-check{display:flex;align-items:flex-start;gap:9px;margin:7px 0;color:#405a72;font-size:13px;line-height:1.4}.risk-check input{flex:0 0 20px;width:20px;min-height:20px;margin:1px 0 0;accent-color:#176b9d}
 .specialty-picker{margin:16px 0 20px;padding:16px;background:#fff;border:1px solid #dce7f0;border-radius:18px;box-shadow:0 5px 20px #173b5b0a}
 .specialty-picker h2{margin:0 0 6px;color:#153e63;font-size:19px}
@@ -15,7 +10,7 @@
 .specialty-picker{margin:14px 0 20px;padding:17px;background:linear-gradient(160deg,#fff,#f8fbfe);border:1px solid #dce7f0;border-radius:20px;box-shadow:0 8px 24px rgba(23,59,91,.07)}
 .specialty-picker h2{margin:0 0 5px;color:#153e63;font-size:20px;letter-spacing:-.3px}
 .specialty-picker>p{margin:0 0 13px;color:#60758a;font-size:13px;line-height:1.45}
-.specialty-filter{position:sticky;top:8px;z-index:15;width:100%;height:46px;margin:0 0 13px;padding:0 14px;border:1px solid #d5e2ed;border-radius:12px;background:rgba(255,255,255,.97);font:inherit;font-size:15px;color:#18324b;box-shadow:0 4px 12px rgba(23,59,91,.05)}
+
 .specialty-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .specialty-choice{position:relative;display:flex;align-items:center;gap:9px;min-width:0;min-height:76px;padding:11px 10px;border:1px solid #dce7f0;border-radius:15px;background:#fff;color:#244d6d;text-align:left;font-family:inherit;font-size:13px;font-weight:700;line-height:1.3;cursor:pointer;box-shadow:0 2px 7px rgba(23,59,91,.035);transition:border-color .18s,background .18s,transform .18s}
 .specialty-choice:active{transform:scale(.98)}
@@ -44,8 +39,8 @@ body.tool-open .category.category-active{display:block!important}
 .specialty-toolbar{display:flex;align-items:center;gap:10px;margin:14px 0 12px;padding:10px 12px;background:#fff;border:1px solid #dce7f0;border-radius:15px}
 .specialty-back{display:none;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border:0;border-radius:12px;background:#e7f0f7;color:#145b87;font-size:24px}
 .specialty-current{display:none;margin:0;color:#153e63;font-size:18px;font-weight:800;line-height:1.3}
-body.searching-all .specialty-picker{display:none}body.searching-all .specialty-toolbar,body.searching-all #specialty-empty{display:none}
-body.specialty-selected .calculator-search,body.specialty-selected #calculator-search-results{display:none!important}
+
+
 body.specialty-selected .specialty-picker{display:none}
 body.specialty-selected .specialty-back{display:flex}
 body.specialty-selected .specialty-current{display:block}
@@ -53,10 +48,8 @@ body.specialty-selected .specialty-current{display:block}
 @media(max-width:340px){.specialty-grid{grid-template-columns:1fr}.specialty-choice{min-height:58px;flex-direction:row;align-items:center;padding:10px 12px;font-size:13px}}
 </style><style id="tool-global-search-style">.tool-global-search{display:grid;place-items:center;flex:none;width:42px;height:42px;border:1px solid #dce7f0;border-radius:13px;background:#fff;color:#145b87;text-decoration:none;font-size:25px;font-weight:700}.top>div{min-width:0}</style></head><body><main class="wrap">
 <header class="top"><a class="back" href="../index.html?openMenu=1" aria-label="Вернуться в меню" title="Вернуться в меню">‹</a><div><div class="brand">MEDPILOT AI · КАЛЬКУЛЯТОРЫ</div><h1 class="title">Клинические расчёты</h1></div></header>
-<section class="specialty-picker" id="specialty-picker"><h2>Выберите специальность</h2><p>Быстрый доступ к калькуляторам по клиническому направлению.</p><input class="specialty-filter" id="specialty-filter" type="search" placeholder="Найти специальность…" autocomplete="off" aria-label="Поиск специальности"><div class="specialty-grid" id="specialty-grid"></div></section><div class="specialty-toolbar"><button type="button" class="specialty-back" id="specialty-back" aria-label="Назад к выбору специальности">‹</button><h2 class="specialty-current" id="specialty-current"></h2></div><div class="specialty-tool-list" id="specialty-tool-list"><button type="button" class="specialty-tool-back" id="specialty-tool-back">‹ Назад</button><div id="specialty-tool-list-content"></div></div><p id="specialty-empty" class="intro" hidden>Для этой специальности калькуляторы пока не добавлены. Нажмите стрелку назад, чтобы выбрать другое направление.</p>
+<section class="specialty-picker" id="specialty-picker"><h2>Выберите специальность</h2><p>Быстрый доступ к калькуляторам по клиническому направлению.</p><div class="specialty-grid" id="specialty-grid"></div></section><div class="specialty-toolbar"><button type="button" class="specialty-back" id="specialty-back" aria-label="Назад к выбору специальности">‹</button><h2 class="specialty-current" id="specialty-current"></h2></div><div class="specialty-tool-list" id="specialty-tool-list"><button type="button" class="specialty-tool-back" id="specialty-tool-back">‹ Назад</button><div id="specialty-tool-list-content"></div></div><p id="specialty-empty" class="intro" hidden>Для этой специальности калькуляторы пока не добавлены. Нажмите стрелку назад, чтобы выбрать другое направление.</p>
 <p class="intro">Инструменты сгруппированы по клиническим направлениям. Вводите значения в указанных единицах. Расчёты поддерживают клиническое решение, но не заменяют оценку пациента и локальные протоколы.</p>
-<div class="calculator-search"><label for="calculator-search-input">Поиск по всем калькуляторам</label><div class="calculator-search-row"><input id="calculator-search-input" type="search" placeholder="Например: SOFA, креатинин, натрий, QTc..." autocomplete="off" aria-controls="calculator-search-results"><button type="button" id="calculator-search-clear" aria-label="Очистить поиск" title="Очистить">×</button></div><div id="calculator-search-status" role="status" aria-live="polite">Показаны все доступные калькуляторы.</div></div><div id="calculator-search-results"></div>
-
 <h2 class="category" id="anesthesia">🫁 Анестезиология и реаниматология</h2>
 <section class="tool" id="extra-gcs"><h3>Шкала комы Глазго (GCS)</h3><p>Оцените три компонента; при интубации вербальный ответ обозначайте NT.</p><div class="grid"><div class="field"><label>Открывание глаз</label><select id="x-gcs-0"><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></div><div class="field"><label>Вербальная реакция</label><select id="x-gcs-1"><option value="5">5 — ориентированная речь</option><option value="4">4 — спутанная речь</option><option value="3">3 — отдельные слова</option><option value="2">2 — нечленораздельные звуки</option><option value="1">1 — отсутствует</option><option value="nt">NT — не тестируется (например, интубация)</option></select></div><div class="field"><label>Двигательная реакция</label><select id="x-gcs-2"><option value="6">6</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></div></div><button class="calc" onclick="runExtraScore('gcs')">Рассчитать</button><div class="result" id="extra-gcs-r" hidden></div></section>
 <section class="tool" id="map"><h3>Среднее артериальное давление (MAP)</h3><p>Расчёт по систолическому и диастолическому АД, мм рт. ст.</p><div class="grid"><div class="field"><label>Систолическое АД</label><input id="map-s" type="number" min="1" placeholder="120"></div><div class="field"><label>Диастолическое АД</label><input id="map-d" type="number" min="1" placeholder="80"></div></div><button class="calc" onclick="runCalc('map')">Рассчитать MAP</button><div class="result" id="map-r" hidden></div></section>
@@ -214,10 +207,7 @@ body.specialty-selected .specialty-current{display:block}
 </main>
 <section class="tool" id="added-ellipsoid"><h3>Объём образования — формула эллипсоида</h3><p>Оценка объёма по трём взаимно перпендикулярным размерам.</p><div class="grid"><div class="field"><label>Размер A, см</label><input id="ell-a" type="number" min="0.01" step="0.01" placeholder="2.0"></div><div class="field"><label>Размер B, см</label><input id="ell-b" type="number" min="0.01" step="0.01" placeholder="1.5"></div><div class="field"><label>Размер C, см</label><input id="ell-c" type="number" min="0.01" step="0.01" placeholder="1.0"></div></div><button class="calc" onclick="runAddedCalc2('ellipsoid')">Рассчитать объём</button><div class="result" id="added-ellipsoid-r" hidden></div></section><script>
 (function(){
- const input=document.getElementById('calculator-search-input');
- const clear=document.getElementById('calculator-search-clear');
- const status=document.getElementById('calculator-search-status');
- const picker=document.getElementById('specialty-picker');
+const picker=document.getElementById('specialty-picker');
  const grid=document.getElementById('specialty-grid');
  const back=document.getElementById('specialty-back');
  const current=document.getElementById('specialty-current');
@@ -230,8 +220,7 @@ body.specialty-selected .specialty-current{display:block}
  const labels={general:'Общая медицина',anesthesia:'Анестезиология и реаниматология',cardiology:'Кардиология',therapy:'Терапия',surgery:'Хирургия',neurology:'Неврология',neurosurgery:'Нейрохирургия',pediatrics:'Педиатрия',obgyn:'Акушерство и гинекология',oncology:'Онкология',trauma:'Травматология и ортопедия',infectious:'Инфекционные болезни',endocrinology:'Эндокринология',gastro:'Гастроэнтерология',nephrology:'Нефрология',pulmonology:'Пульмонология',urology:'Урология',dermatology:'Дерматология',ophthalmology:'Офтальмология',ent:'Оториноларингология',radiology:'Радиология и лучевая диагностика',emergency:'Неотложная медицина',psychiatry:'Психиатрия и психическое здоровье'};
  const emojis={general:'🩺',anesthesia:'🫁',cardiology:'❤️',therapy:'🩺',surgery:'🩻',neurology:'🧠',neurosurgery:'🧠',pediatrics:'🧸',obgyn:'🤰',oncology:'🎗️',trauma:'🦴',infectious:'🦠',endocrinology:'🧬',gastro:'🍽️',nephrology:'🧪',pulmonology:'🫁',urology:'🚻',dermatology:'🧴',ophthalmology:'👁️',ent:'👂',radiology:'🩻',emergency:'🚑',psychiatry:'🧠'};
  const specialtyOrder=['general','anesthesia','cardiology','therapy','surgery','neurology','neurosurgery','pediatrics','obgyn','oncology','trauma','infectious','endocrinology','gastro','nephrology','pulmonology','urology','dermatology','ophthalmology','ent','radiology','emergency','psychiatry'];
- const specialtyFilter=document.getElementById('specialty-filter');
- const scaleIds=new Set(['extra-gcs','sofa','rass','camicu','extra-qsofa','apfel','asa-ps','aldrete','mallampati','extra-wells','curb65','crb65','perc-rule','wells-dvt','extra-hasbled','cha2ds2va','heart-score','timi-ua','kdigo-aki','padua','cfs','morse-fall','braden','news2','extra-alvarado','rcri','caprini2013','abcd2','barthel-index','nihss','mrs','extra-four','apgar-score','povoc','pediatric-gcs','added-bishop','obstetric-shock','extra-ecog','extra-rts','ottawa','iss-score','extra-sirs','mcisaac','findrisc','child-pugh','glasgow-blatchford','ipss','scorad','centor-ent','birads','phq9','gad7']);
+const scaleIds=new Set(['extra-gcs','sofa','rass','camicu','extra-qsofa','apfel','asa-ps','aldrete','mallampati','extra-wells','curb65','crb65','perc-rule','wells-dvt','extra-hasbled','cha2ds2va','heart-score','timi-ua','kdigo-aki','padua','cfs','morse-fall','braden','news2','extra-alvarado','rcri','caprini2013','abcd2','barthel-index','nihss','mrs','extra-four','apgar-score','povoc','pediatric-gcs','added-bishop','obstetric-shock','extra-ecog','extra-rts','ottawa','iss-score','extra-sirs','mcisaac','findrisc','child-pugh','glasgow-blatchford','ipss','scorad','centor-ent','birads','phq9','gad7']);
  function renderPicker(){
   grid.innerHTML='';
   specialtyOrder.forEach(id=>{
@@ -259,10 +248,6 @@ body.specialty-selected .specialty-current{display:block}
    grid.append(button);
   });
  }
- function filterSpecialties(){
-  const query=normalize(specialtyFilter?.value||'');
-  [...grid.children].forEach(button=>{button.hidden=query&&!normalize(button.innerText).includes(query);});
- }
  function renderSpecialtyList(group,query){
   const host=document.getElementById('specialty-tool-list-content');
   if(!host||!group)return;
@@ -289,8 +274,7 @@ body.specialty-selected .specialty-current{display:block}
   addGroup('Шкалы и клинические классификации',scales);
   addGroup('Калькуляторы',calcs);
   if(!matching.length){const msg=document.createElement('p');msg.className='intro';msg.textContent='В этой специальности ничего не найдено.';host.append(msg);}
-  status.textContent='Доступно инструментов: '+matching.length+'. Выберите нужную шкалу или калькулятор.';
- }
+}
  function openSpecialtyTool(group,tool){
   document.body.classList.add('tool-open');
   groups.forEach(g=>{g.category.classList.toggle('category-active',g===group);g.category.hidden=g!==group;g.tools.forEach(t=>{t.classList.toggle('tool-active',t===tool);t.hidden=t!==tool;});});
@@ -303,61 +287,29 @@ body.specialty-selected .specialty-current{display:block}
   document.body.classList.remove('tool-open');
   groups.forEach(g=>{g.category.classList.remove('category-active');g.category.hidden=true;g.tools.forEach(t=>{t.classList.remove('tool-active');t.hidden=true;});});
   const group=groups.find(g=>g.category.id===active);
-  if(group)renderSpecialtyList(group,normalize(input.value));
+  if(group)renderSpecialtyList(group,'');
   history.pushState({specialty:active},'','#specialty-'+active);
   window.scrollTo({top:0,behavior:'smooth'});
  }
- function applySearch(){
-  const query=normalize(input.value);
-  empty.hidden=true;
-  let count=0;
-  if(!active){
-   if(!query){
-    document.body.classList.remove('searching-all','specialty-selected','tool-open');
-    groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
-    status.textContent='Выберите специальность или начните вводить название калькулятора.';
-    return;
-   }
-   document.body.classList.add('searching-all');document.body.classList.remove('tool-open');
-   groups.forEach(g=>{
-    let n=0;g.tools.forEach(tool=>{
-     const hay=normalize((tool.querySelector('h3')?.textContent||'')+' '+(tool.querySelector('p')?.textContent||'')+' '+tool.innerText+' '+g.category.innerText);
-     const match=hay.includes(query);tool.hidden=!match;if(match){count++;n++;}
-    });
-    g.category.hidden=!n;
-   });
-   status.textContent=count?'Найдено калькуляторов: '+count:'Ничего не найдено. Попробуйте название, аббревиатуру или термин.';
-   return;
-  }
-  document.body.classList.remove('searching-all','tool-open');
-  const group=groups.find(g=>g.category.id===active);
-  groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
-  if(group){renderSpecialtyList(group,query);count=group.tools.filter(tool=>normalize((tool.querySelector('h3')?.textContent||'')+' '+(tool.querySelector('p')?.textContent||'')+' '+tool.innerText).includes(query)||!query).length;}
- }
  function selectSpecialty(id,updateHash){
-  active=id;document.body.classList.remove('searching-all','tool-open');document.body.classList.add('specialty-selected');
+  active=id;document.body.classList.remove('tool-open');document.body.classList.add('specialty-selected');
   const group=groups.find(g=>g.category.id===id&&g.tools.length);
   current.textContent=(emojis[id]||'✚')+' '+labels[id];
-  input.value='';
-  groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
+groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
   if(group){renderSpecialtyList(group,'');empty.hidden=true;}
-  else{empty.hidden=false;status.textContent='Для выбранной специальности пока нет доступных калькуляторов.';}
+  else{empty.hidden=false;}
   if(updateHash)history.pushState({specialty:id},'', '#specialty-'+id);
   window.scrollTo({top:0,behavior:'smooth'});
  }
  function showPicker(updateHash){
-  active=null;empty.hidden=true;document.body.classList.remove('specialty-selected','searching-all','tool-open');
+  active=null;empty.hidden=true;document.body.classList.remove('specialty-selected','tool-open');
   groups.forEach(g=>{g.category.hidden=true;g.tools.forEach(t=>t.hidden=true);});
-  input.value='';status.textContent='Выберите специальность или начните вводить название калькулятора.';
   if(updateHash)history.pushState({specialty:null},'', '#specialties');
   window.scrollTo({top:0,behavior:'smooth'});
  }
  back.addEventListener('click',()=>showPicker(true));
  document.getElementById('specialty-tool-back')?.addEventListener('click',showSpecialtyList);
- specialtyFilter?.addEventListener('input',filterSpecialties);
- input.addEventListener('input',applySearch);
- clear.addEventListener('click',()=>{input.value='';if(active)applySearch();input.focus();});
- window.addEventListener('popstate',()=>routeFromHash());
+window.addEventListener('popstate',()=>routeFromHash());
  function routeFromHash(){
   const hash=decodeURIComponent(location.hash.replace(/^#/,''));
   if(hash.startsWith('specialty-')){selectSpecialty(hash.slice(10),false);return;}
@@ -371,7 +323,7 @@ body.specialty-selected .specialty-current{display:block}
   if(category){selectSpecialty(category.id,false);if(target&&target!==category)setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),80);return;}
   showPicker(false);
  }
- renderPicker();routeFromHash();if(!active){status.textContent='Выберите специальность или начните вводить название калькулятора.';}
+ renderPicker();routeFromHash();
 })();
 </script>
 <script>
