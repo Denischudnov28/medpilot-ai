@@ -2057,7 +2057,7 @@ async function askAI(){
         const details=document.createElement("details");details.className="drug-details";
         const summary=document.createElement("summary");summary.textContent="Клиническая карточка · проверенная форма и безопасность";
         const body=document.createElement("div");body.className="drug-detail-body";
-        [["Форма выпуска",d.clinical.form],["Концентрации",d.clinical.concentration],["Путь введения",d.clinical.route],["Противопоказания",d.clinical.contra],["Предупреждения и мониторинг",d.clinical.caution],["Почки/печень и особые группы",d.clinical.organ]].forEach(([label,value])=>{
+        [["Форма выпуска",d.clinical.form],["Концентрации",d.clinical.concentration],["Путь введения",d.clinical.route],["Противопоказания",d.clinical.contra],["Предупреждения и мониторинг",d.clinical.caution],["Почки/печень и особые группы",d.clinical.organ],["Применение при беременности",d.clinical.pregnancy||"Отдельная оценка для этого препарата в карточке пока не заполнена. До назначения проверьте раздел о беременности в актуальной инструкции (SmPC/ОХЛП) именно к выбранному препарату и лекарственной форме; оцените срок беременности, показание, альтернативы и соотношение пользы и риска для матери и плода. Не считать отсутствие сведений подтверждением безопасности."]].forEach(([label,value])=>{
           const row=document.createElement("p");row.className="drug-detail-row";
           const strong=document.createElement("strong");strong.textContent=label+": ";
           row.append(strong,document.createTextNode(value));body.appendChild(row);
