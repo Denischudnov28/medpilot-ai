@@ -753,14 +753,14 @@ async function askAI(){
   <h2>Поиск калькуляторов</h2>
   <p>Введите название калькулятора или клинической шкалы. Выберите найденный инструмент, чтобы открыть его.</p>
   <label for="all-calculators-search">Название калькулятора</label>
-  <input id="all-calculators-search" class="knowledge-search" type="search" placeholder="Например: SOFA, NEWS2, креатинин, QTc…" autocomplete="off">
+  <div class="all-calculators-search-row"><input id="all-calculators-search" class="knowledge-search" type="search" placeholder="Например: SOFA, NEWS2, креатинин, QTc…" autocomplete="off"><button type="button" id="all-calculators-find">Найти</button></div>
   <div id="all-calculators-results" class="knowledge-list" aria-live="polite">
     <div class="knowledge-empty">Начните вводить название — покажем подходящие калькуляторы.</div>
   </div>
   <p class="status" id="all-calculators-status">Поиск по полному каталогу клинических инструментов.</p>
 </section>
 <style id="all-calculators-search-style">
-#all-calculators-search{width:100%;min-height:50px;padding:13px 15px;border:1px solid #d7e2ed;border-radius:13px;font:inherit;font-size:16px;background:#fbfdff}
+.all-calculators-search-row{display:flex;gap:9px;align-items:stretch}.all-calculators-search-row #all-calculators-search{flex:1;min-width:0;width:100%;min-height:50px;padding:13px 15px;border:1px solid #d7e2ed;border-radius:13px;font:inherit;font-size:16px;background:#fbfdff}.all-calculators-search-row button{flex:0 0 auto;min-width:82px;padding:0 16px;border:0;border-radius:13px;background:#176b9d;color:#fff;font:inherit;font-weight:700;cursor:pointer}.all-calculators-search-row button:active{transform:scale(.98)}
 #all-calculators-results .calculator-search-result{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid #e0e8f1;border-radius:14px;background:#fbfdff;color:#174f78;text-decoration:none}
 #all-calculators-results .calculator-search-result strong{display:block;font-size:14px;line-height:1.4}
 #all-calculators-results .calculator-search-result small{display:block;margin-top:4px;color:#718397;font-size:12px}
@@ -790,7 +790,7 @@ async function askAI(){
   });
   status.textContent="Найдено: "+matches.length+(matches.length===30?" (показаны первые 30)":"")+". Нажмите на нужный калькулятор, чтобы открыть его.";
  }
- input.addEventListener("input",render);
+ input.addEventListener("input",render);\n document.getElementById("all-calculators-find")?.addEventListener("click",()=>{render();input.focus({preventScroll:true});});\n input.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();render();}});
  if(new URLSearchParams(window.location.search).get("openSearch")==="1"){document.getElementById("clinical-tools")?.scrollIntoView({behavior:"smooth",block:"start"});input.focus({preventScroll:true});}
  fetch("/calculators/clinical-toolbox.html").then(response=>{if(!response.ok)throw new Error("Каталог недоступен");return response.text();}).then(html=>{
   const doc=new DOMParser().parseFromString(html,"text/html");
