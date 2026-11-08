@@ -688,17 +688,61 @@ async function askAI(){
 </script>
 
 <section class="card" id="clinical-tools">
-  <h2>🩺 Клинические калькуляторы</h2>
-  <p>Каталог разделён по специальностям. Выберите направление, чтобы открыть подходящие инструменты.</p>
-  <div class="calculator-specialties">
-    <section class="calculator-category"><h3>🫁 Анестезиология и реаниматология</h3><div class="calculator-grid">
-      <a class="calculator-link" href="/calculators/sofa.html"><span>🫁</span><strong>SOFA</strong><small>Органная дисфункция</small><b>Открыть →</b></a>
-      <a class="calculator-link" href="/calculators/qsofa.html"><span>🧭</span><strong>qSOFA</strong><small>Быстрая оценка риска</small><b>Открыть →</b></a>
-      <a class="calculator-link" href="/calculators/apache-ii.html"><span>📈</span><strong>APACHE II</strong><small>Тяжесть состояния в ОРИТ</small><b>Открыть →</b></a>
-      <a class="calculator-link" href="/calculators/clinical-toolbox.html#map"><span>🩸</span><strong>Среднее АД (MAP)</strong><small>Гемодинамический расчёт</small><b>Открыть →</b></a>
-      <a class="calculator-link" href="/calculators/clinical-toolbox.html#pf"><span>🫁</span><strong>PaO₂/FiO₂</strong><small>Индекс оксигенации</small><b>Открыть →</b></a>
-      <a class="calculator-link" href="/calculators/clinical-toolbox.html#shock"><span>❤️</span><strong>Шоковый индекс</strong><small>ЧСС / систолическое АД</small><b>Открыть →</b></a>
-    </div></section>
+  <h2>🔎 Поиск калькуляторов</h2>
+  <p>Введите название калькулятора или клинической шкалы. Выберите найденный инструмент, чтобы открыть его.</p>
+  <label for="all-calculators-search">Название калькулятора</label>
+  <input id="all-calculators-search" class="knowledge-search" type="search" placeholder="Например: SOFA, NEWS2, креатинин, QTc…" autocomplete="off">
+  <div id="all-calculators-results" class="knowledge-list" aria-live="polite">
+    <div class="knowledge-empty">Начните вводить название — покажем подходящие калькуляторы.</div>
+  </div>
+  <p class="status" id="all-calculators-status">Поиск по полному каталогу клинических инструментов.</p>
+</section>
+<style id="all-calculators-search-style">
+#all-calculators-search{width:100%;min-height:50px;padding:13px 15px;border:1px solid #d7e2ed;border-radius:13px;font:inherit;font-size:16px;background:#fbfdff}
+#all-calculators-results .calculator-search-result{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid #e0e8f1;border-radius:14px;background:#fbfdff;color:#174f78;text-decoration:none}
+#all-calculators-results .calculator-search-result strong{display:block;font-size:14px;line-height:1.4}
+#all-calculators-results .calculator-search-result small{display:block;margin-top:4px;color:#718397;font-size:12px}
+#all-calculators-results .calculator-search-result b{flex:none;color:#147c91;font-size:12px}
+</style>
+<script id="all-calculators-search-script">
+(function(){
+ const input=document.getElementById("all-calculators-search");
+ const results=document.getElementById("all-calculators-results");
+ const status=document.getElementById("all-calculators-status");
+ if(!input||!results||!status)return;
+ let catalog=[];
+ const normalize=value=>String(value||"").toLocaleLowerCase("ru").replace(/ё/g,"е").replace(/[\\u2010-\\u2015]/g,"-").replace(/[^\\p{L}\\p{N}]+/gu," ").trim().replace(/\\s+/g," ");
+ function render(){
+  const query=normalize(input.value);
+  results.replaceChildren();
+  if(!query){const empty=document.createElement("div");empty.className="knowledge-empty";empty.textContent="Начните вводить название — покажем подходящие калькуляторы.";results.appendChild(empty);status.textContent="Поиск по полному каталогу клинических инструментов.";return;}
+  const matches=catalog.filter(item=>normalize(item.name+" "+item.category+" "+item.description).includes(query)).slice(0,30);
+  if(!matches.length){const empty=document.createElement("div");empty.className="knowledge-empty";empty.textContent="Ничего не найдено. Попробуйте другое название или аббревиатуру.";results.appendChild(empty);status.textContent="Совпадений не найдено.";return;}
+  matches.forEach(item=>{
+   const link=document.createElement("a");link.className="calculator-search-result";link.href="/calculators/clinical-toolbox.html#"+encodeURIComponent(item.id);
+   const info=document.createElement("span");const title=document.createElement("strong");title.textContent=item.name;
+   const meta=document.createElement("small");meta.textContent=item.category;info.append(title,meta);
+   const action=document.createElement("b");action.textContent="Открыть →";link.append(info,action);results.appendChild(link);
+  });
+  status.textContent="Найдено: "+matches.length+(matches.length===30?" (показаны первые 30)":"")+". Нажмите на нужный калькулятор, чтобы открыть его.";
+ }
+ input.addEventListener("input",render);
+ fetch("/calculators/clinical-toolbox.html").then(response=>{if(!response.ok)throw new Error("Каталог недоступен");return response.text();}).then(html=>{
+  const doc=new DOMParser().parseFromString(html,"text/html");
+  let category="Клинические калькуляторы";
+  doc.querySelectorAll(".category,.tool").forEach(node=>{
+   if(node.classList.contains("category")){category=node.textContent.trim();return;}
+   const heading=node.querySelector("h3");
+   if(!heading||!node.id)return;
+   const description=node.querySelector("p");
+   catalog.push({id:node.id,name:heading.textContent.trim(),category,description:description?description.textContent.trim():""});
+  });
+  render();
+ }).catch(()=>{
+  status.textContent="Не удалось загрузить полный каталог. Попробуйте обновить страницу.";
+ });
+})();
+</script>
     <section class="calculator-category"><h3>🧠 Неврология и нейрореанимация</h3><div class="calculator-grid">
       <a class="calculator-link" href="/calculators/gcs.html"><span>🧠</span><strong>Шкала комы Глазго (GCS)</strong><small>Оценка сознания</small><b>Открыть →</b></a>
     </div></section>
