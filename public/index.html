@@ -473,9 +473,9 @@ function calculateSOFA() {
  const result = document.getElementById("sofa-result");
  const vasoValue = document.getElementById("sofa-vaso").value;
 
-if (vasoValue === "") {
-    result.textContent = "⚠️ Укажите данные о вазопрессорах перед расчётом SOFA.";
-    return;
+if (vasoValue === "" || vasoValue === null) {
+  result.textContent = "⚠️ Укажите данные о вазопрессорах или выберите «Нет».";
+  return;
 }
 
  if (values.some(v => v === "")) {
