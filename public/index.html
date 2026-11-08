@@ -1491,7 +1491,7 @@ async function askAI(){
 <section class="card" id="knowledge-base">
   <h2>📚 База медицинских знаний</h2>
   <p class="status">Российские и международные клинические рекомендации, официальные медицинские руководства и проверенные профессиональные источники.</p>
-  <div class="ru-guideline-search">
+  <div class="ru-guideline-search" id="ru-guidelines">
     <h3>🇷🇺 Поиск российских клинических рекомендаций</h3>
     <p class="status">Поиск по названию заболевания, аббревиатуре или коду МКБ-10. Результаты ищутся среди страниц официального рубрикатора Минздрава России.</p>
     <label for="ru-guideline-query">Заболевание или клиническая тема</label>
@@ -1508,6 +1508,8 @@ async function askAI(){
     <a class="knowledge-link knowledge-open-source" href="https://cr.minzdrav.gov.ru/clin_recomend" target="_blank" rel="noopener noreferrer">Открыть официальный рубрикатор Минздрава ↗</a>
     <p class="knowledge-meta" id="ru-guideline-search-status" role="status" aria-live="polite">Поиск выполняется по индексированным страницам официального домена cr.minzdrav.gov.ru. Сверяйте найденную версию и статус документа на сайте Минздрава.</p>
   </div>
+  <div id="international-guidelines">
+  <h3>🌐 Международные клинические рекомендации</h3>
   <label for="knowledge-search">Поиск по источникам и темам</label>
   <input id="knowledge-search" class="knowledge-search" type="search" placeholder="Например: сепсис, реанимация, почки">
   <button id="knowledge-search-button" class="send" type="button">Найти источники</button>
@@ -1523,8 +1525,9 @@ async function askAI(){
     <option value="general">Общая медицина</option>
   </select>
   <div id="knowledge-list" class="knowledge-list" aria-live="polite"></div>
+  </div>
 
-  <div class="knowledge-research">
+  <div class="knowledge-research" id="scientific-publications">
     <h3>🔬 Поиск научных публикаций</h3>
     <p class="status">Поиск по PubMed с аннотациями и переходом к первоисточнику. Для Cochrane доступен официальный поиск библиотеки.</p>
     <label for="publication-query">Клиническая тема или ключевые слова</label>
@@ -2112,7 +2115,9 @@ async function askAI(){
     <a href="#clinical-tools"><span>▦</span><b>Все калькуляторы</b></a>
     <a href="/calculators/clinical-toolbox.html" data-mp-specialty-tab><span>▦</span><b>Калькуляторы по специальностям</b></a>
     <a href="#drug-reference"><span>✚</span><b>Справочник препаратов</b></a>
-    <a href="#knowledge-base"><span>☷</span><b>Клинические рекомендации</b></a>
+    <a href="#ru-guidelines"><span>🇷🇺</span><b>Рекомендации Минздрава РФ</b></a>
+    <a href="#international-guidelines"><span>🌐</span><b>Международные рекомендации</b></a>
+    <a href="#scientific-publications"><span>📚</span><b>Научные публикации</b></a>
   </nav>
   <div class="mp-menu-foot">Выберите нужный раздел</div>
 </aside>
