@@ -384,7 +384,163 @@ function calculateGCS() {
     "<br>" + severity;
 }
 </script>
+<section class="card" id="sofa-calculator">
+<h2>🫁 Калькулятор SOFA</h2>
+<p>Sequential Organ Failure Assessment</p>
 
+<label>1. Дыхательная система — PaO₂/FiO₂</label>
+<input class="sofa-input" id="sofa-pf" type="number"
+placeholder="Например, 250" step="any">
+
+<label>Респираторная поддержка</label>
+<select id="sofa-resp">
+<option value="0">Нет</option>
+<option value="1">Да</option>
+</select>
+
+<label>2. Коагуляция — тромбоциты (×10⁹/л)</label>
+<input class="sofa-input" id="sofa-plt" type="number"
+placeholder="Например, 120" step="any">
+
+<label>3. Печень — билирубин (мкмоль/л)</label>
+<input class="sofa-input" id="sofa-bil" type="number"
+placeholder="Например, 35" step="any">
+
+<label>4. Сердечно-сосудистая система — MAP (мм рт. ст.)</label>
+<input class="sofa-input" id="sofa-map" type="number"
+placeholder="Например, 65" step="any">
+
+<label>Вазопрессоры и инотропы</label>
+<select id="sofa-vaso">
+<option value="0">Нет</option>
+<option value="2">Допамин ≤5 или добутамин в любой дозе</option>
+<option value="3">Допамин 5–15 или адреналин/норадреналин ≤0,1</option>
+<option value="4">Допамин >15 или адреналин/норадреналин >0,1</option>
+</select>
+<p class="status">Дозы катехоламинов: мкг/кг/мин.</p>
+
+<label>5. ЦНС — GCS (баллы)</label>
+<input class="sofa-input" id="sofa-gcs" type="number"
+min="3" max="15" step="1" placeholder="3–15">
+
+<label>6. Почки — креатинин (мкмоль/л)</label>
+<input class="sofa-input" id="sofa-creat" type="number"
+placeholder="Например, 150" step="any">
+
+<label>Диурез за 24 часа (мл) — необязательно</label>
+<input class="sofa-input" id="sofa-urine" type="number"
+placeholder="Например, 450" min="0" step="any">
+
+<button class="send" type="button" onclick="calculateSOFA()">
+Рассчитать SOFA
+</button>
+
+<div id="sofa-result" style="margin-top:18px;font-weight:700"></div>
+</div>
+</section>
+
+<style>
+.sofa-input {
+width:100%;
+padding:14px;
+border:1px solid #d9e1ed;
+border-radius:12px;
+font-size:17px;
+margin-bottom:16px;
+background:white;
+color:#17243a;
+}
+#sofa-calculator label {
+margin-top:12px;
+}
+#sofa-result {
+line-height:1.8;
+font-size:16px;
+}
+</style>
+
+<script>
+function calculateSOFA() {
+ const ids = ["sofa-pf","sofa-plt","sofa-bil",
+ "sofa-map","sofa-gcs","sofa-creat"];
+
+ const values = ids.map(id =>
+   document.getElementById(id).value.trim()
+ );
+
+ const result = document.getElementById("sofa-result");
+
+ if (values.some(v => v === "")) {
+   result.textContent = "Заполните все обязательные показатели.";
+   return;
+ }
+
+ const [pf,plt,bil,map,gcs,creat] = values.map(Number);
+
+ const urineValue = document.getElementById("sofa-urine").value;
+ const urine = urineValue === "" ? null : Number(urineValue);
+
+ if (
+   ![pf,plt,bil,map,gcs,creat].every(Number.isFinite) ||
+   pf <= 0 || plt < 0 || bil < 0 || map < 0 ||
+   gcs < 3 || gcs > 15 || !Number.isInteger(gcs) ||
+   creat < 0 ||
+   (urine !== null && (!Number.isFinite(urine) || urine < 0))
+ ) {
+   result.textContent = "Проверьте введённые значения.";
+   return;
+ }
+
+ const support = Number(document.getElementById("sofa-resp").value);
+ const vaso = Number(document.getElementById("sofa-vaso").value);
+
+ let r = pf >= 400 ? 0 :
+         pf >= 300 ? 1 :
+         pf >= 200 ? 2 :
+         support && pf < 100 ? 4 :
+         support ? 3 : 2;
+
+ let c = plt >= 150 ? 0 :
+         plt >= 100 ? 1 :
+         plt >= 50 ? 2 :
+         plt >= 20 ? 3 : 4;
+
+ let l = bil < 20 ? 0 :
+         bil <= 32 ? 1 :
+         bil <= 101 ? 2 :
+         bil <= 204 ? 3 : 4;
+
+ let cv = vaso > 0 ? vaso : map < 70 ? 1 : 0;
+
+ let n = gcs === 15 ? 0 :
+         gcs >= 13 ? 1 :
+         gcs >= 10 ? 2 :
+         gcs >= 6 ? 3 : 4;
+
+ let k = creat < 110 ? 0 :
+         creat <= 170 ? 1 :
+         creat <= 299 ? 2 :
+         creat <= 440 ? 3 : 4;
+
+ if (urine !== null) {
+   const urineScore = urine < 200 ? 4 :
+                      urine < 500 ? 3 : 0;
+   k = Math.max(k, urineScore);
+ }
+
+ const total = r + c + l + cv + n + k;
+
+ result.innerHTML =
+   "SOFA: " + total + " / 24<br><br>" +
+   "Дыхательная система: " + r + " / 4<br>" +
+   "Коагуляция: " + c + " / 4<br>" +
+   "Печень: " + l + " / 4<br>" +
+   "Сердечно-сосудистая система: " + cv + " / 4<br>" +
+   "ЦНС: " + n + " / 4<br>" +
+   "Почки: " + k + " / 4<br><br>" +
+   "Расчёт завершён. Проверьте клиническую интерпретацию.";
+}
+</script>
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
