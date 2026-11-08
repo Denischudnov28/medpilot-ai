@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b87"><title>Калькулятор SOFA — MedPilot AI</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:20px 14px 40px}.wrap{max-width:720px;margin:0 auto}.top{display:flex;align-items:center;gap:12px;margin:0 0 18px}.back{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:13px;background:#fff;color:#145b87;text-decoration:none;font-size:22px;box-shadow:0 3px 12px #173b5b12}.brand{font-size:12px;letter-spacing:.12em;color:#66829a;font-weight:800}.page-title{font-size:25px;line-height:1.2;margin:2px 0 0;color:#153e63}.card{background:#fff;border:1px solid #e0e9f1;border-radius:20px;padding:22px;box-shadow:0 8px 28px #173b5b0c}h2{font-size:22px;margin:0 0 12px;color:#153e63}h3{font-size:17px;margin:20px 0 12px}p{line-height:1.55;color:#536a7e}label{display:block;margin:14px 0 7px;font-size:14px;font-weight:650;color:#29445f}input,select{width:100%;min-height:48px;padding:12px 13px;border:1px solid #d7e2ed;border-radius:12px;background:#fbfdff;color:#17243a;font:inherit;font-size:16px;margin-bottom:8px}button.send{width:100%;min-height:50px;margin-top:16px;padding:12px 16px;border:0;border-radius:13px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font:inherit;font-weight:750}.warning{padding:13px 15px;border-radius:12px;background:#fff8eb;color:#785b2d;font-size:13px}.status{font-size:13px;color:#70869a}@media(max-width:480px){body{padding:14px 10px 30px}.card{padding:17px}.page-title{font-size:22px}}
+</style></head><body><main class="wrap"><header class="top"><a class="back" href="../index.html#clinical-tools" aria-label="Назад к калькуляторам">‹</a><div><div class="brand">MEDPILOT AI · КАЛЬКУЛЯТОРЫ</div><h1 class="page-title">🫁 Калькулятор SOFA</h1></div></header><section class="card" id="sofa-calculator">
+<h2>🫁 Калькулятор SOFA</h2>
+<p>Sequential Organ Failure Assessment</p>
+
+<label>1. Дыхательная система — PaO₂/FiO₂</label>
+<input class="sofa-input" id="sofa-pf" type="number"
+placeholder="Например, 250" step="any">
+
+<label>Респираторная поддержка</label>
+<select id="sofa-resp">
+<option value="" selected>Не указано</option>
+<option value="0">Нет</option>
+<option value="1">Да</option>
+</select>
+
+<label>2. Коагуляция — тромбоциты (×10⁹/л)</label>
+<input class="sofa-input" id="sofa-plt" type="number"
+placeholder="Например, 120" step="any">
+
+<label>3. Печень — билирубин (мкмоль/л)</label>
+<input class="sofa-input" id="sofa-bil" type="number"
+placeholder="Например, 35" step="any">
+
+<label>4. Сердечно-сосудистая система — MAP (мм рт. ст.)</label>
+<input class="sofa-input" id="sofa-map" type="number"
+placeholder="Например, 65" step="any">
+
+<label>Вазопрессоры и инотропы</label>
+<select id="sofa-vaso">
+<option value="">Не указано</option>
+<option value="0">Нет вазопрессоров</option>
+<option value="2">Допамин ≤5 или добутамин в любой дозе</option>
+<option value="3">Допамин >5–15 или адреналин/норадреналин ≤0,1</option>
+<option value="4">Допамин >15 или адреналин/норадреналин >0,1</option>
+</select>
+<p class="status">Дозы: мкг/кг/мин</p>
+
+<label>5. ЦНС — GCS (баллы)</label>
+<input class="sofa-input" id="sofa-gcs" type="number"
+min="3" max="15" step="1" placeholder="3–15">
+
+<label>6. Почки — креатинин (мкмоль/л)</label>
+<input class="sofa-input" id="sofa-creat" type="number"
+placeholder="Например, 150" step="any">
+
+<label>Диурез за 24 часа (мл) — необязательно</label>
+<input class="sofa-input" id="sofa-urine" type="number"
+placeholder="Например, 450" min="0" step="any">
+
+<button class="send" type="button" onclick="calculateSOFA()">
+Рассчитать SOFA
+</button>
+
+<div id="sofa-result" style="margin-top:18px;font-weight:700"></div>
+</div>
+</section>
+
+<style>
+.sofa-input {
+width:100%;
+padding:14px;
+border:1px solid #d9e1ed;
+border-radius:12px;
+font-size:17px;
+margin-bottom:16px;
+background:white;
+color:#17243a;
+}
+#sofa-calculator label {
+margin-top:12px;
+}
+#sofa-result {
+line-height:1.8;
+font-size:16px;
+}
+</style><script>
+function calculateSOFA() {
+ const ids = ["sofa-pf","sofa-plt","sofa-bil",
+ "sofa-map","sofa-gcs","sofa-creat"];
+
+ const values = ids.map(id =>
+   document.getElementById(id).value.trim()
+ );
+
+ const result = document.getElementById("sofa-result");
+ const vasoValue = document.getElementById("sofa-vaso").value;
+
+if (vasoValue === "" || vasoValue === null) {
+  result.textContent = "⚠️ Укажите данные о вазопрессорах или выберите «Нет».";
+  return;
+}
+
+ if (values.some(v => v === "")) {
+   result.textContent = "Заполните все обязательные показатели.";
+   return;
+ }
+
+ const [pf,plt,bil,map,gcs,creat] = values.map(Number);
+
+ const urineValue = document.getElementById("sofa-urine").value;
+ const urine = urineValue === "" ? null : Number(urineValue);
+
+ if (
+   ![pf,plt,bil,map,gcs,creat].every(Number.isFinite) ||
+   pf <= 0 || plt < 0 || bil < 0 || map < 0 ||
+   gcs < 3 || gcs > 15 || !Number.isInteger(gcs) ||
+   creat < 0 ||
+   (urine !== null && (!Number.isFinite(urine) || urine < 0))
+ ) {
+   result.textContent = "Проверьте введённые значения.";
+   return;
+ }
+
+ const supportValue = document.getElementById("sofa-resp").value;
+ if (supportValue === "") {
+   result.textContent = "⚠️ Укажите, проводится ли респираторная поддержка (Да/Нет).";
+   return;
+ }
+ const support = supportValue === "1";
+ const vaso = Number(document.getElementById("sofa-vaso").value);
+
+ let r = pf >= 400 ? 0 :
+         pf >= 300 ? 1 :
+         pf >= 200 ? 2 :
+         support && pf < 100 ? 4 :
+         support ? 3 : 2;
+
+ let c = plt >= 150 ? 0 :
+         plt >= 100 ? 1 :
+         plt >= 50 ? 2 :
+         plt >= 20 ? 3 : 4;
+
+ let l = bil < 20 ? 0 :
+         bil <= 32 ? 1 :
+         bil <= 101 ? 2 :
+         bil <= 204 ? 3 : 4;
+
+ let cv = vaso > 0 ? vaso : map < 70 ? 1 : 0;
+
+ let n = gcs === 15 ? 0 :
+         gcs >= 13 ? 1 :
+         gcs >= 10 ? 2 :
+         gcs >= 6 ? 3 : 4;
+
+ let k = creat < 110 ? 0 :
+         creat <= 170 ? 1 :
+         creat <= 299 ? 2 :
+         creat <= 440 ? 3 : 4;
+
+ if (urine !== null) {
+   const urineScore = urine < 200 ? 4 :
+                      urine < 500 ? 3 : 0;
+   k = Math.max(k, urineScore);
+ }
+
+ const total = r + c + l + cv + n + k;
+
+ result.innerHTML =
+   "SOFA: " + total + " / 24<br><br>" +
+   "Дыхательная система: " + r + " / 4<br>" +
+   "Коагуляция: " + c + " / 4<br>" +
+   "Печень: " + l + " / 4<br>" +
+   "Сердечно-сосудистая система: " + cv + " / 4<br>" +
+   "ЦНС: " + n + " / 4<br>" +
+   "Почки: " + k + " / 4<br><br>" +
+   "Расчёт завершён. Проверьте клиническую интерпретацию.";
+}
+</script></main></body></html>
