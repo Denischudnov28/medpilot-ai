@@ -12,21 +12,31 @@
 .specialty-picker{margin:16px 0 20px;padding:16px;background:#fff;border:1px solid #dce7f0;border-radius:18px;box-shadow:0 5px 20px #173b5b0a}
 .specialty-picker h2{margin:0 0 6px;color:#153e63;font-size:19px}
 .specialty-picker p{margin:0 0 14px;color:#60758a;font-size:13px;line-height:1.5}
-.specialty-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.specialty-choice{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:58px;padding:12px;border:1px solid #dce7f0;border-radius:13px;background:#f9fcff;color:#244d6d;text-align:left;font-family:inherit;font-size:14px;font-weight:600;line-height:1.35;cursor:pointer}
-.specialty-choice span{min-width:0}
-.specialty-choice small{flex:none;color:#6b8499;font-size:11px}
-.specialty-toolbar{display:flex;align-items:center;gap:10px;margin:14px 0 8px}
+.specialty-picker{margin:14px 0 20px;padding:17px;background:linear-gradient(160deg,#fff,#f8fbfe);border:1px solid #dce7f0;border-radius:20px;box-shadow:0 8px 24px rgba(23,59,91,.07)}
+.specialty-picker h2{margin:0 0 5px;color:#153e63;font-size:20px;letter-spacing:-.3px}
+.specialty-picker>p{margin:0 0 13px;color:#60758a;font-size:13px;line-height:1.45}
+.specialty-filter{position:sticky;top:8px;z-index:15;width:100%;height:46px;margin:0 0 13px;padding:0 14px;border:1px solid #d5e2ed;border-radius:12px;background:rgba(255,255,255,.97);font:inherit;font-size:15px;color:#18324b;box-shadow:0 4px 12px rgba(23,59,91,.05)}
+.specialty-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.specialty-choice{position:relative;display:flex;align-items:center;gap:9px;min-width:0;min-height:76px;padding:11px 10px;border:1px solid #dce7f0;border-radius:15px;background:#fff;color:#244d6d;text-align:left;font-family:inherit;font-size:13px;font-weight:700;line-height:1.3;cursor:pointer;box-shadow:0 2px 7px rgba(23,59,91,.035);transition:border-color .18s,background .18s,transform .18s}
+.specialty-choice:active{transform:scale(.98)}
+.specialty-choice:focus-visible{outline:3px solid rgba(23,102,165,.2);outline-offset:2px}
+.specialty-choice .specialty-icon{display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border-radius:11px;background:#edf5fb;font-size:19px}
+.specialty-choice .specialty-label{display:block;min-width:0;flex:1;overflow-wrap:anywhere}
+.specialty-choice small{position:absolute;right:8px;bottom:6px;padding:2px 6px;border-radius:999px;background:#f0f5f9;color:#6b8499;font-size:10px;font-weight:700;white-space:nowrap}
+.specialty-choice:has(small[data-empty="true"]){opacity:.62}
+.specialty-choice[hidden]{display:none!important}
+.specialty-toolbar{display:flex;align-items:center;gap:10px;margin:14px 0 12px;padding:10px 12px;background:#fff;border:1px solid #dce7f0;border-radius:15px}
 .specialty-back{display:none;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border:0;border-radius:12px;background:#e7f0f7;color:#145b87;font-size:24px}
-.specialty-current{display:none;margin:0;color:#153e63;font-size:19px;font-weight:800}
+.specialty-current{display:none;margin:0;color:#153e63;font-size:18px;font-weight:800;line-height:1.3}
 body:not(.specialty-selected) .calculator-search,body:not(.specialty-selected) #calculator-search-results{display:none}
 body.specialty-selected .specialty-picker{display:none}
-body.specialty-selected .specialty-back,body.specialty-selected .specialty-current{display:flex}
+body.specialty-selected .specialty-back{display:flex}
 body.specialty-selected .specialty-current{display:block}
-@media(max-width:430px){.grid{grid-template-columns:1fr}.title{font-size:21px}.specialty-grid{grid-template-columns:1fr}.specialty-choice{min-height:52px}}
+@media(max-width:430px){.grid{grid-template-columns:1fr}.title{font-size:21px}.specialty-picker{padding:14px}.specialty-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.specialty-choice{min-height:82px;padding:10px 8px 25px;align-items:flex-start;flex-direction:column;gap:5px;font-size:12px}.specialty-choice .specialty-icon{width:29px;height:29px;flex-basis:29px;font-size:17px;border-radius:9px}.specialty-choice small{right:6px;bottom:5px;font-size:9px}.specialty-toolbar{align-items:center}.specialty-current{font-size:16px}}
+@media(max-width:340px){.specialty-grid{grid-template-columns:1fr}.specialty-choice{min-height:58px;flex-direction:row;align-items:center;padding:10px 12px 22px;font-size:13px}}
 </style></head><body><main class="wrap">
 <header class="top"><a class="back" href="../index.html?openMenu=1" aria-label="Вернуться в меню" title="Вернуться в меню">‹</a><div><div class="brand">MEDPILOT AI · КАЛЬКУЛЯТОРЫ</div><h1 class="title">Клинические расчёты</h1></div></header>
-<section class="specialty-picker" id="specialty-picker"><h2>Выберите специальность</h2><p>Показываются только калькуляторы выбранного клинического направления.</p><div class="specialty-grid" id="specialty-grid"></div></section><div class="specialty-toolbar"><button type="button" class="specialty-back" id="specialty-back" aria-label="Назад к выбору специальности">‹</button><h2 class="specialty-current" id="specialty-current"></h2></div><p id="specialty-empty" class="intro" hidden>Для этой специальности калькуляторы пока не добавлены. Нажмите стрелку назад, чтобы выбрать другое направление.</p>
+<section class="specialty-picker" id="specialty-picker"><h2>Выберите специальность</h2><p>Быстрый доступ к калькуляторам по клиническому направлению.</p><input class="specialty-filter" id="specialty-filter" type="search" placeholder="Найти специальность…" autocomplete="off" aria-label="Поиск специальности"><div class="specialty-grid" id="specialty-grid"></div></section><div class="specialty-toolbar"><button type="button" class="specialty-back" id="specialty-back" aria-label="Назад к выбору специальности">‹</button><h2 class="specialty-current" id="specialty-current"></h2></div><p id="specialty-empty" class="intro" hidden>Для этой специальности калькуляторы пока не добавлены. Нажмите стрелку назад, чтобы выбрать другое направление.</p>
 <p class="intro">Инструменты сгруппированы по клиническим направлениям. Вводите значения в указанных единицах. Расчёты поддерживают клиническое решение, но не заменяют оценку пациента и локальные протоколы.</p>
 <div class="calculator-search"><label for="calculator-search-input">Поиск по всем калькуляторам</label><div class="calculator-search-row"><input id="calculator-search-input" type="search" placeholder="Например: SOFA, креатинин, натрий, QTc..." autocomplete="off" aria-controls="calculator-search-results"><button type="button" id="calculator-search-clear" aria-label="Очистить поиск" title="Очистить">×</button></div><div id="calculator-search-status" role="status" aria-live="polite">Показаны все доступные калькуляторы.</div></div><div id="calculator-search-results"></div>
 
@@ -106,18 +116,28 @@ body.specialty-selected .specialty-current{display:block}
  const labels={general:'Общая медицина',anesthesia:'Анестезиология и реаниматология',cardiology:'Кардиология',therapy:'Терапия',surgery:'Хирургия',neurology:'Неврология',neurosurgery:'Нейрохирургия',pediatrics:'Педиатрия',obgyn:'Акушерство и гинекология',oncology:'Онкология',trauma:'Травматология и ортопедия',infectious:'Инфекционные болезни',endocrinology:'Эндокринология',gastro:'Гастроэнтерология',nephrology:'Нефрология',pulmonology:'Пульмонология',urology:'Урология',dermatology:'Дерматология',ophthalmology:'Офтальмология',ent:'Оториноларингология',radiology:'Радиология и лучевая диагностика',emergency:'Неотложная медицина'};
  const emojis={general:'🩺',anesthesia:'🫁',cardiology:'❤️',therapy:'🩺',surgery:'🩻',neurology:'🧠',neurosurgery:'🧠',pediatrics:'🧸',obgyn:'🤰',oncology:'🎗️',trauma:'🦴',infectious:'🦠',endocrinology:'🧬',gastro:'🍽️',nephrology:'🧪',pulmonology:'🫁',urology:'🚻',dermatology:'🧴',ophthalmology:'👁️',ent:'👂',radiology:'🩻',emergency:'🚑'};
  const specialtyOrder=['general','anesthesia','cardiology','therapy','surgery','neurology','neurosurgery','pediatrics','obgyn','oncology','trauma','infectious','endocrinology','gastro','nephrology','pulmonology','urology','dermatology','ophthalmology','ent','radiology','emergency'];
+ const specialtyFilter=document.getElementById('specialty-filter');
  function renderPicker(){
   grid.innerHTML='';
   specialtyOrder.forEach(id=>{
    const g=groups.find(item=>item.category.id===id);
    const count=g?g.tools.length:0;
-   const label=labels[id]||g.category.textContent.replace(/^\S+\s*/,'').trim();
+   const label=labels[id]||(g?g.category.textContent.replace(/^\S+\s*/,'').trim():id);
    const button=document.createElement('button');
    button.type='button';button.className='specialty-choice';
-   const name=document.createElement('span');name.textContent=(emojis[id]||'✚')+' '+label;
-   const countLabel=document.createElement('small');countLabel.textContent=count?count+' '+(count===1?'калькулятор':'калькулятора'):'Пока нет';
-   button.append(name,countLabel);button.addEventListener('click',()=>selectSpecialty(id,true));grid.append(button);
+   button.setAttribute('aria-label',label+', '+(count||0)+' калькуляторов');
+   const icon=document.createElement('span');icon.className='specialty-icon';icon.textContent=emojis[id]||'✚';
+   const name=document.createElement('span');name.className='specialty-label';name.textContent=label;
+   const countLabel=document.createElement('small');countLabel.textContent=count?count+' '+(count===1?'калькулятор':count<5?'калькулятора':'калькуляторов'):'Нет калькуляторов';
+   if(!count)countLabel.dataset.empty='true';
+   button.append(icon,name,countLabel);
+   button.addEventListener('click',()=>selectSpecialty(id,true));
+   grid.append(button);
   });
+ }
+ function filterSpecialties(){
+  const query=normalize(specialtyFilter?.value||'');
+  [...grid.children].forEach(button=>{button.hidden=query&&!normalize(button.innerText).includes(query);});
  }
  function applySearch(){
   const query=normalize(input.value);
@@ -150,6 +170,7 @@ body.specialty-selected .specialty-current{display:block}
   window.scrollTo({top:0,behavior:'smooth'});
  }
  back.addEventListener('click',()=>showPicker(true));
+ specialtyFilter?.addEventListener('input',filterSpecialties);
  input.addEventListener('input',applySearch);
  clear.addEventListener('click',()=>{input.value='';if(active)applySearch();input.focus();});
  window.addEventListener('popstate',()=>routeFromHash());
