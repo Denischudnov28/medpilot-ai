@@ -307,7 +307,7 @@ body{padding-bottom:24px!important}
 body.mp-menu-active{overflow:hidden}
 @media(min-width:760px){.mp-menu-trigger{top:24px;right:max(22px,calc((100vw - 760px)/2))}}
 @media(prefers-reduced-motion:reduce){.mp-side-menu,.mp-menu-backdrop{transition:none}}
-</style>\n
+</style>
 <style id="medpilot-page-navigation">
 .mp-home-page{display:none;text-align:center;margin-top:12px;padding:30px 22px}
 .mp-home-page.mp-page-active{display:block}
@@ -350,7 +350,8 @@ body.mp-page-mode main>section.mp-page-active,body.mp-page-mode>section.mp-page-
 <body>
 <header>
 <div class="logo">✚ MedPilot AI</div>
-<div class="sub">Интеллектуальный помощник для медицинских специалистов</div>\n<button type="button" class="mp-menu-trigger" id="mp-menu-trigger" aria-controls="medpilot-side-menu" aria-expanded="false"><span class="mp-burger">☰</span><span>Меню</span></button>
+<div class="sub">Интеллектуальный помощник для медицинских специалистов</div>
+<button type="button" class="mp-menu-trigger" id="mp-menu-trigger" aria-controls="medpilot-side-menu" aria-expanded="false"><span class="mp-burger">☰</span><span>Меню</span></button>
 </header>
 <main>
 
@@ -1390,7 +1391,7 @@ function calculateAPACHE2(){
  }));
  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&menu.classList.contains("mp-open"))closeMenu();});
 })();
-</script>\n
+</script>
 <script id="medpilot-page-router">
 (function(){
  const directSections=[...document.querySelectorAll('body > main > section, body > section')];
