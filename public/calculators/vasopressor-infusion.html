@@ -11,7 +11,7 @@
 <header class="top"><a class="back" href="clinical-toolbox.html#specialty-anesthesia">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Доза вазоактивных препаратов</h1></div></header>
 <section class="card">
 <p class="intro">Введите массу пациента, количество препарата в шприце, конечный объём раствора и скорость инфузомата. Калькулятор рассчитает фактическую дозу в <b>мкг/кг/мин</b>.</p>
-<div class="field"><label for="drug">Препарат</label><select id="drug"><option>Норадреналин</option><option>Адреналин</option><option>Добутамин</option><option>Допамин</option><option>Фенилэфрин</option><option>Милринон</option><option>Другой препарат (мкг/кг/мин)</option></select></div>
+<div class="field"><label for="drug">Препарат</label><select id="drug"><option>Норадреналин</option><option>Адреналин</option><option>Добутамин</option><option>Допамин</option><option>Фенилэфрин</option><option>Другой препарат (мкг/кг/мин)</option></select></div>
 <div class="result" id="dose-reference" style="margin-top:10px" aria-live="polite">Справочные дозы для взрослых: выберите препарат.</div>
 <div class="grid">
 <div class="field"><label for="weight">Масса пациента, кг</label><input id="weight" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="Например, 70"></div>
@@ -33,7 +33,6 @@
  'Добутамин':{start:'2,5',usual:'2,5–20',max:'20',note:'Обычный диапазон для взрослых в интенсивной терапии; титровать по гемодинамическому ответу.',source:'NSW Health, Adult Continuous Infusions: Dobutamine (2026); Safer Care Victoria.'},
  'Допамин':{start:'2–5',usual:'2–20',max:'50',note:'Инструкция допускает до 50 мкг/кг/мин; во многих клинических протоколах обычный верхний предел — 20 из-за риска нежелательных эффектов.',source:'FDA/DailyMed, Dopamine Hydrochloride Injection (2026); Safer Care Victoria.'},
  'Фенилэфрин':{start:'0,5',usual:'0,5–6,0',max:'6,0',note:'Для взрослых при вазодилатационном шоке по инструкции; при периоперационной гипотензии отдельный диапазон 0,5–1,4 мкг/кг/мин. Титровать к целевому АД; учитывать риск выраженной брадикардии и снижения сердечного выброса.',source:'FDA/DailyMed, Phenylephrine Hydrochloride Injection, разделы 2.4–2.5.'},
- 'Милринон':{start:'0,1',usual:'0,125–0,35',max:'0,75',note:'Старт 0,1 и обычный диапазон приведены в руководстве Safer Care Victoria; инструкция DailyMed указывает поддерживающую инфузию 0,375–0,75 мкг/кг/мин. При почечной недостаточности дозу уменьшают; нагрузочную дозу часто опускают при риске гипотензии.',source:'Safer Care Victoria, Milrinone; FDA/DailyMed, Milrinone Lactate Injection.'}
  };
  function showDoseReference(){
   const ref=doseRefs[$('drug').value],box=$('dose-reference');
