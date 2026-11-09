@@ -53,9 +53,9 @@ out.textContent=r.name+'\nКонцентрация: '+concentration.toFixed(2)+'
   const back=get('calculator-back');
   if(back){back.href='icu-assistant.html'+(patientId?'?patient='+encodeURIComponent(patientId):'')+'#treatment';back.textContent='‹ Назад в помощник ОРИТ';back.setAttribute('aria-label','Вернуться в раздел лечения помощника ОРИТ');}
  }
- let autoSaveTimer=null;
+ let autoSaveTimer=null,hasPendingChanges=false;
  function saveTreatmentHistory(){
-  if(!patientId)return;
+  if(!patientId||!hasPendingChanges)return;
   try{
    const key='medpilot_icu_patient_records_v1',store=JSON.parse(localStorage.getItem(key)||'{}'),patient=store[patientId];if(!patient)return;
    const drug=get('drug').value,weight=get('weight').value,amount=get('amount').value,volume=get('volume').value,pump=get('pump').value;
@@ -70,12 +70,13 @@ out.textContent=r.name+'\nКонцентрация: '+concentration.toFixed(2)+'
    patient.history=patient.history||[];const now=new Date(),cutoff=now.getTime()-5*60*1000;
    let snap=patient.history.find(x=>x.auto===true&&x.source==='sedation'&&new Date(x.at).getTime()>=cutoff);
    if(snap){snap.at=now.toISOString();snap.values=values;}else patient.history.unshift({id:'autosave-sedation-'+now.getTime(),at:now.toISOString(),auto:true,module:'treatment',source:'sedation',values});
-   patient.updatedAt=now.toISOString();localStorage.setItem(key,JSON.stringify(store));
+   patient.updatedAt=now.toISOString();localStorage.setItem(key,JSON.stringify(store));hasPendingChanges=false;
   }catch(e){}
  }
- function scheduleTreatmentSave(){if(!patientId)return;clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(saveTreatmentHistory,1200);}
+ function scheduleTreatmentSave(){if(!patientId)return;hasPendingChanges=true;clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(saveTreatmentHistory,1200);}
+ window.addEventListener('pagehide',()=>{if(hasPendingChanges){clearTimeout(autoSaveTimer);saveTreatmentHistory();}});
  ['drug','weight','amount','volume','pump'].forEach(id=>{const el=get(id);el.addEventListener('input',scheduleTreatmentSave);el.addEventListener('change',scheduleTreatmentSave);});
- const calc=get('calculate');if(calc)calc.addEventListener('click',()=>{clearTimeout(autoSaveTimer);saveTreatmentHistory();});
+ const calc=get('calculate');if(calc)calc.addEventListener('click',()=>{hasPendingChanges=true;clearTimeout(autoSaveTimer);saveTreatmentHistory();});
  
 })();
 </script>
