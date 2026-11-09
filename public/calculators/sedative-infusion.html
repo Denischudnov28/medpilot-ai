@@ -6,7 +6,7 @@
 <header class="top"><a class="back" href="clinical-toolbox.html#anesthesia">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Инфузия седативных препаратов</h1></div></header>
 <section class="card">
 <p class="intro">Калькулятор непрерывной внутривенной инфузии у взрослых. Укажите массу, количество препарата в шприце/флаконе, конечный объём раствора и скорость инфузомата. Результат отображается в единицах, принятых для выбранного препарата.</p>
-<div class="field"><label for="drug">Препарат</label><select id="drug"><option value="propofol">Пропофол</option><option value="dex">Дексмедетомидин</option><option value="midazolam">Мидазолам</option><option value="ketamine">Кетамин</option></select></div>
+<div class="field"><label for="drug">Препарат</label><select id="drug"><option value="propofol">Пропофол</option><option value="dex">Дексмедетомидин</option><option value="midazolam">Мидазолам</option></select></div>
 <div class="result" id="dose-reference" style="margin-top:10px" aria-live="polite"></div>
 <div class="grid">
 <div class="field"><label for="weight">Масса пациента, кг</label><input id="weight" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="Например, 70"></div>
@@ -18,7 +18,7 @@
 <div class="result" id="result" role="status" aria-live="polite" hidden></div>
 <div class="formula"><b>Расчёт:</b><br>Концентрация = количество препарата (мг) × 1000 / объём (мл).<br>Поступление (мг/ч) = концентрация (мкг/мл) × скорость (мл/ч) / 1000.<br>Далее доза пересчитывается на массу тела и выводится в соответствующих единицах.</div>
 <div class="warn"><b>Важно:</b> справочные диапазоны приведены для взрослых пациентов ОРИТ и не являются назначением. Выбор препарата, целевой RASS, стартовую скорость и титрование определяет врач по клинической ситуации и локальному протоколу. Перед запуском независимо проверьте концентрацию, единицы, массу, скорость и настройки инфузомата. Учитывайте гемодинамику, органную недостаточность, взаимодействия и мониторинг. Для пропофола при длительной инфузии контролируйте триглицериды и признаки синдрома инфузии пропофола; для дексмедетомидина — брадикардию и гипотензию; для мидазолама — кумуляцию, особенно при органной дисфункции.</div>
-<p class="sub">Источники дозировочных диапазонов: SCCM ICU Liberation (propofol, dexmedetomidine, midazolam); NSW Health Adult Continuous Infusions (propofol, dexmedetomidine, 2026); SurgicalCriticalCare.net, Analgosedation Management in the Adult Critically Ill (ketamine, 2024). Диапазоны могут различаться между инструкциями и локальными протоколами.</p>
+<p class="sub">Источники дозировочных диапазонов: SCCM ICU Liberation (propofol, dexmedetomidine, midazolam); NSW Health Adult Continuous Infusions (propofol, dexmedetomidine, 2026). Диапазоны могут различаться между инструкциями и локальными протоколами.</p>
 </section></main>
 <script>
 (function(){
@@ -27,7 +27,7 @@ const refs={
 propofol:{name:'Пропофол',start:'0,3 мг/кг/ч',usual:'0,3–4 мг/кг/ч',max:'4 мг/кг/ч (обычный верхний предел диапазона NSW Health)',unit:'мг/кг/ч',note:'Титровать к целевому RASS. При длительной инфузии учитывать риск гипертриглицеридемии и синдрома инфузии пропофола.',source:'NSW Health, Adult Continuous Infusions: Propofol (2026); SCCM ICU Liberation.'},
 dex:{name:'Дексмедетомидин',start:'0,2–0,7 мкг/кг/ч',usual:'0,1–1,5 мкг/кг/ч (диапазон зависит от инструкции/протокола)',max:'1,5 мкг/кг/ч по NSW Health; в ряде инструкций максимум 0,7 или 1,4',unit:'мкг/кг/ч',note:'Нагрузочная доза не включена в расчёт. Возможны выраженная брадикардия и гипотензия; необходим непрерывный мониторинг.',source:'DailyMed Dexmedetomidine (2026); NSW Health Adult Continuous Infusions (2026).'},
 midazolam:{name:'Мидазолам',start:'0,02 мг/кг/ч',usual:'0,02–0,1 мг/кг/ч',max:'0,1 мг/кг/ч (ориентир SCCM)',unit:'мг/кг/ч',note:'Бензодиазепин; риск делирия и кумуляции активного метаболита, особенно при почечной/печёночной дисфункции. Не использовать диапазон как универсальный предел.',source:'SCCM ICU Liberation, Sedatives for Adult Patients on Mechanical Ventilation.'},
-ketamine:{name:'Кетамин',start:'индивидуально по протоколу',usual:'0,5–5 мг/кг/ч',max:'5 мг/кг/ч (диапазон руководства Surgical Critical Care)',unit:'мг/кг/ч',note:'Диапазон для седативной инфузии в ОРИТ; отдельно существуют субдиссоциативные анальгетические режимы. Оценивать гемодинамику, психомиметические эффекты и противопоказания.',source:'SurgicalCriticalCare.net, Analgosedation Management in the Adult Critically Ill (2024).'}
+
 };
 function showRef(){const r=refs[$('drug').value];$('dose-reference').innerHTML='<b>Справочные дозы для взрослых</b><br>Препарат: <b>'+r.name+'</b><br>Стартовый ориентир: <b>'+r.start+'</b><br>Обычный диапазон: <b>'+r.usual+'</b><br>Верхняя граница/ориентир: <b>'+r.max+'</b><br><span class="sub">'+r.note+'</span><br><span class="sub">Источник: '+r.source+'</span>';}
 $('drug').addEventListener('change',showRef);showRef();
