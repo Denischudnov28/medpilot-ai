@@ -13,7 +13,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 .brand{color:#5f8299!important;letter-spacing:.14em!important;font-weight:850!important}
 h1,h2,h3,h4,.title{color:var(--mp-navy)!important;letter-spacing:-.025em}
 .title{font-weight:850!important}
-.card,.tool,.specialty-picker,.specialty-tool-list,.panel,.patient-card,.section-card,.module-panel,[data-module-panel]{
+.card,.tool,.specialty-picker,.specialty-tool-list,.panel,.section-card,.module-panel,[data-module-panel]{
  background:rgba(255,255,255,.96)!important;border:1px solid var(--mp-line)!important;border-radius:var(--mp-radius)!important;box-shadow:var(--mp-shadow)!important
 }
 .tool,.card{transition:box-shadow .18s ease,border-color .18s ease}
@@ -76,3 +76,7 @@ small{color:var(--mp-muted)}
  .grid{gap:9px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+.module-tab-back{display:block;width:100%;min-height:42px;margin:12px 0 8px;padding:9px 13px;border:1px solid #d7e5ee;border-radius:12px;background:#fff;color:#145b87;font:inherit;font-weight:800;text-align:left}
+.module-tab-back[hidden]{display:none!important}
+.module-nav{position:sticky;top:0;z-index:12;padding:7px;background:rgba(244,249,252,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(215,229,238,.9);border-radius:15px}
