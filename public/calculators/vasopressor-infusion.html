@@ -10,31 +10,31 @@
 <body><main class="wrap">
 <header class="top"><a class="back" href="clinical-toolbox.html#specialty-anesthesia">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Доза вазоактивных препаратов</h1></div></header>
 <section class="card">
-<p class="intro">Калькулятор определяет фактически вводимую дозу в <b>мкг/кг/мин</b> по концентрации раствора, массе пациента и скорости инфузионного насоса. Введите фактическую скорость насоса и параметры приготовленного раствора.</p>
+<p class="intro">Калькулятор рассчитывает требуемую скорость инфузионного насоса (мл/ч) по назначенной дозе в <b>мкг/кг/мин</b>, массе пациента и концентрации приготовленного раствора.</p>
 <div class="field"><label for="drug">Препарат</label><select id="drug"><option>Норадреналин</option><option>Адреналин</option><option>Добутамин</option><option>Допамин</option><option>Другой препарат (мкг/кг/мин)</option></select></div>
 <div class="grid">
 <div class="field"><label for="weight">Масса пациента, кг</label><input id="weight" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="Например, 70"></div>
 <div class="field"><label for="amount">Количество препарата, мг</label><input id="amount" type="number" min="0.001" max="10000" step="any" inputmode="decimal" placeholder="Всего в шприце"></div>
 <div class="field"><label for="volume">Конечный объём раствора, мл</label><input id="volume" type="number" min="0.1" max="10000" step="any" inputmode="decimal" placeholder="Общий объём после разведения"></div>
-<div class="field"><label for="pump">Скорость инфузомата, мл/ч</label><input id="pump" type="number" min="0" max="1000" step="any" inputmode="decimal" placeholder="Например, 5"></div>
+<div class="field"><label for="dose">Назначенная доза, мкг/кг/мин</label><input id="dose" type="number" min="0" max="10000" step="any" inputmode="decimal" placeholder="Например, 0,1"></div>
 </div>
-<button class="calc" type="button" id="calculate">Рассчитать дозу, мкг/кг/мин</button>
+<button class="calc" type="button" id="calculate">Рассчитать скорость инфузомата, мл/ч</button>
 <div class="result" id="result" role="status" aria-live="polite" hidden></div>
-<div class="formula"><b>Формула:</b><br>Концентрация (мкг/мл) = количество препарата (мг) × 1000 / конечный объём (мл).<br>Доза (мкг/кг/мин) = концентрация (мкг/мл) × скорость (мл/ч) / [масса (кг) × 60].</div>
-<div class="warn"><b>Важно:</b> перед использованием независимо проверьте препарат, соль/форму вещества, количество препарата, конечный объём, концентрацию, массу пациента, скорость насоса и единицы измерения. Используйте локальный стандарт разведения и назначение врача. Расчёт не проверяет клиническую обоснованность дозы и не предлагает целевые дозировки. Не переносите концентрацию из примера на реального пациента. Этот калькулятор рассчитан только на препараты, дозируемые в мкг/кг/мин; вазопрессин и препараты с другими единицами (например, мЕд/мин) не поддерживаются.</div>
+<div class="formula"><b>Формула:</b><br>Концентрация (мкг/мл) = количество препарата (мг) × 1000 / конечный объём (мл).<br>Скорость инфузомата (мл/ч) = доза (мкг/кг/мин) × масса (кг) × 60 / концентрация (мкг/мл).</div>
+<div class="warn"><b>Важно:</b> перед использованием независимо проверьте препарат, соль/форму вещества, назначенную дозу, количество препарата, конечный объём, концентрацию и массу пациента. Полученную скорость насоса обязательно сверяйте с назначением и локальным стандартом разведения. Расчёт не проверяет клиническую обоснованность дозы и не предлагает целевые дозировки. Не переносите концентрацию из примера на реального пациента. Этот калькулятор рассчитан только на препараты, дозируемые в мкг/кг/мин; вазопрессин и препараты с другими единицами (например, мЕд/мин) не поддерживаются.</div>
 </section></main>
 <script>
 (function(){
  const $=id=>document.getElementById(id);
  $('calculate').addEventListener('click',()=>{
   const out=$('result');out.hidden=false;
-  const weight=Number($('weight').value),amount=Number($('amount').value),volume=Number($('volume').value),pump=Number($('pump').value);
-  if(['weight','amount','volume','pump'].some(id=>$(id).value.trim()==='')||![weight,amount,volume,pump].every(Number.isFinite)){out.textContent='Заполните все четыре поля числовыми значениями.';return;}
-  if(weight<=0||weight>500||amount<=0||amount>10000||volume<=0||volume>10000||pump<0||pump>1000){out.textContent='Проверьте значения: масса до 500 кг, количество препарата и объём должны быть положительными, скорость насоса — от 0 до 1000 мл/ч.';return;}
+  const weight=Number($('weight').value),amount=Number($('amount').value),volume=Number($('volume').value),dose=Number($('dose').value);
+  if(['weight','amount','volume','dose'].some(id=>$(id).value.trim()==='')||![weight,amount,volume,dose].every(Number.isFinite)){out.textContent='Заполните все четыре поля числовыми значениями.';return;}
+  if(weight<=0||weight>500||amount<=0||amount>10000||volume<=0||volume>10000||dose<0||dose>10000){out.textContent='Проверьте значения: масса до 500 кг, количество препарата и объём должны быть положительными, назначенная доза — от 0 до 10000 мкг/кг/мин.';return;}
   const concentration=amount*1000/volume;
-  const dose=concentration*pump/(weight*60);
-  if(!Number.isFinite(dose)||!Number.isFinite(concentration)){out.textContent='Не удалось выполнить расчёт. Проверьте исходные данные.';return;}
-  out.textContent=$('drug').value+'\\nКонцентрация раствора: '+concentration.toFixed(2)+' мкг/мл\\nСкорость инфузомата: '+pump.toFixed(2)+' мл/ч\\n\\nФАКТИЧЕСКАЯ ДОЗА: '+dose.toFixed(4)+' мкг/кг/мин';
+  const pump=dose*weight*60/concentration;
+  if(!Number.isFinite(pump)||!Number.isFinite(concentration)){out.textContent='Не удалось выполнить расчёт. Проверьте исходные данные.';return;}
+  out.textContent=$('drug').value+'\\nКонцентрация раствора: '+concentration.toFixed(2)+' мкг/мл\\nНазначенная доза: '+dose.toFixed(4)+' мкг/кг/мин\\n\\nРАСЧЁТНАЯ СКОРОСТЬ ИНФУЗОМАТА: '+pump.toFixed(2)+' мл/ч';
  });
 })();
 </script></body></html>
