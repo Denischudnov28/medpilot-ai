@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b87"><title>Калькулятор инфузии седативных препаратов — MedPilot AI</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:14px 10px 36px}.wrap{max-width:720px;margin:auto}.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:8px 0 14px;background:rgba(243,247,251,.96);backdrop-filter:blur(10px)}.back{display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 13px;border-radius:12px;background:#fff;color:#145b87;text-decoration:none;font-weight:750;white-space:nowrap}.brand{font-size:11px;letter-spacing:.12em;color:#66829a;font-weight:800}.title{margin:3px 0;color:#153e63;font-size:23px}.card{padding:19px;background:#fff;border:1px solid #e0e9f1;border-radius:18px;box-shadow:0 6px 22px #173b5b0a}.intro,.note{color:#60758a;font-size:13px;line-height:1.55}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{min-width:0}.field label{display:block;margin:12px 0 6px;font-size:13px;font-weight:700;color:#405a72}.field input,.field select{width:100%;min-height:46px;padding:10px 12px;border:1px solid #d7e2ed;border-radius:11px;background:#fbfdff;color:#18324b;font:inherit;font-size:16px}.calc{width:100%;min-height:49px;margin-top:17px;border:0;border-radius:12px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font:inherit;font-weight:750;font-size:15px}.result{margin-top:15px;padding:15px;border-radius:13px;background:#eef7fb;color:#174c6b;line-height:1.65;white-space:pre-line}.warn{margin-top:15px;padding:14px;border-radius:12px;background:#fff8eb;color:#785b2d;font-size:12px;line-height:1.55}.formula{margin-top:13px;padding:12px;border:1px solid #e2ebf2;border-radius:12px;color:#526b80;font-size:12px;line-height:1.55}.sub{font-size:12px;color:#718397;line-height:1.5}@media(max-width:440px){.grid{grid-template-columns:1fr}.title{font-size:20px}.card{padding:15px}}
+</style></head><body><main class="wrap">
+<header class="top"><a class="back" href="clinical-toolbox.html#anesthesia">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Инфузия седативных препаратов</h1></div></header>
+<section class="card">
+<p class="intro">Калькулятор непрерывной внутривенной инфузии у взрослых. Укажите массу, количество препарата в шприце/флаконе, конечный объём раствора и скорость инфузомата. Результат отображается в единицах, принятых для выбранного препарата.</p>
+<div class="field"><label for="drug">Препарат</label><select id="drug"><option value="propofol">Пропофол</option><option value="dex">Дексмедетомидин</option><option value="midazolam">Мидазолам</option><option value="ketamine">Кетамин</option></select></div>
+<div class="result" id="dose-reference" style="margin-top:10px" aria-live="polite"></div>
+<div class="grid">
+<div class="field"><label for="weight">Масса пациента, кг</label><input id="weight" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="Например, 70"></div>
+<div class="field"><label for="amount">Количество препарата, мг</label><input id="amount" type="number" min="0.001" max="10000" step="any" inputmode="decimal" placeholder="Всего в шприце"></div>
+<div class="field"><label for="volume">Конечный объём раствора, мл</label><input id="volume" type="number" min="0.1" max="10000" step="any" inputmode="decimal" placeholder="Общий объём после разведения"></div>
+<div class="field"><label for="pump">Скорость инфузомата, мл/ч</label><input id="pump" type="number" min="0" max="10000" step="any" inputmode="decimal" placeholder="Например, 5"></div>
+</div>
+<button class="calc" type="button" id="calculate">Рассчитать дозу</button>
+<div class="result" id="result" role="status" aria-live="polite" hidden></div>
+<div class="formula"><b>Расчёт:</b><br>Концентрация = количество препарата (мг) × 1000 / объём (мл).<br>Поступление (мг/ч) = концентрация (мкг/мл) × скорость (мл/ч) / 1000.<br>Далее доза пересчитывается на массу тела и выводится в соответствующих единицах.</div>
+<div class="warn"><b>Важно:</b> справочные диапазоны приведены для взрослых пациентов ОРИТ и не являются назначением. Выбор препарата, целевой RASS, стартовую скорость и титрование определяет врач по клинической ситуации и локальному протоколу. Перед запуском независимо проверьте концентрацию, единицы, массу, скорость и настройки инфузомата. Учитывайте гемодинамику, органную недостаточность, взаимодействия и мониторинг. Для пропофола при длительной инфузии контролируйте триглицериды и признаки синдрома инфузии пропофола; для дексмедетомидина — брадикардию и гипотензию; для мидазолама — кумуляцию, особенно при органной дисфункции.</div>
+<p class="sub">Источники дозировочных диапазонов: SCCM ICU Liberation (propofol, dexmedetomidine, midazolam); NSW Health Adult Continuous Infusions (propofol, dexmedetomidine, 2026); SurgicalCriticalCare.net, Analgosedation Management in the Adult Critically Ill (ketamine, 2024). Диапазоны могут различаться между инструкциями и локальными протоколами.</p>
+</section></main>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const refs={
+propofol:{name:'Пропофол',start:'0,3 мг/кг/ч',usual:'0,3–4 мг/кг/ч',max:'4 мг/кг/ч (обычный верхний предел диапазона NSW Health)',unit:'мг/кг/ч',note:'Титровать к целевому RASS. При длительной инфузии учитывать риск гипертриглицеридемии и синдрома инфузии пропофола.',source:'NSW Health, Adult Continuous Infusions: Propofol (2026); SCCM ICU Liberation.'},
+dex:{name:'Дексмедетомидин',start:'0,2–0,7 мкг/кг/ч',usual:'0,1–1,5 мкг/кг/ч (диапазон зависит от инструкции/протокола)',max:'1,5 мкг/кг/ч по NSW Health; в ряде инструкций максимум 0,7 или 1,4',unit:'мкг/кг/ч',note:'Нагрузочная доза не включена в расчёт. Возможны выраженная брадикардия и гипотензия; необходим непрерывный мониторинг.',source:'DailyMed Dexmedetomidine (2026); NSW Health Adult Continuous Infusions (2026).'},
+midazolam:{name:'Мидазолам',start:'0,02 мг/кг/ч',usual:'0,02–0,1 мг/кг/ч',max:'0,1 мг/кг/ч (ориентир SCCM)',unit:'мг/кг/ч',note:'Бензодиазепин; риск делирия и кумуляции активного метаболита, особенно при почечной/печёночной дисфункции. Не использовать диапазон как универсальный предел.',source:'SCCM ICU Liberation, Sedatives for Adult Patients on Mechanical Ventilation.'},
+ketamine:{name:'Кетамин',start:'индивидуально по протоколу',usual:'0,5–5 мг/кг/ч',max:'5 мг/кг/ч (диапазон руководства Surgical Critical Care)',unit:'мг/кг/ч',note:'Диапазон для седативной инфузии в ОРИТ; отдельно существуют субдиссоциативные анальгетические режимы. Оценивать гемодинамику, психомиметические эффекты и противопоказания.',source:'SurgicalCriticalCare.net, Analgosedation Management in the Adult Critically Ill (2024).'}
+};
+function showRef(){const r=refs[$('drug').value];$('dose-reference').innerHTML='<b>Справочные дозы для взрослых</b><br>Препарат: <b>'+r.name+'</b><br>Стартовый ориентир: <b>'+r.start+'</b><br>Обычный диапазон: <b>'+r.usual+'</b><br>Верхняя граница/ориентир: <b>'+r.max+'</b><br><span class="sub">'+r.note+'</span><br><span class="sub">Источник: '+r.source+'</span>';}
+$('drug').addEventListener('change',showRef);showRef();
+$('calculate').addEventListener('click',()=>{
+const out=$('result');out.hidden=false;
+const ids=['weight','amount','volume','pump'];
+if(ids.some(id=>$(id).value.trim()==='')){out.textContent='Заполните все четыре поля.';return;}
+const w=Number($('weight').value),a=Number($('amount').value),v=Number($('volume').value),p=Number($('pump').value);
+if(![w,a,v,p].every(Number.isFinite)||w<=0||w>500||a<=0||a>10000||v<=0||v>10000||p<0||p>10000){out.textContent='Проверьте введённые значения и единицы измерения.';return;}
+const concentration=a*1000/v,mgHour=concentration*p/1000,mgKgHour=mgHour/w,mcgKgMin=mgKgHour*1000/60,mcgKgHour=mgKgHour*1000;
+const key=$('drug').value,r=refs[key];let dose='',unit=r.unit;
+if(key==='dex')dose=mcgKgHour.toFixed(3)+' мкг/кг/ч';
+else dose=mgKgHour.toFixed(4)+' мг/кг/ч';
+let extra=key==='propofol'?'Эквивалент: '+mcgKgMin.toFixed(2)+' мкг/кг/мин.':key==='dex'?'Эквивалент: '+mcgKgMin.toFixed(3)+' мкг/кг/мин.':'Эквивалент: '+mcgKgMin.toFixed(3)+' мкг/кг/мин.';
+out.textContent=r.name+'\nКонцентрация: '+concentration.toFixed(2)+' мкг/мл\nСкорость инфузомата: '+p.toFixed(2)+' мл/ч\nПоступление препарата: '+mgHour.toFixed(3)+' мг/ч\nРАСЧЁТНАЯ ДОЗА: '+dose+'\n'+extra+'\nПроверьте результат по назначению и локальному протоколу.';
+});
+})();
+</script></body></html>
