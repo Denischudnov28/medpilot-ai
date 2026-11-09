@@ -12,6 +12,7 @@
 <section class="card">
 <p class="intro">Введите массу пациента, количество препарата в шприце, конечный объём раствора и скорость инфузомата. Калькулятор рассчитает фактическую дозу в <b>мкг/кг/мин</b>.</p>
 <div class="field"><label for="drug">Препарат</label><select id="drug"><option>Норадреналин</option><option>Адреналин</option><option>Добутамин</option><option>Допамин</option><option>Другой препарат (мкг/кг/мин)</option></select></div>
+<div class="result" id="dose-reference" style="margin-top:10px" aria-live="polite">Справочные дозы для взрослых: выберите препарат.</div>
 <div class="grid">
 <div class="field"><label for="weight">Масса пациента, кг</label><input id="weight" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="Например, 70"></div>
 <div class="field"><label for="amount">Количество препарата, мг</label><input id="amount" type="number" min="0.001" max="10000" step="any" inputmode="decimal" placeholder="Всего в шприце"></div>
@@ -26,6 +27,19 @@
 <script>
 (function(){
  const $=id=>document.getElementById(id);
+ const doseRefs={
+ 'Норадреналин':{start:'0,05–0,15',usual:'0,05–0,5',max:'1,0',note:'Стартовый диапазон и справочная верхняя граница для взрослых; универсального абсолютного максимума нет.',source:'Michigan Medicine, Early Recognition and Initial Management of Sepsis in Adult Patients (2023).'},
+ 'Адреналин':{start:'0,05',usual:'0,05–2,0',max:'2,0',note:'Для взрослых при гипотензии, связанной с септическим шоком; титровать к целевому АД. Не относится к внутримышечному лечению анафилаксии.',source:'FDA/DailyMed, Adrenalin Prescribing Information (2026).'},
+ 'Добутамин':{start:'2,5',usual:'2,5–20',max:'20',note:'Обычный диапазон для взрослых в интенсивной терапии; титровать по гемодинамическому ответу.',source:'NSW Health, Adult Continuous Infusions: Dobutamine (2026); Safer Care Victoria.'},
+ 'Допамин':{start:'2–5',usual:'2–20',max:'50',note:'Инструкция допускает до 50 мкг/кг/мин; во многих клинических протоколах обычный верхний предел — 20 из-за риска нежелательных эффектов.',source:'FDA/DailyMed, Dopamine Hydrochloride Injection (2026); Safer Care Victoria.'}
+ };
+ function showDoseReference(){
+  const ref=doseRefs[$('drug').value],box=$('dose-reference');
+  if(!ref){box.textContent='Для выбранного препарата справочные дозы не заданы. Используйте утверждённый локальный протокол.';return;}
+  box.innerHTML='<b>Справочные дозы для взрослых (мкг/кг/мин)</b><br>Стартовая: <b>'+ref.start+'</b><br>Обычный диапазон: <b>'+ref.usual+'</b><br>Максимум по указанному источнику: <b>'+ref.max+'</b><br><span class="sub">'+ref.note+'</span><br><span class="sub">Источник: '+ref.source+'</span>';
+ }
+ $('drug').addEventListener('change',showDoseReference);
+ showDoseReference();
  $('calculate').addEventListener('click',()=>{
   const out=$('result');out.hidden=false;
   const weight=Number($('weight').value),amount=Number($('amount').value),volume=Number($('volume').value),pump=Number($('pump').value);
@@ -44,7 +58,10 @@
    out.textContent='Не удалось выполнить расчёт. Проверьте исходные данные.';
    return;
   }
-  out.textContent=$('drug').value+'\\nКонцентрация раствора: '+concentration.toFixed(2)+' мкг/мл\\nСкорость инфузомата: '+pump.toFixed(2)+' мл/ч\\nМасса пациента: '+weight.toFixed(1)+' кг\\n\\nРАСЧЁТНАЯ ДОЗА: '+dose.toFixed(4)+' мкг/кг/мин';
+  const ref=doseRefs[$('drug').value];
+  let doseWarning='';
+  if(ref && dose>Number(ref.max.replace(',','.'))) doseWarning='\\n\\nВНИМАНИЕ: расчётная доза выше справочного максимума '+ref.max+' мкг/кг/мин. Проверьте назначение и локальный протокол.';
+  out.textContent=$('drug').value+'\\nКонцентрация раствора: '+concentration.toFixed(2)+' мкг/мл\\nСкорость инфузомата: '+pump.toFixed(2)+' мл/ч\\nМасса пациента: '+weight.toFixed(1)+' кг\\n\\nРАСЧЁТНАЯ ДОЗА: '+dose.toFixed(4)+' мкг/кг/мин'+doseWarning;
  });
 })();
 </script></body></html>
