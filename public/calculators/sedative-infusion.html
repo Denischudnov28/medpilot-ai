@@ -3,7 +3,7 @@
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:14px 10px 36px}.wrap{max-width:720px;margin:auto}.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:8px 0 14px;background:rgba(243,247,251,.96);backdrop-filter:blur(10px)}.back{display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 13px;border-radius:12px;background:#fff;color:#145b87;text-decoration:none;font-weight:750;white-space:nowrap}.brand{font-size:11px;letter-spacing:.12em;color:#66829a;font-weight:800}.title{margin:3px 0;color:#153e63;font-size:23px}.card{padding:19px;background:#fff;border:1px solid #e0e9f1;border-radius:18px;box-shadow:0 6px 22px #173b5b0a}.intro,.note{color:#60758a;font-size:13px;line-height:1.55}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{min-width:0}.field label{display:block;margin:12px 0 6px;font-size:13px;font-weight:700;color:#405a72}.field input,.field select{width:100%;min-height:46px;padding:10px 12px;border:1px solid #d7e2ed;border-radius:11px;background:#fbfdff;color:#18324b;font:inherit;font-size:16px}.calc{width:100%;min-height:49px;margin-top:17px;border:0;border-radius:12px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font:inherit;font-weight:750;font-size:15px}.result{margin-top:15px;padding:15px;border-radius:13px;background:#eef7fb;color:#174c6b;line-height:1.65;white-space:pre-line}.warn{margin-top:15px;padding:14px;border-radius:12px;background:#fff8eb;color:#785b2d;font-size:12px;line-height:1.55}.formula{margin-top:13px;padding:12px;border:1px solid #e2ebf2;border-radius:12px;color:#526b80;font-size:12px;line-height:1.55}.sub{font-size:12px;color:#718397;line-height:1.5}@media(max-width:440px){.grid{grid-template-columns:1fr}.title{font-size:20px}.card{padding:15px}}
 </style></head><body><main class="wrap">
-<header class="top"><a class="back" href="clinical-toolbox.html#anesthesia">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Инфузия седативных препаратов</h1></div></header>
+<header class="top"><a class="back" href="clinical-toolbox.html#anesthesia" id="calculator-back">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Инфузия седативных препаратов</h1></div></header>
 <section class="card">
 <p class="intro">Калькулятор непрерывной внутривенной инфузии у взрослых. Укажите массу, количество препарата в шприце/флаконе, конечный объём раствора и скорость инфузомата. Результат отображается в единицах, принятых для выбранного препарата.</p>
 <div class="field"><label for="drug">Препарат</label><select id="drug"><option value="propofol">Пропофол</option><option value="dex">Дексмедетомидин</option><option value="midazolam">Мидазолам</option><option value="diazepam">Сибазон (диазепам)</option></select></div>
@@ -46,4 +46,13 @@ let extra=key==='propofol'?'Эквивалент: '+mcgKgMin.toFixed(2)+' мкг
 out.textContent=r.name+'\nКонцентрация: '+concentration.toFixed(2)+' мкг/мл\nСкорость инфузомата: '+p.toFixed(2)+' мл/ч\nПоступление препарата: '+mgHour.toFixed(3)+' мг/ч\nРАСЧЁТНАЯ ДОЗА: '+dose+'\n'+extra+'\nПроверьте результат по назначению и локальному протоколу.';
 });
 })();
-</script></body></html>
+</script><script>
+(function(){
+ const params=new URLSearchParams(window.location.search);
+ if(params.get('from')==='icu'){
+  const back=document.getElementById('calculator-back');
+  if(back){back.href='icu-assistant.html#treatment';back.textContent='‹ Назад в помощник ОРИТ';back.setAttribute('aria-label','Вернуться в раздел лечения помощника ОРИТ');}
+ }
+})();
+</script>
+</body></html>
