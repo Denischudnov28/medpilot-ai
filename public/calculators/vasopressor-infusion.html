@@ -72,16 +72,16 @@
   const back=document.getElementById('calculator-back');
   if(back){back.href='icu-assistant.html'+(patientId?'?patient='+encodeURIComponent(patientId):'')+'#treatment';back.textContent='‹ Назад в помощник ОРИТ';back.setAttribute('aria-label','Вернуться в раздел лечения помощника ОРИТ');}
  }
- let autoSaveTimer=null;
+ const get=id=>document.getElementById(id);let autoSaveTimer=null;
  function saveTreatmentHistory(){
   if(!patientId)return;
   try{
    const key='medpilot_icu_patient_records_v1',store=JSON.parse(localStorage.getItem(key)||'{}'),patient=store[patientId];if(!patient)return;
-   const drug=$('drug').value,weight=$('weight').value,amount=$('amount').value,volume=$('volume').value,pump=$('pump').value;
+   const drug=get('drug').value,weight=get('weight').value,amount=get('amount').value,volume=get('volume').value,pump=get('pump').value;
    const valid=[weight,amount,volume,pump].every(v=>v.trim()!=='')&&Number(weight)>0&&Number(amount)>0&&Number(volume)>0&&Number(pump)>=0;
    const concentration=valid?Number(amount)*1000/Number(volume):'';
    const dose=valid?Number(pump)*Number(concentration)/(Number(weight)*60):'';
-   const params={'treatment-calc-drug':drug,'treatment-calc-weight':weight,'treatment-calc-amount':amount,'treatment-calc-volume':volume,'treatment-calc-pump':pump,'treatment-calc-concentration':valid?concentration.toFixed(2):'','treatment-calc-dose':valid?dose.toFixed(4):'','treatment-calc-result':$('result').hidden?'':$('result').textContent};
+   const params={'treatment-calc-drug':drug,'treatment-calc-weight':weight,'treatment-calc-amount':amount,'treatment-calc-volume':volume,'treatment-calc-pump':pump,'treatment-calc-concentration':valid?concentration.toFixed(2):'','treatment-calc-dose':valid?dose.toFixed(4):'','treatment-calc-result':get('result').hidden?'':get('result').textContent};
    const values={module:'treatment',moduleLabel:'Вазопрессоры — калькулятор',parameters:params,norepi:drug==='Норадреналин'&&valid?String(dose):'',epi:drug==='Адреналин'&&valid?String(dose):'',dobutamine:drug==='Добутамин'&&valid?String(dose):'',dopamine:drug==='Допамин'&&valid?String(dose):''};
    patient.history=patient.history||[];const now=new Date(),cutoff=now.getTime()-5*60*1000;
    let snap=patient.history.find(x=>x.auto===true&&x.source==='vasopressor'&&new Date(x.at).getTime()>=cutoff);
@@ -90,7 +90,7 @@
   }catch(e){}
  }
  function scheduleTreatmentSave(){if(!patientId)return;clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(saveTreatmentHistory,1200);}
- ['drug','weight','amount','volume','pump'].forEach(id=>{const el=$(id);el.addEventListener('input',scheduleTreatmentSave);el.addEventListener('change',scheduleTreatmentSave);});
+ ['drug','weight','amount','volume','pump'].forEach(id=>{const el=get(id);el.addEventListener('input',scheduleTreatmentSave);el.addEventListener('change',scheduleTreatmentSave);});
  document.getElementById('calculate').addEventListener('click',()=>{clearTimeout(autoSaveTimer);saveTreatmentHistory();});
 })();
 </script>
