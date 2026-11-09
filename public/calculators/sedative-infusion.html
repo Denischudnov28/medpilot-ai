@@ -59,7 +59,7 @@ out.textContent=r.name+'\nКонцентрация: '+concentration.toFixed(2)+'
   try{
    const key='medpilot_icu_patient_records_v1',store=JSON.parse(localStorage.getItem(key)||'{}'),patient=store[patientId];if(!patient)return;
    const drug=get('drug').value,weight=get('weight').value,amount=get('amount').value,volume=get('volume').value,pump=get('pump').value;
-   const valid=[weight,amount,volume,pump].every(v=>v.trim()!=='')&&Number(weight)>0&&Number(amount)>0&&Number(volume)>0&&Number(pump)>=0;
+   const valid=drug!=='diazepam'&&[weight,amount,volume,pump].every(v=>v.trim()!=='')&&Number(weight)>0&&Number(amount)>0&&Number(volume)>0&&Number(pump)>=0;
    const concentration=valid?Number(amount)*1000/Number(volume):'';
    const mgHour=valid?Number(concentration)*Number(pump)/1000:'';
    const mgKgHour=valid?Number(mgHour)/Number(weight):'';
