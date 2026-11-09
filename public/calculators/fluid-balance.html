@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b87">
+<title>Калькулятор гидробаланса — MedPilot AI</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0;padding:14px 10px 36px}.wrap{max-width:760px;margin:auto}.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:8px 0 14px;background:rgba(243,247,251,.96);backdrop-filter:blur(10px)}.back{display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 13px;border-radius:12px;background:#fff;color:#145b87;text-decoration:none;font-weight:750;white-space:nowrap}.brand{font-size:11px;letter-spacing:.12em;color:#66829a;font-weight:800}.title{margin:3px 0;color:#153e63;font-size:23px}.card{padding:19px;background:#fff;border:1px solid #e0e9f1;border-radius:18px;box-shadow:0 6px 22px #173b5b0a;margin-bottom:14px}.intro,.note{color:#60758a;font-size:13px;line-height:1.55}.section-title{margin:2px 0 9px;color:#145b87;font-size:15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{min-width:0}.field label{display:block;margin:10px 0 6px;font-size:13px;font-weight:700;color:#405a72}.field input{width:100%;min-height:46px;padding:10px 12px;border:1px solid #d7e2ed;border-radius:11px;background:#fbfdff;color:#18324b;font:inherit;font-size:16px}.field input:focus{outline:3px solid #176b9d22;border-color:#65a7c4}.calc{width:100%;min-height:49px;margin-top:17px;border:0;border-radius:12px;background:linear-gradient(120deg,#176b9d,#168b91);color:white;font:inherit;font-weight:750;font-size:15px}.result{margin-top:15px;padding:16px;border:1px solid #cfe2ee;border-radius:15px;background:#f3f9fc;color:#174c6b;line-height:1.5}.result[hidden]{display:none}.result-label{font-size:12px;font-weight:800;letter-spacing:.04em;color:#55758d;text-transform:uppercase}.big{margin:5px 0 2px;font-size:clamp(30px,8vw,40px);font-weight:850;line-height:1.12;color:#125b83;overflow-wrap:anywhere}.unit{font-size:14px;font-weight:700;color:#426b84}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.metric{padding:11px;border:1px solid #dceaf2;border-radius:11px;background:#fff;min-width:0}.metric span{display:block;font-size:11px;color:#6b8193;margin-bottom:3px}.metric strong{font-size:16px;overflow-wrap:anywhere}.positive{color:#14735b}.negative{color:#a14b36}.formula,.warn{margin-top:13px;padding:12px;border:1px solid #e2ebf2;border-radius:12px;color:#526b80;font-size:12px;line-height:1.55}.warn{background:#fff8eb;border-color:#f0dfbd;color:#785b2d}.error{margin-top:12px;padding:11px;border-radius:10px;background:#fff0ed;color:#963d2f;font-size:13px;font-weight:700}.foot{margin-top:12px;color:#61798d;font-size:12px;line-height:1.5}@media(max-width:440px){.grid,.metrics{grid-template-columns:1fr}.title{font-size:20px}.card{padding:15px}}
+</style>
+<link rel="stylesheet" href="medical-theme.css?v=3"></head>
+<body><main class="wrap">
+<header class="top"><a class="back" href="clinical-toolbox.html#anesthesia">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Расчёт гидробаланса</h1></div></header>
+<section class="card">
+<p class="intro">Укажите объём поступившей жидкости и измеренных потерь за выбранный период. Калькулятор рассчитает суммарное поступление, потери и разницу между ними. Все объёмы вводятся в миллилитрах.</p>
+<div class="grid">
+<div class="field"><label for="weight">Масса пациента, кг</label><input id="weight" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="Например, 70"></div>
+<div class="field"><label for="hours">Продолжительность периода, ч</label><input id="hours" type="number" min="0.01" max="1000" step="0.1" inputmode="decimal" placeholder="Например, 4"></div>
+</div>
+</section>
+<section class="card">
+<h2 class="section-title">Поступление жидкости</h2>
+<div class="grid">
+<div class="field"><label for="crystalloid">Кристаллоиды, мл</label><input id="crystalloid" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="colloid">Коллоиды, мл</label><input id="colloid" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="blood">Компоненты крови, мл</label><input id="blood" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="otherIn">Другие поступления, мл</label><input id="otherIn" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+</div>
+<p class="note">Учитывайте все фактически введённые растворы, препараты-носители и энтеральное поступление, если они входят в выбранный период.</p>
+</section>
+<section class="card">
+<h2 class="section-title">Потери жидкости</h2>
+<div class="grid">
+<div class="field"><label for="urine">Диурез, мл</label><input id="urine" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="bloodLoss">Кровопотеря, мл</label><input id="bloodLoss" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="drains">По дренажам, мл</label><input id="drains" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="otherOut">Другие измеренные потери, мл</label><input id="otherOut" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="insensible">Дополнительные/неощутимые потери, мл</label><input id="insensible" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+</div>
+<p class="note">Неощутимые потери не рассчитываются автоматически: введите их только при наличии принятой в вашем отделении методики оценки. Не включайте один и тот же объём дважды.</p>
+<button class="calc" type="button" id="calculate">Рассчитать гидробаланс</button>
+<div class="result" id="result" role="status" aria-live="polite" hidden></div>
+</section>
+<div class="warn"><b>Важно:</b> положительный баланс означает, что поступление превысило учтённые потери; отрицательный — что потери превысили поступление. Это арифметический итог введённых данных, а не оценка волемии или рекомендация по инфузионной терапии. Учитывайте точность измерения кровопотери, скрытые потери, перераспределение жидкости, исходный баланс и клиническое состояние пациента. Не используйте результат изолированно для назначения инфузии или диуретиков.</div>
+<div class="formula"><b>Формулы:</b><br>Гидробаланс (мл) = суммарное поступление − суммарные потери.<br>Гидробаланс (мл/кг) = гидробаланс (мл) / масса тела (кг).<br>Диурез (мл/кг/ч) = объём мочи (мл) / масса тела (кг) / время (ч).</div>
+</main>
+<script>
+(function(){
+ const ids=['weight','hours','crystalloid','colloid','blood','otherIn','urine','bloodLoss','drains','otherOut','insensible'];
+ const $=id=>document.getElementById(id);
+ const number=id=>{const raw=$(id).value.trim().replace(',','.');return raw===''?0:Number(raw);};
+ const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n);
+ const result=$('result');
+ $('calculate').addEventListener('click',()=>{
+  const values=Object.fromEntries(ids.map(id=>[id,number(id)]));
+  const invalid=ids.filter(id=>!Number.isFinite(values[id])||values[id]<0);
+  if(invalid.length){result.hidden=false;result.innerHTML='<div class="error">Проверьте введённые значения: объёмы, массу и время. Отрицательные или некорректные числа недопустимы.</div>';return;}
+  if(values.weight<=0||values.hours<=0){result.hidden=false;result.innerHTML='<div class="error">Для расчёта удельного диуреза укажите массу пациента и продолжительность периода больше нуля.</div>';return;}
+  const intake=values.crystalloid+values.colloid+values.blood+values.otherIn;
+  const urine=values.urine;
+  const losses=urine+values.bloodLoss+values.drains+values.otherOut+values.insensible;
+  const balance=intake-losses;
+  const urineRate=urine/values.weight/values.hours;
+  const balanceClass=balance>0?'positive':balance<0?'negative':'';
+  const balanceText=balance>0?'Положительный баланс':balance<0?'Отрицательный баланс':'Нулевой баланс';
+  result.innerHTML='<div class="result-label">Итог за выбранный период</div>'+
+   '<div class="big '+balanceClass+'">'+(balance>0?'+':'')+fmt(balance)+' мл</div>'+
+   '<div class="unit">'+balanceText+'</div>'+
+   '<div class="metrics">'+
+    '<div class="metric"><span>Поступило всего</span><strong>'+fmt(intake)+' мл</strong></div>'+
+    '<div class="metric"><span>Потери всего</span><strong>'+fmt(losses)+' мл</strong></div>'+
+    '<div class="metric"><span>Баланс на 1 кг массы</span><strong>'+fmt(balance/values.weight)+' мл/кг</strong></div>'+
+    '<div class="metric"><span>Диурез</span><strong>'+fmt(urineRate)+' мл/кг/ч</strong></div>'+
+   '</div>'+
+   '<div class="foot">Масса: '+fmt(values.weight)+' кг · Продолжительность: '+fmt(values.hours)+' ч · Диурез: '+fmt(urine)+' мл. Значения отражают только введённые данные.</div>';
+  result.hidden=false;
+ });
+ ids.forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('calculate').click();}));
+})();
+</script>
+</body></html>
