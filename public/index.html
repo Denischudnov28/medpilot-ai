@@ -393,10 +393,10 @@ body.mp-menu-active{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.mp-side-menu,.mp-menu-backdrop{transition:none}}
 </style>
 <style id="medpilot-back-button-style">
-.mp-back-button{position:absolute;left:16px;top:22px;z-index:3;display:none;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid rgba(255,255,255,.28);border-radius:13px;background:rgba(255,255,255,.14);color:#fff;font-size:27px;line-height:1;backdrop-filter:blur(8px)}
+.mp-back-button{position:fixed!important;left:12px!important;top:calc(env(safe-area-inset-top,0px) + 12px)!important;z-index:10050!important;display:none;align-items:center;justify-content:center;width:46px;height:46px;padding:0;border:1px solid rgba(190,211,229,.95);border-radius:15px;background:rgba(255,255,255,.96);color:#174f78;font-size:30px;font-weight:700;line-height:1;box-shadow:0 4px 16px rgba(20,55,85,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);cursor:pointer;touch-action:manipulation}
 body.mp-page-mode.mp-subpage .mp-back-button{display:flex}
-body.mp-page-mode.mp-subpage header .logo,body.mp-page-mode.mp-subpage header .sub{margin-left:48px}
-@media(min-width:760px){.mp-back-button{left:max(18px,calc((100vw - 760px)/2))}}
+body.mp-page-mode.mp-subpage header .logo,body.mp-page-mode.mp-subpage header .sub{margin-left:58px}
+@media(min-width:760px){.mp-back-button{left:max(18px,calc((100vw - 760px)/2))!important}}
 </style>
 <style id="medpilot-page-navigation">
 /* На главной странице глобальный поиск скрыт; в остальных разделах остаётся доступен. */
