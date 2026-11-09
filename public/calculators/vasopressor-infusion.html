@@ -8,7 +8,7 @@
 </style>
 </head>
 <body><main class="wrap">
-<header class="top"><a class="back" href="clinical-toolbox.html#specialty-anesthesia">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Доза вазоактивных препаратов</h1></div></header>
+<header class="top"><a class="back" href="clinical-toolbox.html#anesthesia" id="calculator-back">‹ Назад</a><div><div class="brand">MEDPILOT AI · АНЕСТЕЗИОЛОГИЯ И ОРИТ</div><h1 class="title">Доза вазоактивных препаратов</h1></div></header>
 <section class="card">
 <p class="intro">Введите массу пациента, количество препарата в шприце, конечный объём раствора и скорость инфузомата. Калькулятор рассчитает фактическую дозу в <b>мкг/кг/мин</b>.</p>
 <div class="field"><label for="drug">Препарат</label><select id="drug"><option>Норадреналин</option><option>Адреналин</option><option>Добутамин</option><option>Допамин</option><option>Фенилэфрин</option><option>Другой препарат (мкг/кг/мин)</option></select></div>
@@ -65,4 +65,13 @@
   out.textContent=$('drug').value+'\\nКонцентрация раствора: '+concentration.toFixed(2)+' мкг/мл\\nСкорость инфузомата: '+pump.toFixed(2)+' мл/ч\\nМасса пациента: '+weight.toFixed(1)+' кг\\n\\nРАСЧЁТНАЯ ДОЗА: '+dose.toFixed(4)+' мкг/кг/мин'+doseWarning;
  });
 })();
-</script></body></html>
+</script><script>
+(function(){
+ const params=new URLSearchParams(window.location.search);
+ if(params.get('from')==='icu'){
+  const back=document.getElementById('calculator-back');
+  if(back){back.href='icu-assistant.html#treatment';back.textContent='‹ Назад в помощник ОРИТ';back.setAttribute('aria-label','Вернуться в раздел лечения помощника ОРИТ');}
+ }
+})();
+</script>
+</body></html>
