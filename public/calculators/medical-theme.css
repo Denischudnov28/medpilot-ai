@@ -1,0 +1,78 @@
+/* MedPilot AI — unified clinical interface */
+:root{
+ --mp-ink:#18324b;--mp-muted:#657d91;--mp-navy:#123e60;--mp-blue:#176b9d;
+ --mp-teal:#168b91;--mp-line:#dce8f0;--mp-soft:#f2f8fb;--mp-white:#fff;
+ --mp-shadow:0 10px 28px rgba(18,62,96,.075);--mp-radius:18px;
+ color-scheme:light;
+}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+body{color:var(--mp-ink)!important;background:radial-gradient(ellipse at 5% 0%,rgba(37,137,166,.10),transparent 34%),linear-gradient(180deg,#f4f9fc 0%,#eef4f8 100%)!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background-image:linear-gradient(rgba(23,107,157,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(23,107,157,.025) 1px,transparent 1px);background-size:28px 28px}
+.wrap,.container,.page,.app-shell{max-width:980px}
+.top,header.top,.app-header{background:rgba(244,249,252,.92)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(210,225,236,.65);padding-top:10px!important;padding-bottom:12px!important}
+.brand{color:#5f8299!important;letter-spacing:.14em!important;font-weight:850!important}
+h1,h2,h3,h4,.title{color:var(--mp-navy)!important;letter-spacing:-.025em}
+.title{font-weight:850!important}
+.card,.tool,.specialty-picker,.specialty-tool-list,.panel,.patient-card,.section-card,.module-panel,[data-module-panel]{
+ background:rgba(255,255,255,.96)!important;border:1px solid var(--mp-line)!important;border-radius:var(--mp-radius)!important;box-shadow:var(--mp-shadow)!important
+}
+.tool,.card{transition:box-shadow .18s ease,border-color .18s ease}
+.tool:focus-within,.card:focus-within{border-color:#b9d5e5!important;box-shadow:0 12px 30px rgba(18,62,96,.10)!important}
+button,.button,.calc,input[type=button],input[type=submit]{
+ font-family:inherit;cursor:pointer;transition:transform .14s ease,filter .14s ease,box-shadow .14s ease
+}
+button:active,.button:active,.calc:active{transform:translateY(1px) scale(.99)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+ outline:3px solid rgba(23,107,157,.24)!important;outline-offset:2px
+}
+.calc,.primary,.primary-button,.btn-primary{
+ border:0!important;border-radius:13px!important;background:linear-gradient(120deg,#155f91,#168b91)!important;color:#fff!important;
+ box-shadow:0 6px 14px rgba(21,105,145,.17);font-weight:800!important
+}
+.calc:hover,.primary:hover,.primary-button:hover,.btn-primary:hover{filter:brightness(1.04);box-shadow:0 8px 18px rgba(21,105,145,.22)}
+.back,.secondary,.secondary-button,.btn-secondary,.specialty-tool-back,.specialty-back{
+ border:1px solid #d7e5ee!important;background:#fff!important;color:#145b87!important;border-radius:12px!important;font-weight:800!important
+}
+a{color:#176b9d}
+.field label,label{color:#405d73}
+input:not([type=checkbox]):not([type=radio]),select,textarea{
+ border:1px solid #d5e2eb!important;border-radius:12px!important;background:#fbfdff!important;color:#18324b!important;
+ min-height:44px;max-width:100%;font:inherit
+}
+input:not([type=checkbox]):not([type=radio]):focus,select:focus,textarea:focus{border-color:#65a7c4!important;box-shadow:0 0 0 3px rgba(35,130,168,.10)}
+input[type=checkbox],input[type=radio]{accent-color:#168b91}
+.result,[role=status],.status,.notice{
+ border:1px solid #d7e8f0;border-radius:14px;background:#eff7fb;color:#174c6b
+}
+.warn,.warning,.alert-warning{border:1px solid #f0dfbd;border-radius:13px;background:#fff8eb;color:#77582a}
+.note,.intro,.sub{color:var(--mp-muted)!important}
+.category{padding:10px 13px;border-left:4px solid #168b91;border-radius:0 12px 12px 0;background:rgba(226,241,247,.72)}
+.specialty-choice{border:1px solid var(--mp-line)!important;border-radius:15px!important;background:#fff!important;box-shadow:0 3px 10px rgba(18,62,96,.045)!important}
+.specialty-choice[aria-pressed=true],.specialty-choice.active{border-color:#5aa8bd!important;background:#eff8fa!important}
+.specialty-choice .specialty-icon{background:#eaf4f8!important}
+.specialty-tool-item{border:1px solid var(--mp-line)!important;border-radius:13px!important;background:#f8fbfd!important}
+.specialty-tool-item:hover{border-color:#9fc7d8!important;background:#f0f8fb!important}
+.specialty-toolbar{background:rgba(255,255,255,.92)!important;border:1px solid var(--mp-line)!important;border-radius:15px!important}
+[data-module-tab],.module-tab,.tab-button,.tab-btn{
+ min-height:42px;border:1px solid #dce7ef!important;border-radius:12px!important;background:#fff!important;color:#42627a!important;font-weight:750!important
+}
+[data-module-tab].active,.module-tab.active,.tab-button.active,.tab-btn.active,[aria-selected=true]{
+ background:linear-gradient(120deg,#e8f3f8,#e7f5f3)!important;border-color:#9fc9d7!important;color:#145b78!important;box-shadow:inset 0 0 0 1px rgba(22,139,145,.06)
+}
+[data-module-panel]:not(.active){display:none}
+table{border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--mp-line);border-radius:12px}
+th{background:#edf5f9;color:#315a73}
+td,th{padding:9px;border-bottom:1px solid #e7eef3}
+tr:last-child td{border-bottom:0}
+[hidden]{display:none!important}
+hr{border:0;border-top:1px solid #e3edf3}
+small{color:var(--mp-muted)}
+@media(max-width:600px){
+ body{padding-left:10px!important;padding-right:10px!important}
+ .top,header.top{gap:9px!important}
+ .title{font-size:clamp(19px,5.4vw,23px)!important}
+ .card,.tool,.specialty-picker{padding:14px!important;border-radius:16px!important}
+ button,.calc,.primary,.primary-button{min-height:44px}
+ .grid{gap:9px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
