@@ -1440,13 +1440,13 @@ async function askAI(){
   if(!query){showMessage("Введите название калькулятора или шкалы и нажмите «Найти».");status.textContent="В поиске доступен весь каталог MedPilot AI. Каталог обновляется автоматически.";return;}
   const terms=query.split(" ").filter(Boolean);
   const matches=catalog.filter(item=>{const hay=normalize(item.name+" "+item.category+" "+item.description+" "+item.id);return terms.every(term=>hay.includes(term));}).slice(0,50);
-  if(!matches.length){showMessage("Ничего не найдено. Попробуйте МНН, аббревиатуру, часть названия или другое написание.");status.textContent="Совпадений не найдено. В каталоге "+catalog.length+" инструментов.";return;}
+  if(!matches.length){showMessage("Ничего не найдено. Попробуйте МНН, аббревиатуру, часть названия или другое написание.");status.textContent="Попробуйте изменить запрос или использовать другое написание.";return;}
   matches.forEach(item=>{
    const link=document.createElement("a");link.className="calculator-search-result";link.href="/calculators/clinical-toolbox.html#"+encodeURIComponent(item.id);
    const info=document.createElement("span"),title=document.createElement("strong"),meta=document.createElement("small"),action=document.createElement("b");
    title.textContent=item.name;meta.textContent=item.category;info.append(title,meta);action.textContent="Открыть →";link.append(info,action);results.appendChild(link);
   });
-  status.textContent="Найдено: "+matches.length+(matches.length===50?" (показаны первые 50)":"")+" из "+catalog.length+". Нажмите на нужный инструмент, чтобы открыть его.";
+  status.textContent="Выберите нужный инструмент, чтобы открыть его.";
  }
  async function loadCatalog(){
   status.textContent="Синхронизируем полный каталог MedPilot AI…";
