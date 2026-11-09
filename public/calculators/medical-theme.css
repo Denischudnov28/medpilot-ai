@@ -80,3 +80,7 @@ small{color:var(--mp-muted)}
 .module-tab-back{display:block;width:100%;min-height:42px;margin:12px 0 8px;padding:9px 13px;border:1px solid #d7e5ee;border-radius:12px;background:#fff;color:#145b87;font:inherit;font-weight:800;text-align:left}
 .module-tab-back[hidden]{display:none!important}
 .module-nav{position:sticky;top:0;z-index:12;padding:7px;background:rgba(244,249,252,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(215,229,238,.9);border-radius:15px}
+
+button{border-radius:12px}
+.mp-back-button{border:1px solid #d5e5ee!important;border-radius:14px!important;background:rgba(255,255,255,.96)!important;color:#145b87!important;box-shadow:0 5px 16px rgba(18,62,96,.12)!important}
+.mp-back-button:hover{background:#edf6fa!important}
