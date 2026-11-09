@@ -753,7 +753,7 @@ function runSpecialtyCalc(id){
  }
  if(id==='egfr-2021'){
   if(!valid(['sp-eg-age','sp-eg-cr'])||n('sp-eg-age')<18||n('sp-eg-age')>120||n('sp-eg-cr')<=0)return done(err);
-  const scr=get('sp-eg-unit')==='umol'?n('sp-eg-cr')/88.4:n('sp-eg-cr'),female=get('sp-eg-sex')==='f',k=female?.7:.9,alpha=female?-.241:-.302,ratio=scr/k;
+  const scr=get('sp-eg-unit')==='umol'?n('sp-eg-cr')/88.4:n('sp-eg-cr'),female=get('sp-eg-sex')==='f',k=female ? 0.7 : 0.9,alpha=female ? -0.241 : -0.302,ratio=scr/k;
   const egfr=142*Math.pow(Math.min(ratio,1),alpha)*Math.pow(Math.max(ratio,1),-1.2)*Math.pow(.9938,n('sp-eg-age'))*(female?1.012:1);
   return done('рСКФ CKD-EPI 2021 ≈ '+egfr.toFixed(1)+' мл/мин/1,73 м². При беременности, ОПП и быстро меняющемся креатинине формула ненадёжна.');
  }
