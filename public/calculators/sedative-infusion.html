@@ -76,7 +76,7 @@ out.textContent=r.name+'\nКонцентрация: '+concentration.toFixed(2)+'
  function scheduleTreatmentSave(){if(!patientId)return;clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(saveTreatmentHistory,1200);}
  ['drug','weight','amount','volume','pump'].forEach(id=>{const el=get(id);el.addEventListener('input',scheduleTreatmentSave);el.addEventListener('change',scheduleTreatmentSave);});
  const calc=get('calculate');if(calc)calc.addEventListener('click',()=>{clearTimeout(autoSaveTimer);saveTreatmentHistory();});
- scheduleTreatmentSave();
+ 
 })();
 </script>
 </body></html>
