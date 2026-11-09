@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
@@ -9,6 +11,17 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: "30kb" }));
 app.use("/api/", rateLimit({ windowMs: 60 * 1000, limit: 20 }));
+// Add the shared medical theme to the large main HTML page without rewriting its embedded clinical content.
+app.get(["/", "/index.html"], (req, res, next) => {
+  fs.readFile(path.join(__dirname, "public", "index.html"), "utf8", (error, html) => {
+    if (error) return next(error);
+    const themeLink = '<link rel="stylesheet" href="/calculators/medical-theme.css?v=3">';
+    const page = html.includes("medical-theme.css") ? html : html.replace("</head>", themeLink + "</head>");
+    res.set("Cache-Control", "no-cache");
+    res.type("html").send(page);
+  });
+});
+
 app.use(express.static("public"));
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
