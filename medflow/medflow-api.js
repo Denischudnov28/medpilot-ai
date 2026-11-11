@@ -59,7 +59,9 @@ function mountMedflowApi(app) {
     "CREATE TABLE IF NOT EXISTS medflow_patients (id uuid PRIMARY KEY, user_id uuid NOT NULL REFERENCES medflow_users(id) ON DELETE CASCADE, display_code varchar(40) NOT NULL, unit varchar(80) NOT NULL DEFAULT '', handoff_note varchar(1000) NOT NULL DEFAULT '', status varchar(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active','discharged')), created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now())",
     "CREATE INDEX IF NOT EXISTS medflow_patients_user_updated_idx ON medflow_patients(user_id, updated_at DESC)",
     "CREATE TABLE IF NOT EXISTS medflow_notes (id uuid PRIMARY KEY, user_id uuid NOT NULL REFERENCES medflow_users(id) ON DELETE CASCADE, body varchar(2000) NOT NULL, created_at timestamptz NOT NULL DEFAULT now())",
-    "CREATE INDEX IF NOT EXISTS medflow_notes_user_created_idx ON medflow_notes(user_id, created_at DESC)"
+    "CREATE INDEX IF NOT EXISTS medflow_notes_user_created_idx ON medflow_notes(user_id, created_at DESC)",
+    "CREATE TABLE IF NOT EXISTS medflow_subscriptions (user_id uuid PRIMARY KEY REFERENCES medflow_users(id) ON DELETE CASCADE, plan varchar(20) NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro')), status varchar(20) NOT NULL DEFAULT 'inactive' CHECK (status IN ('inactive','trialing','active','past_due','canceled')), provider varchar(20) CHECK (provider IS NULL OR provider IN ('stripe','apple','google','manual')), external_subscription_id text UNIQUE, current_period_end timestamptz, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now())",
+    "INSERT INTO medflow_subscriptions(user_id) SELECT id FROM medflow_users ON CONFLICT (user_id) DO NOTHING"
   ].join(";");
 
   let schemaReady = false;
@@ -121,6 +123,23 @@ function mountMedflowApi(app) {
   app.use("/api/medflow/auth", authLimiter, auth);
 
   app.get("/api/medflow/me", requireAuth, (req, res) => res.json({ user: { id: req.medflowUser.sub, email: req.medflowUser.email } }));
+
+  // Server-authoritative subscription state. Payment providers will update this row via verified webhooks in a later release.
+  app.get("/api/medflow/billing/status", requireAuth, async (req, res) => {
+    try {
+      const result = await pool.query(
+        "SELECT plan,status,provider,current_period_end FROM medflow_subscriptions WHERE user_id=$1",
+        [req.medflowUser.sub]
+      );
+      const subscription = result.rows[0] || { plan: "free", status: "inactive", provider: null, current_period_end: null };
+      const periodValid = !subscription.current_period_end || new Date(subscription.current_period_end).getTime() > Date.now();
+      const isPro = subscription.plan === "pro" && ["trialing", "active"].includes(subscription.status) && periodValid;
+      res.json({ plan: isPro ? "pro" : "free", status: subscription.status, isPro, provider: subscription.provider, currentPeriodEnd: subscription.current_period_end });
+    } catch (error) {
+      console.error("MEDFLOW billing status failed:", error.message);
+      res.status(500).json({ error: "Не удалось получить статус подписки." });
+    }
+  });
 
   app.get("/api/medflow/patients", requireAuth, async (req, res) => {
     try {
