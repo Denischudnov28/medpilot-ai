@@ -180,4 +180,4 @@ function mountMedflowApi(app) {
   });
 }
 
-module.exports = { mountMedflowApi };
+module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, UUID_RE };
