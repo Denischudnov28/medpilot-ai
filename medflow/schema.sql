@@ -26,6 +26,18 @@ CREATE TABLE IF NOT EXISTS medflow_notes (
 );
 CREATE INDEX IF NOT EXISTS medflow_notes_user_created_idx ON medflow_notes(user_id, created_at DESC);
 
+-- Unified chart records: every entry belongs to one patient and one authenticated account.
+CREATE TABLE IF NOT EXISTS medflow_records (
+  id uuid PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES medflow_users(id) ON DELETE CASCADE,
+  patient_id uuid NOT NULL REFERENCES medflow_patients(id) ON DELETE CASCADE,
+  category varchar(50) NOT NULL,
+  body varchar(8000) NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS medflow_records_patient_created_idx
+  ON medflow_records(user_id, patient_id, created_at DESC);
+
 -- Subscription state is controlled by verified billing-provider events, never by the browser.
 CREATE TABLE IF NOT EXISTS medflow_subscriptions (
   user_id uuid PRIMARY KEY REFERENCES medflow_users(id) ON DELETE CASCADE,
