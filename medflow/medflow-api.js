@@ -99,7 +99,7 @@ function mountMedflowApi(app) {
       if (!schemaReady) return res.status(503).json({ error: "База данных временно недоступна." });
       const credentials = await hashPassword(password);
       const result = await pool.query(
-        "INSERT INTO medflow_users(id,email,password_hash,password_salt) VALUES($1,$2,$3,$4) RETURNING id,email",
+        "WITH new_user AS (INSERT INTO medflow_users(id,email,password_hash,password_salt) VALUES($1,$2,$3,$4) RETURNING id,email), new_subscription AS (INSERT INTO medflow_subscriptions(user_id) SELECT id FROM new_user) SELECT id,email FROM new_user",
         [crypto.randomUUID(), email, credentials.hash, credentials.salt]
       );
       const user = result.rows[0];
