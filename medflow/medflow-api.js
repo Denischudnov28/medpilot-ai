@@ -35,6 +35,13 @@ async function verifyPassword(password, salt, hash) {
   const expected = Buffer.from(hash, "hex");
   return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 }
+function hasProAccess(subscription, now = Date.now()) {
+  if (!subscription || subscription.plan !== "pro" || !["trialing", "active"].includes(subscription.status)) return false;
+  if (!subscription.current_period_end) return true;
+  const periodEnd = new Date(subscription.current_period_end).getTime();
+  return Number.isFinite(periodEnd) && periodEnd > now;
+}
+
 function cleanText(value, max, required = false) {
   if (typeof value !== "string") return required ? null : "";
   const result = value.trim();
@@ -132,8 +139,7 @@ function mountMedflowApi(app) {
         [req.medflowUser.sub]
       );
       const subscription = result.rows[0] || { plan: "free", status: "inactive", provider: null, current_period_end: null };
-      const periodValid = !subscription.current_period_end || new Date(subscription.current_period_end).getTime() > Date.now();
-      const isPro = subscription.plan === "pro" && ["trialing", "active"].includes(subscription.status) && periodValid;
+      const isPro = hasProAccess(subscription);
       res.json({ plan: isPro ? "pro" : "free", status: subscription.status, isPro, provider: subscription.provider, currentPeriodEnd: subscription.current_period_end });
     } catch (error) {
       console.error("MEDFLOW billing status failed:", error.message);
@@ -199,4 +205,4 @@ function mountMedflowApi(app) {
   });
 }
 
-module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, UUID_RE };
+module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, hasProAccess, UUID_RE };
