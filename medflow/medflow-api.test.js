@@ -10,6 +10,8 @@ const {
   verifyToken,
   cleanText,
   hasProAccess,
+  getProPriceKopecks,
+  isMatchingSuccessfulPayment,
   UUID_RE
 } = require("./medflow-api");
 
@@ -57,4 +59,24 @@ test("Pro access requires an active or trialing subscription within its paid per
   assert.equal(hasProAccess({ plan: "pro", status: "trialing", current_period_end: null }, now), true);
   assert.equal(hasProAccess({ plan: "pro", status: "active", current_period_end: "2026-11-10T00:00:00.000Z" }, now), false);
   assert.equal(hasProAccess({ plan: "pro", status: "canceled" }, now), false);
+});
+
+test("Pro price is server-controlled and validated in kopecks", () => {
+  assert.equal(getProPriceKopecks(undefined), 49900);
+  assert.equal(getProPriceKopecks("79900"), 79900);
+  assert.equal(getProPriceKopecks("0"), null);
+  assert.equal(getProPriceKopecks("not-a-price"), null);
+  assert.equal(getProPriceKopecks("100000001"), null);
+});
+
+test("payment confirmation must match status, order, amount, currency and provider", () => {
+  const order = { id: "order-1", provider: "yookassa", amount_kopecks: "49900", currency: "RUB" };
+  const payment = { orderId: "order-1", provider: "yookassa", amountKopecks: 49900, currency: "RUB", status: "succeeded" };
+  assert.equal(isMatchingSuccessfulPayment(order, payment), true);
+  assert.equal(isMatchingSuccessfulPayment(order, { ...payment, status: "pending" }), false);
+  assert.equal(isMatchingSuccessfulPayment(order, { ...payment, amountKopecks: 1 }), false);
+  assert.equal(isMatchingSuccessfulPayment(order, { ...payment, currency: "USD" }), false);
+  assert.equal(isMatchingSuccessfulPayment(order, { ...payment, orderId: "other" }), false);
+  assert.equal(isMatchingSuccessfulPayment(order, { ...payment, provider: "manual_transfer" }), false);
+  assert.equal(isMatchingSuccessfulPayment(order, null), false);
 });
