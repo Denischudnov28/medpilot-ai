@@ -140,7 +140,7 @@ function attachVoiceControl(fieldId,buttonId,statusId,maxLength){
 attachVoiceControl('pnote','pnoteVoice','pnoteVoiceStatus',500);
 attachVoiceControl('handoffGeneral','handoffVoice','handoffVoiceStatus',4000);
 attachVoiceControl('noteText','noteVoice','noteVoiceStatus',1200);
-function showTab(id){const currentScroll=window.scrollY;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));if(id==='handoff')renderHandoff();if(id==='specialties')renderSpecialties($("specialtySearch").value);window.scrollTo(0,currentScroll)}
+function showTab(id){const target=$(id);if(!target)return;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));if(id==='handoff')renderHandoff();if(id==='specialties')renderSpecialties($("specialtySearch").value);target.setAttribute('tabindex','-1');target.focus({preventScroll:true});target.scrollIntoView({behavior:'smooth',block:'start'});}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function render(){ $('patientCount').textContent=patients.length;$('taskCount').textContent=notes.length;$('noteCount').textContent=notes.length;$('patientBadge').textContent=patients.length+' записей';
 const html=patients.map((p,i)=>'<div class="patient"><div><strong>'+esc(p.name)+'</strong><small>'+esc(p.place||'Место не указано')+' · '+esc(p.note||'Без заметки')+'</small></div><button class="action" onclick="removePatient('+i+')">Удалить</button></div>').join('');
