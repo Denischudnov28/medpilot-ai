@@ -36,3 +36,14 @@ This is an early product prototype, not a certified electronic health record. Do
 3. With the returned bearer token, create and list a test patient at `/api/medflow/patients`.
 4. Verify a second account cannot read or delete the first account's records.
 5. Verify logout clears the browser session token.
+
+
+## Payment preparation (no live payments)
+
+- The payment-order ledger records provider, RUB amount in kopecks, idempotency key, provider payment reference, a 30-day access period, and payment state.
+- Supported provider identifiers are reserved for manual bank transfer, YooKassa, and Sberbank acquiring. This is database preparation only; no checkout endpoint, card transfer monitoring, provider credentials, recurring charge, or webhook is enabled.
+- Creating or receiving a pending order never grants Pro. Pro can only be enabled after a server-side verification of a successful payment, matching provider payment ID, amount, currency, and order metadata.
+- Manual transfer to a personal bank card cannot be reliably confirmed by a browser redirect or a user-uploaded receipt. It would require a trusted bank statement/API reconciliation process or explicit administrator review; never trust the client as proof of payment.
+- Do not store card numbers, CVV, banking passwords, or raw bank credentials. Keep provider secrets in Render environment variables, never in Git or browser code.
+- The proposed 499 RUB / 30 days price is provisional. Live payments remain disabled until the merchant's legal/tax eligibility, provider contract, receipt/fiscalization flow, privacy terms, and cancellation/refund process are reviewed.
+- For a future YooKassa integration, acknowledge webhooks only after checking the current payment object server-side and matching it to the pending order; YooKassa documents webhook delivery and authenticity checks at https://yookassa.ru/developers/using-api/webhooks.
