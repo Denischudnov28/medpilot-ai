@@ -8,10 +8,10 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function b64url(value) { return Buffer.from(value).toString("base64url"); }
-function signToken(user) {
+function signToken(user, rememberMe = false) {
   const now = Math.floor(Date.now() / 1000);
   const input = b64url(JSON.stringify({ alg: "HS256", typ: "JWT" })) + "." +
-    b64url(JSON.stringify({ sub: user.id, email: user.email, iat: now, exp: now + TOKEN_TTL_SECONDS }));
+    b64url(JSON.stringify({ sub: user.id, email: user.email, iat: now, exp: now + (rememberMe ? 2592000 : TOKEN_TTL_SECONDS) }));
   return input + "." + crypto.createHmac("sha256", process.env.MEDFLOW_TOKEN_SECRET).update(input).digest("base64url");
 }
 function verifyToken(token) {
@@ -143,7 +143,7 @@ function mountMedflowApi(app) {
       const result = await pool.query("SELECT id,email,password_hash,password_salt FROM medflow_users WHERE email=$1", [email]);
       const user = result.rows[0];
       if (!user || !(await verifyPassword(password, user.password_salt, user.password_hash))) return res.status(401).json({ error: "Неверный email или пароль." });
-      res.json({ token: signToken(user), user: { id: user.id, email: user.email } });
+      res.json({ token: signToken(user, req.body?.rememberMe === true), user: { id: user.id, email: user.email } });
     } catch (error) {
       console.error("MEDFLOW login failed:", error.message);
       res.status(500).json({ error: "Не удалось выполнить вход." });
