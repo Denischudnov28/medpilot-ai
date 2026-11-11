@@ -38,14 +38,14 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:1
 <script>
 const $=id=>document.getElementById(id);
 const load=(k,d)=>{try{return JSON.parse(localStorage.getItem('mf_'+k))??d}catch{return d}};
-const save=(k,v)=>localStorage.setItem('mf_'+k,JSON.stringify(v));
+const save=(k,v)=>{const localOnly=Array.isArray(v)?v.filter(item=>!item.server):v;localStorage.setItem('mf_'+k,JSON.stringify(localOnly))};
 let patients=load('patients',[]),notes=load('notes',[]);
 let authToken=sessionStorage.getItem('medflow_token')||'';
 function setAccountStatus(message,online=false){$('accountStatus').textContent=message;$('accountStatus').classList.toggle('online',online);$('logoutButton').classList.toggle('hidden',!authToken)}
 async function api(path,options={}){const response=await fetch('/api/medflow'+path,{...options,headers:{'Content-Type':'application/json',...(authToken?{Authorization:'Bearer '+authToken}:{}),...(options.headers||{})}});if(response.status===204)return null;const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Ошибка сервера');return data}
 async function accountAction(mode){const email=$('accountEmail').value.trim(),password=$('accountPassword').value;if(!email||!password){setAccountStatus('Введите email и пароль.');return}try{setAccountStatus('Подключаем аккаунт…');const result=await api('/auth/'+mode,{method:'POST',body:JSON.stringify({email,password})});authToken=result.token;sessionStorage.setItem('medflow_token',authToken);await syncFromServer();$('accountPassword').value='';setAccountStatus('Синхронизация включена · '+result.user.email,true)}catch(error){setAccountStatus(error.message)}}
-async function syncFromServer(){const values=await Promise.all([api('/patients'),api('/notes')]);patients=values[0].patients.map(x=>({id:x.id,name:x.code,place:x.unit,note:x.note,server:true}));notes=values[1].notes.map(x=>({id:x.id,text:x.body,time:new Date(x.created_at).toLocaleString('ru-RU'),server:true}));save('patients',patients);save('notes',notes);render()}
-function logout(){authToken='';sessionStorage.removeItem('medflow_token');setAccountStatus('Вы вышли. Локальные данные остаются на устройстве.')}
+async function syncFromServer(){const localPatients=patients.filter(x=>!x.server),localNotes=notes.filter(x=>!x.server);const values=await Promise.all([api('/patients'),api('/notes')]);const serverPatients=values[0].patients.map(x=>({id:x.id,name:x.code,place:x.unit,note:x.note,server:true}));const serverNotes=values[1].notes.map(x=>({id:x.id,text:x.body,time:new Date(x.created_at).toLocaleString('ru-RU'),server:true}));patients=[...serverPatients,...localPatients];notes=[...serverNotes,...localNotes];save('patients',patients);save('notes',notes);render()}
+function logout(){authToken='';sessionStorage.removeItem('medflow_token');patients=patients.filter(item=>!item.server);notes=notes.filter(item=>!item.server);save('patients',patients);save('notes',notes);render();setAccountStatus('Вы вышли. Данные аккаунта скрыты; локальные записи остались на устройстве.')}
 if(authToken){api('/me').then(()=>syncFromServer()).then(()=>setAccountStatus('Синхронизация включена',true)).catch(()=>{logout();setAccountStatus('Сессия недействительна. Войдите снова.')})}
 
 $('today').textContent=new Intl.DateTimeFormat('ru-RU',{weekday:'long',day:'numeric',month:'long'}).format(new Date());
