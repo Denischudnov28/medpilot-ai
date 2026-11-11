@@ -25,3 +25,18 @@ CREATE TABLE IF NOT EXISTS medflow_notes (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS medflow_notes_user_created_idx ON medflow_notes(user_id, created_at DESC);
+
+-- Subscription state is controlled by verified billing-provider events, never by the browser.
+CREATE TABLE IF NOT EXISTS medflow_subscriptions (
+  user_id uuid PRIMARY KEY REFERENCES medflow_users(id) ON DELETE CASCADE,
+  plan varchar(20) NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro')),
+  status varchar(20) NOT NULL DEFAULT 'inactive' CHECK (status IN ('inactive','trialing','active','past_due','canceled')),
+  provider varchar(20) CHECK (provider IS NULL OR provider IN ('stripe','apple','google','manual')),
+  external_subscription_id text UNIQUE,
+  current_period_end timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+INSERT INTO medflow_subscriptions(user_id)
+SELECT id FROM medflow_users
+ON CONFLICT (user_id) DO NOTHING;
