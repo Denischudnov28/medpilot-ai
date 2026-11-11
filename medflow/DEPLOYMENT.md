@@ -8,6 +8,14 @@
 
 The API creates its initial MEDFLOW tables and indexes on startup. The standalone reference schema is in `schema.sql`.
 
+## Subscription foundation
+
+- A `medflow_subscriptions` row is created for every existing and new account with the `free` plan by default.
+- `GET /api/medflow/billing/status` returns the server-authoritative plan and entitlement state for the authenticated account.
+- A Pro entitlement is recognized only for `trialing` or `active` subscriptions whose billing period has not expired.
+- The browser cannot activate or modify a subscription. Only a future verified payment-provider webhook may update subscription state.
+- No payment provider, checkout, paid feature gate, or automatic charge is enabled in this release.
+
 ## First release scope
 
 - Email/password registration and login.
