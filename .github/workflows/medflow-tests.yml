@@ -1,0 +1,28 @@
+name: MEDFLOW tests
+
+on:
+  push:
+    paths:
+      - "medflow/**"
+      - "package.json"
+      - ".github/workflows/medflow-tests.yml"
+  pull_request:
+    paths:
+      - "medflow/**"
+      - "package.json"
+      - ".github/workflows/medflow-tests.yml"
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Run unit tests
+        run: npm test
