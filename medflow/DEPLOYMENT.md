@@ -47,3 +47,11 @@ This is an early product prototype, not a certified electronic health record. Do
 - Do not store card numbers, CVV, banking passwords, or raw bank credentials. Keep provider secrets in Render environment variables, never in Git or browser code.
 - The proposed 499 RUB / 30 days price is provisional. Live payments remain disabled until the merchant's legal/tax eligibility, provider contract, receipt/fiscalization flow, privacy terms, and cancellation/refund process are reviewed.
 - For a future YooKassa integration, acknowledge webhooks only after checking the current payment object server-side and matching it to the pending order; YooKassa documents webhook delivery and authenticity checks at https://yookassa.ru/developers/using-api/webhooks.
+
+### Pending payment-order API
+
+- Authenticated POST /api/medflow/billing/orders creates a server-priced 30-day RUB order (default 499 RUB; optional server env MEDFLOW_PRO_PRICE_KOPECKS, in kopecks).
+- Authenticated GET /api/medflow/billing/orders/:id returns only the requesting user's order.
+- These endpoints are order tracking only: no payment link, card details, bank transfer confirmation, webhook, or Pro activation is enabled.
+- getProPriceKopecks validates the server-side price; isMatchingSuccessfulPayment requires successful status and exact order/provider/amount/currency match before a future verified-payment handler can consider activation.
+- Unit tests cover invalid prices and mismatched payment confirmations. A pending order must never be treated as paid.
