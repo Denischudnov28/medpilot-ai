@@ -42,6 +42,9 @@ SELECT id FROM medflow_users
 ON CONFLICT (user_id) DO NOTHING;
 
 
+ALTER TABLE medflow_subscriptions DROP CONSTRAINT IF EXISTS medflow_subscriptions_provider_check;
+ALTER TABLE medflow_subscriptions ADD CONSTRAINT medflow_subscriptions_provider_check CHECK (provider IS NULL OR provider IN ('stripe','apple','google','manual','yookassa','sberbank'));
+
 -- Payment ledger. Store references and amounts only; never store card numbers or CVV.
 -- A pending order does not grant Pro. Only verified provider confirmation may do so.
 CREATE TABLE IF NOT EXISTS medflow_payment_orders (
