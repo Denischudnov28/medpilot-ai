@@ -4,6 +4,7 @@ const express = require("express");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const OpenAI = require("openai");
+const { mountMedflowApi } = require("./medflow/medflow-api");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,7 @@ app.get(["/", "/index.html"], (req, res, next) => {
 });
 
 app.use(express.static("public"));
+app.use("/medflow", express.static(path.join(__dirname, "medflow")));
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
@@ -159,5 +161,7 @@ app.post("/api/chat", async (req, res) => {
     });
   }
 });
+
+mountMedflowApi(app);
 
 app.listen(PORT, () => console.log(`MedPilot AI listening on ${PORT}`));
