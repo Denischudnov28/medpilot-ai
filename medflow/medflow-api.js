@@ -43,6 +43,11 @@ function hasProAccess(subscription, now = Date.now()) {
   return Number.isFinite(periodEnd) && periodEnd > now;
 }
 
+function isOwnerEmail(email, configured = process.env.MEDFLOW_OWNER_EMAILS || "") {
+  const allowed = configured.split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
+  return Boolean(email) && allowed.includes(String(email).trim().toLowerCase());
+}
+
 function getProPriceKopecks(value = process.env.MEDFLOW_PRO_PRICE_KOPECKS) {
   const amount = value === undefined || value === "" ? DEFAULT_PRO_PRICE_KOPECKS : Number(value);
   return Number.isSafeInteger(amount) && amount >= 100 && amount <= 100000000 ? amount : null;
@@ -155,8 +160,9 @@ function mountMedflowApi(app) {
         [req.medflowUser.sub]
       );
       const subscription = result.rows[0] || { plan: "free", status: "inactive", provider: null, current_period_end: null };
-      const isPro = hasProAccess(subscription);
-      res.json({ plan: isPro ? "pro" : "free", status: subscription.status, isPro, provider: subscription.provider, currentPeriodEnd: subscription.current_period_end });
+      const ownerAccess = isOwnerEmail(req.medflowUser.email);
+      const isPro = ownerAccess || hasProAccess(subscription);
+      res.json({ plan: isPro ? "pro" : "free", status: ownerAccess ? "owner" : subscription.status, isPro, ownerAccess, provider: ownerAccess ? "owner_grant" : subscription.provider, currentPeriodEnd: subscription.current_period_end });
     } catch (error) {
       console.error("MEDFLOW billing status failed:", error.message);
       res.status(500).json({ error: "Не удалось получить статус подписки." });
@@ -254,4 +260,4 @@ function mountMedflowApi(app) {
   });
 }
 
-module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, hasProAccess, getProPriceKopecks, isMatchingSuccessfulPayment, UUID_RE };
+module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, hasProAccess, isOwnerEmail, getProPriceKopecks, isMatchingSuccessfulPayment, UUID_RE };
