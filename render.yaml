@@ -1,3 +1,9 @@
+databases:
+  - name: medflow-db
+    plan: free
+    region: oregon
+    postgresMajorVersion: "18"
+
 services:
   - type: web
     name: medpilot-ai
@@ -12,6 +18,8 @@ services:
       - key: OPENAI_MODEL
         value: gpt-5.5
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: medflow-db
+          property: connectionString
       - key: MEDFLOW_TOKEN_SECRET
         sync: false
