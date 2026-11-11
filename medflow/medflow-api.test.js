@@ -10,6 +10,7 @@ const {
   verifyToken,
   cleanText,
   hasProAccess,
+  isOwnerEmail,
   getProPriceKopecks,
   isMatchingSuccessfulPayment,
   UUID_RE
@@ -59,6 +60,13 @@ test("Pro access requires an active or trialing subscription within its paid per
   assert.equal(hasProAccess({ plan: "pro", status: "trialing", current_period_end: null }, now), true);
   assert.equal(hasProAccess({ plan: "pro", status: "active", current_period_end: "2026-11-10T00:00:00.000Z" }, now), false);
   assert.equal(hasProAccess({ plan: "pro", status: "canceled" }, now), false);
+});
+
+test("owner Pro allowlist matches normalized email addresses only", () => {
+  assert.equal(isOwnerEmail("Chudnov1996@mail.ru", "chudnov1996@mail.ru"), true);
+  assert.equal(isOwnerEmail(" CHUDNOV1996@MAIL.RU ", "chudnov1996@mail.ru"), true);
+  assert.equal(isOwnerEmail("other@example.com", "chudnov1996@mail.ru"), false);
+  assert.equal(isOwnerEmail("chudnov1996@mail.ru", ""), false);
 });
 
 test("Pro price is server-controlled and validated in kopecks", () => {
