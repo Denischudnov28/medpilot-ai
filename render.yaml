@@ -11,3 +11,7 @@ services:
         sync: false
       - key: OPENAI_MODEL
         value: gpt-5.5
+      - key: DATABASE_URL
+        sync: false
+      - key: MEDFLOW_TOKEN_SECRET
+        sync: false
