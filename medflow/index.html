@@ -68,5 +68,6 @@ function renderHandoff(){const general=$('handoffGeneral').value;const list=pati
 $('handoffGeneral').addEventListener('input',renderHandoff);
 function copyHandoff(){renderHandoff();const t=$('handoffOutput').textContent;if(navigator.clipboard?.writeText){navigator.clipboard.writeText(t).then(()=>alert('Сводка скопирована')).catch(()=>alert('Не удалось скопировать — выделите текст вручную'))}else alert('Копирование недоступно в этом браузере')}
 render();
+fetch('/api/medflow/status').then(async response=>{const state=await response.json().catch(()=>({}));if(!state.ready)setAccountStatus('Локальный режим доступен. Для аккаунтов и синхронизации нужно подключить PostgreSQL и секрет сервера.');else if(!authToken)setAccountStatus('Сервер готов. Создайте аккаунт или войдите для синхронизации.',true)}).catch(()=>setAccountStatus('Серверная синхронизация пока недоступна. Локальный режим работает.'));
 </script>
 </body></html>
