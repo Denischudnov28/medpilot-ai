@@ -126,7 +126,7 @@ function mountMedflowApi(app) {
         [crypto.randomUUID(), email, credentials.hash, credentials.salt]
       );
       const user = result.rows[0];
-      res.status(201).json({ token: signToken(user), user });
+      res.status(201).json({ token: signToken(user, req.body?.rememberMe === true), user });
     } catch (error) {
       if (error.code === "23505") return res.status(409).json({ error: "Аккаунт с таким email уже существует." });
       console.error("MEDFLOW registration failed:", error.message);
