@@ -84,6 +84,8 @@ function mountMedflowApi(app) {
     "CREATE INDEX IF NOT EXISTS medflow_patients_user_updated_idx ON medflow_patients(user_id, updated_at DESC)",
     "CREATE TABLE IF NOT EXISTS medflow_notes (id uuid PRIMARY KEY, user_id uuid NOT NULL REFERENCES medflow_users(id) ON DELETE CASCADE, body varchar(2000) NOT NULL, created_at timestamptz NOT NULL DEFAULT now())",
     "CREATE INDEX IF NOT EXISTS medflow_notes_user_created_idx ON medflow_notes(user_id, created_at DESC)",
+    "CREATE TABLE IF NOT EXISTS medflow_records (id uuid PRIMARY KEY, user_id uuid NOT NULL REFERENCES medflow_users(id) ON DELETE CASCADE, patient_id uuid NOT NULL REFERENCES medflow_patients(id) ON DELETE CASCADE, category varchar(50) NOT NULL, body varchar(8000) NOT NULL, created_at timestamptz NOT NULL DEFAULT now())",
+    "CREATE INDEX IF NOT EXISTS medflow_records_patient_created_idx ON medflow_records(user_id, patient_id, created_at DESC)",
     "CREATE TABLE IF NOT EXISTS medflow_subscriptions (user_id uuid PRIMARY KEY REFERENCES medflow_users(id) ON DELETE CASCADE, plan varchar(20) NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro')), status varchar(20) NOT NULL DEFAULT 'inactive' CHECK (status IN ('inactive','trialing','active','past_due','canceled')), provider varchar(20) CHECK (provider IS NULL OR provider IN ('stripe','apple','google','manual','yookassa','sberbank')), external_subscription_id text UNIQUE, current_period_end timestamptz, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now())",
     "ALTER TABLE medflow_subscriptions DROP CONSTRAINT IF EXISTS medflow_subscriptions_provider_check",
     "ALTER TABLE medflow_subscriptions ADD CONSTRAINT medflow_subscriptions_provider_check CHECK (provider IS NULL OR provider IN ('stripe','apple','google','manual','yookassa','sberbank'))",
@@ -258,6 +260,38 @@ function mountMedflowApi(app) {
       res.status(204).end();
     } catch (error) { console.error("MEDFLOW note delete failed:", error.message); res.status(500).json({ error: "Не удалось удалить заметку." }); }
   });
+  // Unified patient chart: records are always scoped to both the authenticated user and an owned patient.
+  app.get("/api/medflow/patients/:id/records", requireAuth, async (req, res) => {
+    if (!UUID_RE.test(req.params.id)) return res.status(400).json({ error: "Некорректный идентификатор пациента." });
+    try {
+      const owned = await pool.query("SELECT 1 FROM medflow_patients WHERE id=$1 AND user_id=$2", [req.params.id, req.medflowUser.sub]);
+      if (!owned.rowCount) return res.status(404).json({ error: "Пациент не найден." });
+      const result = await pool.query("SELECT id,category,body,created_at FROM medflow_records WHERE patient_id=$1 AND user_id=$2 ORDER BY created_at DESC LIMIT 500", [req.params.id, req.medflowUser.sub]);
+      res.json({ records: result.rows });
+    } catch (error) { console.error("MEDFLOW chart read failed:", error.message); res.status(500).json({ error: "Не удалось загрузить карту пациента." }); }
+  });
+  app.post("/api/medflow/patients/:id/records", requireAuth, async (req, res) => {
+    if (!UUID_RE.test(req.params.id)) return res.status(400).json({ error: "Некорректный идентификатор пациента." });
+    const category = cleanText(req.body?.category, 50, true), body = cleanText(req.body?.body, 8000, true);
+    if (!category || !body) return res.status(400).json({ error: "Укажите раздел и содержание записи." });
+    try {
+      const result = await pool.query(
+        "INSERT INTO medflow_records(id,user_id,patient_id,category,body) SELECT $1,$2,p.id,$4,$5 FROM medflow_patients p WHERE p.id=$3 AND p.user_id=$2 RETURNING id,category,body,created_at",
+        [crypto.randomUUID(), req.medflowUser.sub, req.params.id, category, body]
+      );
+      if (!result.rowCount) return res.status(404).json({ error: "Пациент не найден." });
+      res.status(201).json({ record: result.rows[0] });
+    } catch (error) { console.error("MEDFLOW chart write failed:", error.message); res.status(500).json({ error: "Не удалось сохранить запись в карту." }); }
+  });
+  app.delete("/api/medflow/records/:id", requireAuth, async (req, res) => {
+    if (!UUID_RE.test(req.params.id)) return res.status(400).json({ error: "Некорректный идентификатор записи." });
+    try {
+      const result = await pool.query("DELETE FROM medflow_records WHERE id=$1 AND user_id=$2", [req.params.id, req.medflowUser.sub]);
+      if (!result.rowCount) return res.status(404).json({ error: "Запись не найдена." });
+      res.status(204).end();
+    } catch (error) { console.error("MEDFLOW chart delete failed:", error.message); res.status(500).json({ error: "Не удалось удалить запись." }); }
+  });
+
 }
 
 module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, hasProAccess, isOwnerEmail, getProPriceKopecks, isMatchingSuccessfulPayment, UUID_RE };
