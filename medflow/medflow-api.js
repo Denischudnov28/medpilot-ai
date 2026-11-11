@@ -3,6 +3,7 @@ const express = require("express");
 const { Pool } = require("pg");
 
 const TOKEN_TTL_SECONDS = 43200;
+const DEFAULT_PRO_PRICE_KOPECKS = 49900;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -40,6 +41,17 @@ function hasProAccess(subscription, now = Date.now()) {
   if (!subscription.current_period_end) return true;
   const periodEnd = new Date(subscription.current_period_end).getTime();
   return Number.isFinite(periodEnd) && periodEnd > now;
+}
+
+function getProPriceKopecks(value = process.env.MEDFLOW_PRO_PRICE_KOPECKS) {
+  const amount = value === undefined || value === "" ? DEFAULT_PRO_PRICE_KOPECKS : Number(value);
+  return Number.isSafeInteger(amount) && amount >= 100 && amount <= 100000000 ? amount : null;
+}
+function isMatchingSuccessfulPayment(order, payment) {
+  return Boolean(order && payment && payment.status === "succeeded" &&
+    String(payment.amountKopecks) === String(order.amount_kopecks) &&
+    payment.currency === order.currency && payment.orderId === order.id &&
+    payment.provider === order.provider);
 }
 
 function cleanText(value, max, required = false) {
@@ -151,6 +163,39 @@ function mountMedflowApi(app) {
     }
   });
 
+  // Creates a pending order only. It never activates Pro or claims a transfer was received.
+  app.post("/api/medflow/billing/orders", requireAuth, async (req, res) => {
+    const amountKopecks = getProPriceKopecks();
+    if (!amountKopecks) return res.status(503).json({ error: "Цена подписки временно не настроена." });
+    try {
+      const result = await pool.query(
+        "INSERT INTO medflow_payment_orders(id,user_id,provider,idempotency_key,amount_kopecks,currency,period_days) VALUES($1,$2,'manual_transfer',$3,$4,'RUB',30) RETURNING id,provider,amount_kopecks,currency,period_days,status,created_at",
+        [crypto.randomUUID(), req.medflowUser.sub, crypto.randomUUID(), amountKopecks]
+      );
+      const order = result.rows[0];
+      res.status(201).json({ order: { ...order, amountRub: Number(order.amount_kopecks) / 100 }, paymentEnabled: false, message: "Тестовый заказ создан. Перевод на карту и активация Pro пока не подключены." });
+    } catch (error) {
+      console.error("MEDFLOW billing order create failed:", error.message);
+      res.status(500).json({ error: "Не удалось создать заказ." });
+    }
+  });
+
+  app.get("/api/medflow/billing/orders/:id", requireAuth, async (req, res) => {
+    if (!UUID_RE.test(req.params.id)) return res.status(400).json({ error: "Некорректный идентификатор заказа." });
+    try {
+      const result = await pool.query(
+        "SELECT id,provider,amount_kopecks,currency,period_days,status,created_at,paid_at FROM medflow_payment_orders WHERE id=$1 AND user_id=$2",
+        [req.params.id, req.medflowUser.sub]
+      );
+      if (!result.rowCount) return res.status(404).json({ error: "Заказ не найден." });
+      const order = result.rows[0];
+      res.json({ order: { ...order, amountRub: Number(order.amount_kopecks) / 100 }, paymentEnabled: false });
+    } catch (error) {
+      console.error("MEDFLOW billing order lookup failed:", error.message);
+      res.status(500).json({ error: "Не удалось получить заказ." });
+    }
+  });
+
   app.get("/api/medflow/patients", requireAuth, async (req, res) => {
     try {
       const result = await pool.query("SELECT id,display_code AS code,unit,handoff_note AS note,status,created_at,updated_at FROM medflow_patients WHERE user_id=$1 ORDER BY updated_at DESC", [req.medflowUser.sub]);
@@ -209,4 +254,4 @@ function mountMedflowApi(app) {
   });
 }
 
-module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, hasProAccess, UUID_RE };
+module.exports = { mountMedflowApi, hashPassword, verifyPassword, signToken, verifyToken, cleanText, hasProAccess, getProPriceKopecks, isMatchingSuccessfulPayment, UUID_RE };
