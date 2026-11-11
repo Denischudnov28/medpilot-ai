@@ -5,7 +5,8 @@
   "description": "MedPilot AI and MEDFLOW clinical workflow platform",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
